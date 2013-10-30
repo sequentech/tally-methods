@@ -1,8 +1,8 @@
 from importlib import import_module
 
 VOTING_METHODS = (
-    'voting_systems.plurality.Plurality',
-    'voting_systems.meek_stv.MeekSTV',
+    'agora_tally.voting_systems.plurality.Plurality',
+    'agora_tally.voting_systems.meek_stv.MeekSTV',
 )
 
 def get_voting_system_classes():
