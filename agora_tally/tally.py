@@ -19,6 +19,7 @@
 from voting_systems.base import get_voting_system_by_id
 
 import copy
+import glob
 import codecs
 import tarfile
 import json
@@ -26,11 +27,7 @@ import os
 import sys
 from tempfile import mkdtemp
 
-def do_tartally(tally_path, questions_path):
-    with codecs.open(questions_path, encoding='utf-8', mode='r') as qfile:
-        questions_content = qfile.read()
-
-    questions = json.loads(questions_content.strip())
+def do_tartally(tally_path):
     dir_path = mkdtemp("tally")
 
     # untar the plaintexts
@@ -38,14 +35,22 @@ def do_tartally(tally_path, questions_path):
     paths = tally_gz.getnames()
     plaintexts_paths = [path for path in paths if path.endswith("/plaintexts_json")]
 
-    i = 0
+    member = tally_gz.getmember("result_json")
+    member.name = "result_json"
+    tally_gz.extract(member, path=dir_path)
+    res_path = os.path.join(dir_path, 'result_json')
+    with codecs.open(res_path, encoding='utf-8', mode='r') as res_f:
+        result = json.loads(res_f.read())
+
     for plaintexts_path in plaintexts_paths:
         member = tally_gz.getmember(plaintexts_path)
-        member.name = "%d_plaintexts_json" % i
+        base = os.path.basename(os.path.dirname(plaintexts_path))
+        subdir = os.path.join(dir_path, base)
+        member.name = os.path.join(base, "plaintexts_json")
+        os.makedirs(subdir)
         tally_gz.extract(member, path=dir_path)
-        i += 1
 
-    return do_tally(dir_path, questions)
+    return do_tally(dir_path, result['counts'])
 
 def do_tally(dir_path, questions):
     # result is in the same format as get_result_pretty(). Initialized here
@@ -71,8 +76,9 @@ def do_tally(dir_path, questions):
             answer['total_count_percentage'] = 0
 
         tally.pre_tally(result)
+        plaintexts_path = os.path.join(dir_path, "%d*" % i, "plaintexts_json")
+        plaintexts_path = glob.glob(plaintexts_path)[0]
 
-        plaintexts_path = os.path.join(dir_path, "%d_plaintexts_json" % i)
         with codecs.open(plaintexts_path, encoding='utf-8', mode='r') as plaintexts_file:
             for line in plaintexts_file.readlines():
                 voter_answers = base_vote
@@ -117,12 +123,11 @@ def do_tally(dir_path, questions):
 if __name__ == "__main__":
     try:
         tally_path = sys.argv[1]
-        questions_path = sys.argv[2]
     except:
-        print "usage: %s <tally_path> <questions_path>" % sys.argv[0]
+        print "usage: %s <tally_path>" % sys.argv[0]
         exit(1)
 
-    if not os.path.exists(tally_path) or not os.path.exists(questions_path):
+    if not os.path.exists(tally_path):
         print "tally path and/or questions_path don't exist"
         exit(1)
-    do_tartally(tally_path, questions_path)
+    print json.dumps(do_tartally(tally_path), indent=4)
