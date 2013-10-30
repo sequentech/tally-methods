@@ -92,6 +92,8 @@ def do_tally(dir_path, questions):
                     option_index = int(line[1:-2]) - 1
                     if option_index < len(question['answers']):
                         option_str = question['answers'][option_index]['value']
+                    if option_index >= len(question['answers']):
+                        option_str = ""
 
                     # craft the voter_answers in the format admitted by
                     # tally.add_vote
