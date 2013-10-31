@@ -52,6 +52,13 @@ def do_tartally(tally_path):
 
     return do_tally(dir_path, result['counts'])
 
+def do_dirtally(dir_path):
+    res_path = os.path.join(dir_path, 'result_json')
+    with codecs.open(res_path, encoding='utf-8', mode='r') as res_f:
+        result = json.loads(res_f.read())
+
+    return do_tally(dir_path, result['counts'])
+
 def do_tally(dir_path, questions):
     # result is in the same format as get_result_pretty(). Initialized here
     result = copy.deepcopy(questions)
