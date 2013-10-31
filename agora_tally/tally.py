@@ -80,7 +80,9 @@ def do_tally(dir_path, questions):
         plaintexts_path = glob.glob(plaintexts_path)[0]
 
         with codecs.open(plaintexts_path, encoding='utf-8', mode='r') as plaintexts_file:
+            total_count = 0
             for line in plaintexts_file.readlines():
+                total_count += 1
                 voter_answers = base_vote
                 try:
                     # Note line starts with " (1 character) and ends with
@@ -118,7 +120,7 @@ def do_tally(dir_path, questions):
     return dict(
         a= "result",
         counts = result,
-        total_votes = result[0]['total_votes'] + result[0]['dirty_votes'],
+        total_votes = total_count,
         total_delegated_votes = 0
     )
 
@@ -132,4 +134,4 @@ if __name__ == "__main__":
     if not os.path.exists(tally_path):
         print "tally path and/or questions_path don't exist"
         exit(1)
-    print json.dumps(do_tartally(tally_path))
+    print json.dumps(do_tartally(tally_path), indent=4)
