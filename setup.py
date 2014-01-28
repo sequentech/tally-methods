@@ -6,7 +6,7 @@ setup(
     version='0.0.1',
     author='Eduardo Robles Elvira',
     author_email='edulix@wadobo.com',
-    packages=['agora_tally'],
+    packages=['agora_tally', 'agora_tally.voting_systems'],
     scripts=[],
     url='http://pypi.python.org/pypi/agora_tally/',
     license='LICENSE.txt',
