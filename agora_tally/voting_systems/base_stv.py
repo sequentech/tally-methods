@@ -73,7 +73,7 @@ class BaseSTVTally(BaseTally):
     report = None
 
     def init(self):
-        self.ballots_path = tempfile.mktemp("blt")
+        self.ballots_path = tempfile.mktemp(".blt")
         self.ballots = []
         self.answer_to_ids_dict = dict()
 
@@ -150,8 +150,6 @@ class BaseSTVTally(BaseTally):
         q.encode('utf-8')
         self.ballots_file.write(q)
         self.ballots_file.close()
-        self.election.extra_data['ballots_path'] = self.ballots_path
-        self.election.save()
 
     def perform_tally(self):
         '''
