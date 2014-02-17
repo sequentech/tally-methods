@@ -85,6 +85,7 @@ def do_tally(dir_path, questions):
         tally.pre_tally(result)
         plaintexts_path = os.path.join(dir_path, "%d*" % i, "plaintexts_json")
         plaintexts_path = glob.glob(plaintexts_path)[0]
+        tally.question_id = plaintexts_path.split('/')[-2]
 
         with codecs.open(plaintexts_path, encoding='utf-8', mode='r') as plaintexts_file:
             total_count = 0
@@ -105,9 +106,7 @@ def do_tally(dir_path, questions):
                     # tally.add_vote
                     voter_answers[i]['choices'] = choices
                 except:
-                    print "invalid vote: " + line
-                    print "voter_answers = " + json.dumps(voter_answers)
-                    import traceback; print traceback.format_exc()
+                    print "invalid/blank vote: " + line
 
                 tally.add_vote(voter_answers=voter_answers,
                     result=result, is_delegated=False)

@@ -71,6 +71,7 @@ class BaseTally(object):
     '''
     election = None
     question_num = None
+    question_id = None
 
     def __init__(self, election, question_num):
         self.election = election
