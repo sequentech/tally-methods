@@ -95,7 +95,6 @@ class BaseSTVTally(BaseTally):
                 return []
             ret.append(option_str)
 
-        print ret
         return ret
 
     def pre_tally(self, result):
