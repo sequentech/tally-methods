@@ -92,6 +92,12 @@ class BaseTally(object):
         '''
         pass
 
+    def parse_vote(self, number, question):
+        '''
+        parse vote
+        '''
+        pass
+
     def post_tally(self, result):
         '''
         Once all votes have been added, this function is called once

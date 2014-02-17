@@ -98,15 +98,12 @@ def do_tally(dir_path, questions):
                     # because number 0 cannot be encrypted with elgammal
                     # so we trim beginning and end, parse the int and
                     # substract one
-                    option_index = int(line[1:-2]) - 1
-                    if option_index < len(question['answers']):
-                        option_str = question['answers'][option_index]['value']
-                    if option_index >= len(question['answers']):
-                        option_str = ""
+                    number = int(line[1:-2]) - 1
+                    choices = tally.parse_vote(number, question)
 
                     # craft the voter_answers in the format admitted by
                     # tally.add_vote
-                    voter_answers[i]['choices'] = [option_str]
+                    voter_answers[i]['choices'] = choices
                 except:
                     print "invalid vote: " + line
                     print "voter_answers = " + json.dumps(voter_answers)
