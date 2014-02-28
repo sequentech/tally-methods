@@ -137,4 +137,7 @@ if __name__ == "__main__":
     if not os.path.exists(tally_path):
         print "tally path and/or questions_path don't exist"
         exit(1)
-    print json.dumps(do_tartally(tally_path), indent=4)
+    if os.path.isdir(tally_path):
+        print json.dumps(do_dirtally(tally_path), indent=4)
+    else:
+        print json.dumps(do_tartally(tally_path), indent=4)

@@ -3,6 +3,7 @@ from importlib import import_module
 VOTING_METHODS = (
     'agora_tally.voting_systems.plurality.Plurality',
     'agora_tally.voting_systems.meek_stv.MeekSTV',
+    'agora_tally.voting_systems.approval.Approval',
 )
 
 def get_voting_system_classes():
