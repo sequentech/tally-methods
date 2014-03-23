@@ -220,9 +220,16 @@ class BaseSTVTally(BaseTally):
         question['total_votes'] = json_report['ballots_count']
         question['dirty_votes'] = json_report['dirty_ballots_count'] - json_report['ballots_count']
         json_report['winners'] = [winner.decode('utf-8') for winner in json_report['winners']]
-        question['winners'] = json_report['winners']
+        question['winners'] = []
 
         i = 1
+        # order winners properly
+        for iteration in json_report['iterations']:
+            it_winners = [cand for cand in iteration['candidates']
+                if cand['status'] == 'won']
+            for winner in sorted(it_winners, key=lambda winner: winner['count']):
+                question['winners'].append(winner['name'])
+
         for answer in question['answers']:
             name = answer['value']
             name.encode('utf-8')
