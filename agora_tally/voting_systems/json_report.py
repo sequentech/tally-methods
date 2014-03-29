@@ -22,7 +22,9 @@ class JsonReport(ReportPlugin):
 
         i = 0
         for count in self.e.count:
-            key = self.cleanB.names[i].decode('utf-8')
+            key = self.cleanB.names[i]
+            if hasattr(self.cleanB.names[i], 'decode'):
+                key = key.decode('utf-8')
             self.json['answers'][key] = count
             i += 1
 
