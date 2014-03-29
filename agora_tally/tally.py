@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from voting_systems.base import get_voting_system_by_id
+from agora_tally.voting_systems.base import get_voting_system_by_id
 
 import copy
 import glob
