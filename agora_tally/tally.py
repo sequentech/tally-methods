@@ -106,7 +106,7 @@ def do_tally(dir_path, questions):
                     # tally.add_vote
                     voter_answers[i]['choices'] = choices
                 except:
-                    print "invalid/blank vote: " + line
+                    print("invalid/blank vote: " + line)
 
                 tally.add_vote(voter_answers=voter_answers,
                     result=result, is_delegated=False)
@@ -131,13 +131,13 @@ if __name__ == "__main__":
     try:
         tally_path = sys.argv[1]
     except:
-        print "usage: %s <tally_path>" % sys.argv[0]
+        print("usage: %s <tally_path>" % sys.argv[0])
         exit(1)
 
     if not os.path.exists(tally_path):
-        print "tally path and/or questions_path don't exist"
+        print("tally path and/or questions_path don't exist")
         exit(1)
     if os.path.isdir(tally_path):
-        print json.dumps(do_dirtally(tally_path), indent=4)
+        print(json.dumps(do_dirtally(tally_path), indent=4))
     else:
-        print json.dumps(do_tartally(tally_path), indent=4)
+        print(json.dumps(do_tartally(tally_path), indent=4))
