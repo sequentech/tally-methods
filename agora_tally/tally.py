@@ -59,14 +59,13 @@ def do_dirtally(dir_path):
 
     return do_tally(dir_path, result['counts'])
 
-def do_tally(dir_path, questions):
+def do_tally(dir_path, questions, tallies=[]):
     # result is in the same format as get_result_pretty(). Initialized here
     result = copy.deepcopy(questions)
     base_vote =[dict(choices=[]) for q in result]
 
     # setup the initial data common to all voting system
     i = 0
-    tallies = []
     for question in result:
         tally_type = question['tally_type']
         voting_system = get_voting_system_by_id(tally_type)
