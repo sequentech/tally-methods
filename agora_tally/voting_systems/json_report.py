@@ -83,7 +83,7 @@ class JsonReport(ReportPlugin):
                 else:
                     return False
 
-            for i in xrange(self.e.b.numCandidates):
+            for i in range(self.e.b.numCandidates):
                 x = self.e.count[r][i]
                 candidate = {
                     'count': self.e.displayValue(x),

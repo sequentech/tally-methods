@@ -87,7 +87,7 @@ class BaseSTVTally(BaseTally):
             vote_str = "0" * num_zeros + vote_str
 
         ret = []
-        for i in xrange(len(vote_str) / tab_size):
+        for i in range(len(vote_str) / tab_size):
             option = int(vote_str[i*tab_size: (i+1)*tab_size]) - 1
             if option < len(question['answers']):
                 option_str = question['answers'][option]['value']
@@ -223,7 +223,7 @@ class BaseSTVTally(BaseTally):
             it_winners = [cand for cand in iteration['candidates']
                 if cand['status'] == 'won']
             for winner in sorted(it_winners, key=lambda winner: winner['count']):
-                question['winners'].append(winner['name'])
+                question['winners'].append(winner['name'].decode('utf-8'))
 
         for answer in question['answers']:
             name = answer['value']
