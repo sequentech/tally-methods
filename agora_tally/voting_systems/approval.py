@@ -86,7 +86,7 @@ class ApprovalTally(BaseTally):
             vote_str = "0" * num_zeros + vote_str
 
         ret = []
-        for i in range(len(vote_str) / tab_size):
+        for i in range(int(len(vote_str) / tab_size)):
             option = int(vote_str[i*tab_size: (i+1)*tab_size]) - 1
             if option < len(question['answers']):
                 option_str = question['answers'][option]['value']

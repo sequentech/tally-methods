@@ -59,7 +59,7 @@ def do_dirtally(dir_path):
 
     return do_tally(dir_path, result['counts'])
 
-def do_tally(dir_path, questions, tallies=[]):
+def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False):
     # result is in the same format as get_result_pretty(). Initialized here
     result = copy.deepcopy(questions)
     base_vote =[dict(choices=[]) for q in result]
@@ -105,7 +105,8 @@ def do_tally(dir_path, questions, tallies=[]):
                     # tally.add_vote
                     voter_answers[i]['choices'] = choices
                 except:
-                    print("invalid/blank vote: " + line)
+                    if not ignore_invalid_votes:
+                        print("invalid/blank vote: " + line)
 
                 tally.add_vote(voter_answers=voter_answers,
                     result=result, is_delegated=False)
