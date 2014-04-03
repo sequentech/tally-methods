@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from agora_tally.voting_systems.base import get_voting_system_by_id
+from agora_tally.voting_systems.base import get_voting_system_by_id, BlankVoteException
 
 import copy
 import glob
@@ -52,12 +52,13 @@ def do_tartally(tally_path):
 
     return do_tally(dir_path, result['counts'])
 
-def do_dirtally(dir_path):
+def do_dirtally(dir_path, ignore_invalid_votes=False):
     res_path = os.path.join(dir_path, 'result_json')
     with codecs.open(res_path, encoding='utf-8', mode='r') as res_f:
         result = json.loads(res_f.read())
 
-    return do_tally(dir_path, result['counts'])
+    return do_tally(dir_path, result['counts'],
+                    ignore_invalid_votes=ignore_invalid_votes)
 
 def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False):
     # result is in the same format as get_result_pretty(). Initialized here
@@ -104,9 +105,11 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False):
                     # craft the voter_answers in the format admitted by
                     # tally.add_vote
                     voter_answers[i]['choices'] = choices
+                except BlankVoteException:
+                    pass
                 except:
                     if not ignore_invalid_votes:
-                        print("invalid/blank vote: " + line)
+                        print("invalid vote: " + line)
 
                 tally.add_vote(voter_answers=voter_answers,
                     result=result, is_delegated=False)

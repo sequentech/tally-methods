@@ -10,7 +10,7 @@ import tempfile
 from openstv.ballots import Ballots
 from openstv.plugins import getMethodPlugins
 
-from .base import BaseVotingSystem, BaseTally
+from .base import BaseVotingSystem, BaseTally, BlankVoteException
 
 class Approval(BaseVotingSystem):
     '''
@@ -90,10 +90,17 @@ class ApprovalTally(BaseTally):
             option = int(vote_str[i*tab_size: (i+1)*tab_size]) - 1
             if option < len(question['answers']):
                 option_str = question['answers'][option]['value']
-            if option >= len(question['answers']):
+            if option == len(question['answers']) + 1:
+                raise BlankVoteException()
+            elif option > len(question['answers']):
                 # invalid vote
                 raise Exception()
             ret.append(option_str)
+
+        # detect invalid vote
+        if len(ret) < question['min'] or len(ret) > question['max'] or\
+                len(set(ret)) != len(ret):
+            raise Exception()
 
         return ret
 

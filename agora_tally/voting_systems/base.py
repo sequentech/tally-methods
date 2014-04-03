@@ -111,3 +111,6 @@ class BaseTally(object):
         Returns the tally log. Called after post_tally()
         '''
         return None
+
+class BlankVoteException(Exception):
+    pass
