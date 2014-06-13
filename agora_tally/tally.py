@@ -76,6 +76,8 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False):
         question['a'] = "question/result/" + voting_system.get_id()
         question['winners'] = []
         question['total_votes'] = 0
+        question['blank_votes'] = 0
+        question['invalid_votes'] = 0
 
         for answer in question['answers']:
             answer['a'] = "answer/result/" + voting_system.get_id()
@@ -91,7 +93,7 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False):
             total_count = 0
             for line in plaintexts_file.readlines():
                 total_count += 1
-                voter_answers = base_vote
+                voter_answers = copy.deepcopy(base_vote)
                 try:
                     # Note line starts with " (1 character) and ends with
                     # "\n (2 characters). It contains the index of the
@@ -106,8 +108,9 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False):
                     # tally.add_vote
                     voter_answers[i]['choices'] = choices
                 except BlankVoteException:
-                    pass
+                    question['blank_votes'] += 1
                 except:
+                    question['invalid_votes'] += 1
                     if not ignore_invalid_votes:
                         print("invalid vote: " + line)
 
