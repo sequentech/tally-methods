@@ -90,10 +90,8 @@ class ApprovalTally(BaseTally):
             option = int(vote_str[i*tab_size: (i+1)*tab_size]) - 1
             if option < len(question['answers']):
                 option_str = question['answers'][option]['value']
-            if option == len(question['answers']) + 1:
-                raise BlankVoteException()
-            elif option > len(question['answers']):
-                # invalid vote
+            if option >= len(question['answers']):
+                # invalid/blank vote
                 raise Exception()
             ret.append(option_str)
 

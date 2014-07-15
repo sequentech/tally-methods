@@ -61,8 +61,11 @@ class PluralityTally(BaseTally):
     def parse_vote(self, number, question):
         if number < len(question['answers']):
             option_str = question['answers'][number]['value']
-        if number >= len(question['answers']):
-            option_str = ""
+        if number == len(question['answers']):
+            raise BlankVoteException()
+        elif number > len(question['answers']):
+            # invalid vote
+            raise Exception()
 
         return [option_str]
 
