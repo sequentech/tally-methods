@@ -1,0 +1,35 @@
+{
+    "counts": [
+        {
+            "answers": [
+                {
+                    "a": "answer/result/MEEK-STV",
+                    "value": "Alice"
+                },
+                {
+                    "a": "answer/result/MEEK-STV",
+                    "value": "Bob"
+                },
+                {
+                    "a": "answer/result/MEEK-STV",
+                    "value": "Charles"
+                },
+                {
+                    "a": "answer/result/MEEK-STV",
+                    "value": "Donna"
+                },
+                {
+                    "a": "answer/result/MEEK-STV",
+                    "value": "Edward"
+                },
+                {
+                    "a": "answer/result/MEEK-STV",
+                    "value": "Fiona"
+                }
+            ],
+            "tally_type": "MEEK-STV",
+            "num_seats": 2,
+            "question": "Who should we choose?"
+        }
+    ]
+}

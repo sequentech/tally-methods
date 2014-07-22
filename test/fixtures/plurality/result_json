@@ -1,0 +1,17 @@
+{
+    "counts": [
+        {
+            "answers": [
+                {
+                    "a": "answer/result/ONE_CHOICE",
+                    "value": "Alice"
+                },
+                {
+                    "a": "answer/result/ONE_CHOICE",
+                    "value": "Bob"
+                }
+            ],
+            "tally_type": "ONE_CHOICE"
+        }
+    ]
+}

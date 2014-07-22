@@ -40,7 +40,7 @@ class BaseSTV(BaseVotingSystem):
 
 class BaseSTVTally(BaseTally):
     '''
-    Class oser to tally an election
+    Class used to tally an election
     '''
     ballots_file = None
     ballots_path = ""
@@ -57,7 +57,7 @@ class BaseSTVTally(BaseTally):
     ballots = []
 
     # dict that has as keys the possible answer['value'], and as value the id
-    # of each answer. 
+    # of each answer.
     # Used because internally we store the answers by id with a number to speed
     # things up.
     answer_to_ids_dict = dict()
@@ -74,12 +74,14 @@ class BaseSTVTally(BaseTally):
 
     def init(self):
         self.ballots_path = tempfile.mktemp(".blt")
+
         self.ballots = []
         self.answer_to_ids_dict = dict()
 
     def parse_vote(self, number, question):
         vote_str = str(number)
         tab_size = len(str(len(question['answers']) + 2))
+
 
         # fix add zeros
         if len(vote_str) % tab_size != 0:
@@ -89,6 +91,9 @@ class BaseSTVTally(BaseTally):
         ret = []
         for i in range(int(len(vote_str) / tab_size)):
             option = int(vote_str[i*tab_size: (i+1)*tab_size]) - 1
+            if option < 0:
+                # invalid vote
+                raise Exception()
             if option < len(question['answers']):
                 option_str = question['answers'][option]['value']
             if option >= len(question['answers']):
@@ -113,20 +118,20 @@ class BaseSTVTally(BaseTally):
             self.answer_to_ids_dict[answer['value']] = i
             i += 1
 
-        # write the header of the BLT File 
+        # write the header of the BLT File
         # See format here: https://code.google.com/p/droop/wiki/BltFileFormat
         self.ballots_file.write('%d %d\n' % (len(question['answers']), question['num_seats']))
 
     def answer2id(self, answer):
         '''
-        Converts the answer to an id. 
+        Converts the answer to an id.
         @return the id or -1 if not found
         '''
         return self.answer_to_ids_dict.get(answer, -1)
 
     def find_ballot(self, answers):
         '''
-        Find a ballot with the same answers as the one given in self.ballots. 
+        Find a ballot with the same answers as the one given in self.ballots.
         Returns the ballot or None if not found.
         '''
         for ballot in self.ballots:

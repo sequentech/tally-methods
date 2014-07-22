@@ -59,6 +59,9 @@ class PluralityTally(BaseTally):
             self.dirty_votes += 1
 
     def parse_vote(self, number, question):
+        if number < 0:
+            # invalid vote
+            raise Exception()
         if number < len(question['answers']):
             option_str = question['answers'][number]['value']
         if number == len(question['answers']):
