@@ -74,8 +74,8 @@ test/testing_setup.sh
 
 is provided to do this. When testing you have to activate the environment with
 
-workon agora-tally
+```workon agora-tally```
 
 Then run the tests with
 
- python -m unittest discover
+ ```python -m unittest discover```
