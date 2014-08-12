@@ -98,4 +98,5 @@ class TestSequenceFunctions(unittest.TestCase):
             self.assertTrue(element in self.seq)
     '''
 if __name__ == '__main__':
-    unittest.main()
+    import xmlrunner
+    unittest.main(testRunner=xmlrunner.XMLTestRunner(output='report'))
