@@ -55,11 +55,6 @@ class ApprovalTally(BaseTally):
     #}
     ballots = []
 
-    # dict that has as keys the possible answer['value'], and as value the id
-    # of each answer.
-    # Used because internally we store the answers by id with a number to speed
-    # things up.
-    answer_to_ids_dict = dict()
     num_seats = -1
 
     # openstv options
@@ -75,7 +70,6 @@ class ApprovalTally(BaseTally):
         self.ballots_path = tempfile.mktemp(".blt")
 
         self.ballots = []
-        self.answer_to_ids_dict = dict()
 
     def parse_vote(self, number, question):
         vote_str = str(number)
@@ -83,21 +77,16 @@ class ApprovalTally(BaseTally):
 
         # fix add zeros
         if len(vote_str) % tab_size != 0:
-            num_zeros = (tab_size - (len(vote_str) % tab_size)) % tab_size
+            num_zeros = (tdab_size - (len(vote_str) % tab_size)) % tab_size
             vote_str = "0" * num_zeros + vote_str
 
         ret = []
         for i in range(int(len(vote_str) / tab_size)):
             option = int(vote_str[i*tab_size: (i+1)*tab_size]) - 1
-            if option < 0:
-                # invalid vote
-                raise Exception()
-            if option < len(question['answers']):
-                option_str = question['answers'][option]['value']
-            if option >= len(question['answers']):
+            if option < 0 or option >= len(question['answers']):
                 # invalid/blank vote
                 raise Exception()
-            ret.append(option_str)
+            ret.append(option)
 
         # detect invalid vote
         if len(ret) < question['min'] or len(ret) > question['max'] or\
@@ -114,27 +103,6 @@ class ApprovalTally(BaseTally):
         import os
         if not os.path.exists(os.path.dirname(self.ballots_path)):
             os.makedirs(os.path.dirname(self.ballots_path))
-        self.ballots_file = codecs.open(self.ballots_path, encoding='utf-8', mode='w')
-
-        question = result[self.question_num]
-        self.num_seats = question['num_seats']
-
-        # fill answer to dict
-        i = 1
-        for answer in question['answers']:
-            self.answer_to_ids_dict[answer['value']] = i
-            i += 1
-
-        # write the header of the BLT File
-        # See format here: https://code.google.com/p/droop/wiki/BltFileFormat
-        self.ballots_file.write('%d %d\n' % (len(question['answers']), question['num_seats']))
-
-    def answer2id(self, answer):
-        '''
-        Converts the answer to an id.
-        @return the id or -1 if not found
-        '''
-        return self.answer_to_ids_dict.get(answer, -1)
 
     def find_ballot(self, answers):
         '''
@@ -151,7 +119,7 @@ class ApprovalTally(BaseTally):
         '''
         Add to the count a vote from a voter
         '''
-        answers = [self.answer2id(a) for a in voter_answers[self.question_num]['choices']]
+        answers = [choice+1 for choice in voter_answers[self.question_num]['choices']]
         # we got ourselves an invalid vote, don't count it
         if -1 in answers:
             return
@@ -165,6 +133,14 @@ class ApprovalTally(BaseTally):
 
     def finish_writing_ballots_file(self, result):
         # write the ballots
+        self.ballots_file = codecs.open(self.ballots_path, encoding='utf-8', mode='w')
+        question = result[self.question_num]
+        self.num_seats = question['num_seats']
+
+        # write the header of the BLT File
+        # See format here: https://code.google.com/p/droop/wiki/BltFileFormat
+        self.ballots_file.write('%d %d\n' % (len(question['answers']), question['num_seats']))
+
         question = result[self.question_num]
         for ballot in self.ballots:
             self.ballots_file.write('%d %s 0\n' % (ballot['votes'],
