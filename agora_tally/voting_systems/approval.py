@@ -193,7 +193,12 @@ class ApprovalTally(BaseTally):
         question = result[self.question_num]
         question['total_votes'] = json_report['ballots_count']
         question['dirty_votes'] = json_report['dirty_ballots_count'] - json_report['ballots_count']
-        json_report['winners'] = [winner.decode('utf-8') for winner in json_report['winners']]
+        def decode(s):
+            if hasattr(s, 'decode'):
+                return s.decode('utf-8')
+            else:
+                return s
+        json_report['winners'] = [decode(winner) for winner in json_report['winners']]
         question['winners'] = json_report['winners']
 
         # we cant use ballots_count as there is more than one vote per ballot
