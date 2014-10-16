@@ -72,12 +72,13 @@ class ApprovalTally(BaseTally):
         self.ballots = []
 
     def parse_vote(self, number, question):
+        import pdb; pdb.set_trace()
         vote_str = str(number)
         tab_size = len(str(len(question['answers']) + 2))
 
         # fix add zeros
         if len(vote_str) % tab_size != 0:
-            num_zeros = (tdab_size - (len(vote_str) % tab_size)) % tab_size
+            num_zeros = (tab_size - (len(vote_str) % tab_size)) % tab_size
             vote_str = "0" * num_zeros + vote_str
 
         ret = []
