@@ -72,7 +72,6 @@ class ApprovalTally(BaseTally):
         self.ballots = []
 
     def parse_vote(self, number, question):
-        import pdb; pdb.set_trace()
         vote_str = str(number)
         tab_size = len(str(len(question['answers']) + 2))
 
