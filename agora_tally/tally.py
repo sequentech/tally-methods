@@ -84,7 +84,6 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
         for answer in question['answers']:
             answer['a'] = "answer/result/" + voting_system.get_id()
             answer['total_count'] = 0
-            answer['total_count_percentage'] = 0
 
         tally.pre_tally(result)
         plaintexts_path = os.path.join(dir_path, "%d*" % i, "plaintexts_json")
