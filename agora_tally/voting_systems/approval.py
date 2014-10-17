@@ -192,7 +192,7 @@ class ApprovalTally(BaseTally):
         json_report = self.report.json
         question = result[self.question_num]
         question['total_votes'] = json_report['ballots_count']
-        question['dirty_votes'] = json_report['dirty_ballots_count'] - json_report['ballots_count']
+        question['dirty_votes'] = question['invalid_votes'] + json_report['dirty_ballots_count'] - json_report['ballots_count']
         def decode(s):
             if hasattr(s, 'decode'):
                 return s.decode('utf-8')
@@ -205,16 +205,6 @@ class ApprovalTally(BaseTally):
         total_votes = 0
         for name in json_report['answers']:
             total_votes += json_report['answers'][name]
-
-        for answer in question['answers']:
-            name = answer['value']
-            name.encode('utf-8')
-
-            answer['total_count'] = json_report['answers'][name]
-            if total_votes > 0:
-                answer['total_count_percentage'] = (answer['total_count'] * 100.0) / total_votes
-            else:
-                answer['total_count_percentage'] = 0
 
     def post_tally(self, result):
         '''
