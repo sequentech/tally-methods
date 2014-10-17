@@ -52,13 +52,14 @@ def do_tartally(tally_path):
 
     return do_tally(dir_path, result['counts'])
 
-def do_dirtally(dir_path, ignore_invalid_votes=False):
+def do_dirtally(dir_path, ignore_invalid_votes=False, encrypted_invalid_votes=0):
     res_path = os.path.join(dir_path, 'result_json')
     with codecs.open(res_path, encoding='utf-8', mode='r') as res_f:
         result = json.loads(res_f.read())
 
     return do_tally(dir_path, result['counts'],
-                    ignore_invalid_votes=ignore_invalid_votes)
+                    ignore_invalid_votes=ignore_invalid_votes,
+                    encrypted_invalid_votes=encrypted_invalid_votes)
 
 def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
              encrypted_invalid_votes=0):
@@ -76,7 +77,7 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
 
         question['a'] = "question/result/" + voting_system.get_id()
         question['winners'] = []
-        question['total_votes'] = 0
+        question['total_votes'] = encrypted_invalid_votes
         question['blank_votes'] = 0
         question['invalid_votes'] = encrypted_invalid_votes
 
@@ -91,7 +92,7 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
         tally.question_id = plaintexts_path.split('/')[-2]
 
         with codecs.open(plaintexts_path, encoding='utf-8', mode='r') as plaintexts_file:
-            total_count = 0
+            total_count = encrypted_invalid_votes
             for line in plaintexts_file.readlines():
                 total_count += 1
                 voter_answers = copy.deepcopy(base_vote)
