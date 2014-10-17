@@ -77,7 +77,6 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
 
         question['a'] = "question/result/" + voting_system.get_id()
         question['winners'] = []
-        question['total_votes'] = encrypted_invalid_votes
         question['blank_votes'] = 0
         question['invalid_votes'] = encrypted_invalid_votes
 
