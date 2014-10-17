@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (C) 2013 Eduardo Robles Elvira <edulix AT wadobo DOT com>
+# Copyright (C) 2013 2014 Eduardo Robles Elvira <edulix AT wadobo DOT com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -60,7 +60,8 @@ def do_dirtally(dir_path, ignore_invalid_votes=False):
     return do_tally(dir_path, result['counts'],
                     ignore_invalid_votes=ignore_invalid_votes)
 
-def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False):
+def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
+             encrypted_invalid_votes=0):
     # result is in the same format as get_result_pretty(). Initialized here
     result = copy.deepcopy(questions)
     base_vote =[dict(choices=[]) for q in result]
@@ -77,7 +78,7 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False):
         question['winners'] = []
         question['total_votes'] = 0
         question['blank_votes'] = 0
-        question['invalid_votes'] = 0
+        question['invalid_votes'] = encrypted_invalid_votes
 
         for answer in question['answers']:
             answer['a'] = "answer/result/" + voting_system.get_id()
