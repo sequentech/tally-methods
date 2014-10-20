@@ -83,8 +83,12 @@ class ApprovalTally(BaseTally):
         ret = []
         for i in range(int(len(vote_str) / tab_size)):
             option = int(vote_str[i*tab_size: (i+1)*tab_size]) - 1
-            if option < 0 or option >= len(question['answers']):
-                # invalid/blank vote
+
+            # blank vote
+            if option == len(question['answers']) + 1:
+                raise BlankVoteException()
+            # invalid vote
+            elif option < 0 or option > len(question['answers']):
                 raise Exception()
             ret.append(option)
 
@@ -192,7 +196,6 @@ class ApprovalTally(BaseTally):
         json_report = self.report.json
         question = result[self.question_num]
         question['valid_votes'] = json_report['ballots_count']
-        question['dirty_votes'] = question['invalid_votes'] + json_report['dirty_ballots_count'] - json_report['ballots_count']
         def decode(s):
             if hasattr(s, 'decode'):
                 return s.decode('utf-8')

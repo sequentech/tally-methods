@@ -109,7 +109,7 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
                     voter_answers[i]['choices'] = choices
                 except BlankVoteException:
                     question['blank_votes'] += 1
-                except:
+                except Exception as e:
                     question['invalid_votes'] += 1
                     if not ignore_invalid_votes:
                         print("invalid vote: " + line)
