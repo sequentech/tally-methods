@@ -62,7 +62,7 @@ def do_dirtally(dir_path, ignore_invalid_votes=False, encrypted_invalid_votes=0)
                     encrypted_invalid_votes=encrypted_invalid_votes)
 
 def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
-             encrypted_invalid_votes=0):
+             encrypted_invalid_votes=0, monkey_patcher=None):
     # result is in the same format as get_result_pretty(). Initialized here
     result = copy.deepcopy(questions)
     base_vote =[dict(choices=[]) for q in result]
@@ -73,6 +73,8 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
         tally_type = question['tally_type']
         voting_system = get_voting_system_by_id(tally_type)
         tally = voting_system.create_tally(None, i)
+        if monkey_patcher:
+            monkey_patcher(tally)
         tallies.append(tally)
 
         question['a'] = "question/result/" + voting_system.get_id()
