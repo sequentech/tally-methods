@@ -6,7 +6,7 @@ import sys
 import codecs
 import os
 import tempfile
-from operator import itemgetter, attrgetter
+from operator import itemgetter
 
 from openstv.ballots import Ballots
 from openstv.plugins import getMethodPlugins
@@ -217,8 +217,8 @@ class ApprovalTally(BaseTally):
         json_report['winners'] = [decode(winner) for winner in json_report['winners']]
         winner_answers = [answ for answ in question['answers'] if answ['value'] in json_report['winners']]
         # sort first by name then by total_count, that makes it reproducible
-        winner_answers.sort(key=attrgetter('value'))
-        winner_answers.sort(key=attrgetter('total_count'), reverse=True)
+        winner_answers.sort(key=itemgetter('value'))
+        winner_answers.sort(key=itemgetter('total_count'), reverse=True)
         json_report['winners'] = [answ['value'] for answ in winner_answers]
 
         # sort winners by number of votes
