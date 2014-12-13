@@ -1,9 +1,8 @@
 from importlib import import_module
 
 VOTING_METHODS = (
-    'agora_tally.voting_systems.plurality.Plurality',
-    'agora_tally.voting_systems.meek_stv.MeekSTV',
-    'agora_tally.voting_systems.approval.Approval',
+    #'agora_tally.voting_systems.meek_stv.MeekSTV',
+    'agora_tally.voting_systems.plurality_at_large.PluralityAtLarge',
 )
 
 def get_voting_system_classes():
@@ -82,13 +81,13 @@ class BaseTally(object):
     def init(self):
         pass
 
-    def pre_tally(self, result):
+    def pre_tally(self, questions):
         '''
         Function called once before the tally begins
         '''
         pass
 
-    def add_vote(self, voter_answers, result, is_delegated):
+    def add_vote(self, voter_answers, questions, is_delegated):
         '''
         Add to the count a vote from a voter
         '''
@@ -100,7 +99,7 @@ class BaseTally(object):
         '''
         pass
 
-    def post_tally(self, result):
+    def post_tally(self, questions):
         '''
         Once all votes have been added, this function is called once
         '''

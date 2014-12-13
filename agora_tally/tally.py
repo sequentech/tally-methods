@@ -35,12 +35,12 @@ def do_tartally(tally_path):
     paths = tally_gz.getnames()
     plaintexts_paths = [path for path in paths if path.endswith("/plaintexts_json")]
 
-    member = tally_gz.getmember("result_json")
-    member.name = "result_json"
+    member = tally_gz.getmember("question_json")
+    member.name = "question_json"
     tally_gz.extract(member, path=dir_path)
-    res_path = os.path.join(dir_path, 'result_json')
-    with codecs.open(res_path, encoding='utf-8', mode='r') as res_f:
-        result = json.loads(res_f.read())
+    questions_path = os.path.join(dir_path, 'question_json')
+    with codecs.open(questions_path, encoding='utf-8', mode='r') as questions_f:
+        questions = json.loads(questions_f.read())
 
     for plaintexts_path in plaintexts_paths:
         member = tally_gz.getmember(plaintexts_path)
@@ -50,26 +50,26 @@ def do_tartally(tally_path):
         os.makedirs(subdir)
         tally_gz.extract(member, path=dir_path)
 
-    return do_tally(dir_path, result['counts'])
+    return do_tally(dir_path, questions)
 
 def do_dirtally(dir_path, ignore_invalid_votes=False, encrypted_invalid_votes=0):
-    res_path = os.path.join(dir_path, 'result_json')
+    res_path = os.path.join(dir_path, 'questions_json')
     with codecs.open(res_path, encoding='utf-8', mode='r') as res_f:
-        result = json.loads(res_f.read())
+        questions = json.loads(res_f.read())
 
-    return do_tally(dir_path, result['counts'],
+    return do_tally(dir_path, questions,
                     ignore_invalid_votes=ignore_invalid_votes,
                     encrypted_invalid_votes=encrypted_invalid_votes)
 
 def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
              encrypted_invalid_votes=0, monkey_patcher=None):
-    # result is in the same format as get_result_pretty(). Initialized here
-    result = copy.deepcopy(questions)
-    base_vote =[dict(choices=[]) for q in result]
+    # questions is in the same format as get_questions_pretty(). Initialized here
+    questions = copy.deepcopy(questions)
+    base_vote =[dict(choices=[]) for q in questions]
 
     # setup the initial data common to all voting system
     i = 0
-    for question in result:
+    for question in questions:
         tally_type = question['tally_type']
         voting_system = get_voting_system_by_id(tally_type)
         tally = voting_system.create_tally(None, i)
@@ -77,16 +77,17 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
             monkey_patcher(tally)
         tallies.append(tally)
 
-        question['a'] = "question/result/" + voting_system.get_id()
         question['winners'] = []
-        question['blank_votes'] = 0
-        question['invalid_votes'] = encrypted_invalid_votes
+        question['totals'] = dict(
+            blank_votes=0,
+            null_votes=encrypted_invalid_votes,
+            valid_votes=0
+        )
 
         for answer in question['answers']:
-            answer['a'] = "answer/result/" + voting_system.get_id()
             answer['total_count'] = 0
 
-        tally.pre_tally(result)
+        tally.pre_tally(questions)
         plaintexts_path = os.path.join(dir_path, "%d*" % i, "plaintexts_json")
         plaintexts_path = glob.glob(plaintexts_path)[0]
         tally.question_id = plaintexts_path.split('/')[-2]
@@ -110,14 +111,14 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
                     # tally.add_vote
                     voter_answers[i]['choices'] = choices
                 except BlankVoteException:
-                    question['blank_votes'] += 1
+                    question['totals']['blank_votes'] += 1
                 except Exception as e:
-                    question['invalid_votes'] += 1
+                    question['totals']['null_votes'] += 1
                     if not ignore_invalid_votes:
                         print("invalid vote: " + line)
 
                 tally.add_vote(voter_answers=voter_answers,
-                    result=result, is_delegated=False)
+                    questions=questions, is_delegated=False)
 
         i += 1
 
@@ -126,13 +127,11 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
 
     # post process the tally
     for tally in tallies:
-        tally.post_tally(result)
+        tally.post_tally(questions)
 
     return dict(
-        a= "result",
-        counts = result,
-        total_votes = total_count,
-        total_delegated_votes = 0
+        questions = questions,
+        total_votes = total_count
     )
 
 if __name__ == "__main__":

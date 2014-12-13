@@ -13,7 +13,7 @@ class MeekSTV(BaseSTV):
         Returns the identifier of the voting system, used internally to
         discriminate  the voting system used in an election
         '''
-        return 'MEEK-STV'
+        return 'meek-stv'
 
     @staticmethod
     def get_description():

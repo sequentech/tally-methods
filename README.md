@@ -23,7 +23,7 @@ Both the tar and directory functions expect the same file structure for election
 ```
 <root>
 |
-|- result_json (file desribing the election questions and types)
+|- questions_json (file describing the election questions)
 |
 |--- 0-xxxxx (directory with data for the 0th question)
 |    |
@@ -53,15 +53,11 @@ Please refer to the test/fixtures directory for samples of election data.
 
 The following methods are supported
 
-* ONE_CHOICE
-
-Classic plurality method with one winner.
-
 * MEEK-STV
 
 Preferential, single transferable voting for selecting a list of candidates, uses Meek's method.
 
-* APPROVAL (FIXME what happens with ties)
+* plurality-at-large
 
 Refers to both approval (one winner) and plurality-at-large (list of winners) methods where ballots reflect
 approval of candidates with no order specified.

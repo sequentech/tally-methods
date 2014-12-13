@@ -13,10 +13,10 @@ from openstv.plugins import getMethodPlugins
 
 from .base import BaseVotingSystem, BaseTally, BlankVoteException
 
-class Approval(BaseVotingSystem):
+class PluralityAtLarge(BaseVotingSystem):
     '''
     Defines the helper functions that allows agora to manage an OpenSTV-based
-    Approval voting system.
+    Plurality at large voting system.
     '''
 
     @staticmethod
@@ -25,7 +25,7 @@ class Approval(BaseVotingSystem):
         Returns the identifier of the voting system, used internally to
         discriminate  the voting system used in an election
         '''
-        return 'APPROVAL'
+        return 'plurality-at-large'
 
     @staticmethod
     def get_description():
@@ -36,9 +36,9 @@ class Approval(BaseVotingSystem):
         '''
         Create object that helps to compute the tally
         '''
-        return ApprovalTally(election, question_num)
+        return PluralityAtLargeTally(election, question_num)
 
-class ApprovalTally(BaseTally):
+class PluralityAtLargeTally(BaseTally):
     '''
     Class used to tally an election
     '''
@@ -56,7 +56,7 @@ class ApprovalTally(BaseTally):
     #}
     ballots = []
 
-    num_seats = -1
+    num_winners = -1
 
     # openstv options
     method_name = "Approval"
@@ -89,7 +89,7 @@ class ApprovalTally(BaseTally):
             if option == len(question['answers']) + 1:
                 raise BlankVoteException()
             # invalid vote
-            elif option < 0 or option > len(question['answers']):
+            elif option < 0 or option >= len(question['answers']):
                 raise Exception()
             ret.append(option)
 
@@ -100,7 +100,7 @@ class ApprovalTally(BaseTally):
 
         return ret
 
-    def pre_tally(self, result):
+    def pre_tally(self, questions):
         '''
         Function called once before the tally begins
         '''
@@ -120,7 +120,7 @@ class ApprovalTally(BaseTally):
 
         return None
 
-    def add_vote(self, voter_answers, result, is_delegated):
+    def add_vote(self, voter_answers, questions, is_delegated):
         '''
         Add to the count a vote from a voter
         '''
@@ -136,17 +136,17 @@ class ApprovalTally(BaseTally):
         else:
             self.ballots.append(dict(votes=1, answers=answers))
 
-    def finish_writing_ballots_file(self, result):
+    def finish_writing_ballots_file(self, questions):
         # write the ballots
         self.ballots_file = codecs.open(self.ballots_path, encoding='utf-8', mode='w')
-        question = result[self.question_num]
-        self.num_seats = question['num_seats']
+        question = questions[self.question_num]
+        self.num_winners = question['num_winners']
 
         # write the header of the BLT File
         # See format here: https://code.google.com/p/droop/wiki/BltFileFormat
-        self.ballots_file.write('%d %d\n' % (len(question['answers']), question['num_seats']))
+        self.ballots_file.write('%d %d\n' % (len(question['answers']), question['num_winners']))
 
-        question = result[self.question_num]
+        question = questions[self.question_num]
         for ballot in self.ballots:
             self.ballots_file.write('%d %s 0\n' % (ballot['votes'],
                 ' '.join([str(a) for a in ballot['answers']])))
@@ -154,12 +154,12 @@ class ApprovalTally(BaseTally):
 
         # write the candidates
         for answer in question['answers']:
-            name = answer['value']
+            name = answer['text']
             name.encode('utf-8')
             ans = u'"%s"\n' % name
             self.ballots_file.write(ans)
 
-        q = '"%s"\n' % question['question'].replace("\n", "")
+        q = '"%s"\n' % question['title'].replace("\n", "")
         q.encode('utf-8')
         self.ballots_file.write(q)
         self.ballots_file.close()
@@ -177,7 +177,7 @@ class ApprovalTally(BaseTally):
         # generate ballots
         dirtyBallots = Ballots()
         dirtyBallots.loadKnown(self.ballots_path, exclude0=False)
-        dirtyBallots.numSeats = self.num_seats
+        dirtyBallots.numSeats = self.num_winners
         cleanBallots = dirtyBallots.getCleanBallots()
 
         # create and configure election
@@ -192,11 +192,11 @@ class ApprovalTally(BaseTally):
         self.report = JsonReport(e)
         self.report.generateReport()
 
-    def fill_results(self, result):
+    def fill_results(self, questions):
 
         json_report = self.report.json
-        question = result[self.question_num]
-        question['valid_votes'] = json_report['ballots_count']
+        question = questions[self.question_num]
+        question['totals']['valid_votes'] = json_report['ballots_count']
         def decode(s):
             if hasattr(s, 'decode'):
                 return s.decode('utf-8')
@@ -209,29 +209,32 @@ class ApprovalTally(BaseTally):
             total_votes += json_report['answers'][name]
 
         for answer in question['answers']:
-            name = answer['value']
+            name = answer['text']
             name.encode('utf-8')
 
             answer['total_count'] = json_report['answers'][name]
 
         json_report['winners'] = [decode(winner) for winner in json_report['winners']]
-        winner_answers = [answ for answ in question['answers'] if answ['value'] in json_report['winners']]
+        winner_answers = [answ for answ in question['answers'] if answ['text'] in json_report['winners']]
         # sort first by name then by total_count, that makes it reproducible
-        winner_answers.sort(key=itemgetter('value'))
+        winner_answers.sort(key=itemgetter('text'))
         winner_answers.sort(key=itemgetter('total_count'), reverse=True)
-        json_report['winners'] = [answ['value'] for answ in winner_answers]
+        json_report['winners'] = [answ['text'] for answ in winner_answers]
 
-        # sort winners by number of votes
-        question['winners'] = json_report['winners']
+        for answer in question['answers']:
+          if answer['text'] in json_report['winners']:
+            answer['winner_position'] = answer['text'].index(answer['text'])
+          else:
+            answer['winner_position'] = None
 
-    def post_tally(self, result):
+    def post_tally(self, questions):
         '''
         Once all votes have been added, this function actually save them to
         disk and then calls openstv to perform the tally
         '''
-        self.finish_writing_ballots_file(result)
+        self.finish_writing_ballots_file(questions)
         self.perform_tally()
-        self.fill_results(result)
+        self.fill_results(questions)
 
     def get_log(self):
         '''

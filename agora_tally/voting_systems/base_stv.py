@@ -1,3 +1,6 @@
+'''
+WARNING: Not yet migrated to the new version!
+'''
 from __future__ import unicode_literals
 import random
 import copy
