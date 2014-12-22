@@ -51,12 +51,7 @@ Please refer to the test/fixtures directory for samples of election data.
 
 ### Voting methods
 
-The following methods are supported
-
-* MEEK-STV
-
-Preferential, single transferable voting for selecting a list of candidates, uses Meek's method.
-
+The following methods are currently supported:
 * plurality-at-large
 
 Refers to both approval (one winner) and plurality-at-large (list of winners) methods where ballots reflect
