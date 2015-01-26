@@ -1,5 +1,6 @@
 import random
 import unittest
+import codecs
 import os
 import json
 
@@ -15,7 +16,7 @@ def serialize(data):
 class TestSequenceFunctions(unittest.TestCase):
     FIXTURES_PATH = os.path.join("test", "fixtures")
     PLURALITY_AT_LARGE = "plurality-at-large"
-    MEEK_STV = "meek-stv"
+    #MEEK_STV = "meek-stv"
     BORDA_NAURU = "borda-nauru"
 
     def setUp(self):
@@ -23,140 +24,19 @@ class TestSequenceFunctions(unittest.TestCase):
         do_tally.func_defaults[0][:] = []
         pass
 
+    def _test_method(self, dirname):
+        tally_path = os.path.join(self.FIXTURES_PATH, dirname)
+        results_path = os.path.join(tally_path, "results_json")
+        results = do_dirtally(tally_path)
+        with codecs.open(results_path, encoding='utf-8', mode='r') as f:
+            should_results = f.read()
+        self.assertEqual(serialize(results), should_results)
+
     def test_borda_nauru(self):
-        tally_path = os.path.join(self.FIXTURES_PATH, self.BORDA_NAURU)
-        result = do_dirtally(tally_path)
-        self.assertEqual(
-            serialize(result),
-            """{
-    "questions": [
-        {
-            "answer_total_votes_percentage": "over-total-valid-votes",
-            "answers": [
-                {
-                    "category": "",
-                    "details": "",
-                    "id": 1,
-                    "text": "Alice",
-                    "total_count": 3.0,
-                    "urls": [],
-                    "winner_position": null
-                },
-                {
-                    "category": "",
-                    "details": "",
-                    "id": 2,
-                    "text": "Bob",
-                    "total_count": 3.5,
-                    "urls": [],
-                    "winner_position": 0
-                },
-                {
-                    "category": "",
-                    "details": "",
-                    "id": 3,
-                    "text": "Carmen",
-                    "total_count": 0.5,
-                    "urls": [],
-                    "winner_position": null
-                }
-            ],
-            "description": "Test question",
-            "layout": "simple",
-            "max": 2,
-            "min": 0,
-            "num_winners": 1,
-            "randomize_answer_order": true,
-            "tally_type": "borda-nauru",
-            "title": "Test question",
-            "totals": {
-                "blank_votes": 0,
-                "null_votes": 3,
-                "valid_votes": 6
-            },
-            "winners": []
-        }
-    ],
-    "total_votes": 9
-}"""
-        )
+        self._test_method(self.BORDA_NAURU)
 
     def test_plurality_at_large(self):
-        tally_path = os.path.join(self.FIXTURES_PATH, self.PLURALITY_AT_LARGE)
-        result = do_dirtally(tally_path)
-        self.assertEqual(
-            serialize(result),
-            """{
-    "questions": [
-        {
-            "answer_total_votes_percentage": "over-total-valid-votes",
-            "answers": [
-                {
-                    "category": "",
-                    "details": "",
-                    "id": 1,
-                    "text": "Alice",
-                    "total_count": 3,
-                    "urls": [],
-                    "winner_position": null
-                },
-                {
-                    "category": "",
-                    "details": "",
-                    "id": 2,
-                    "text": "Bob",
-                    "total_count": 4,
-                    "urls": [],
-                    "winner_position": 0
-                },
-                {
-                    "category": "",
-                    "details": "",
-                    "id": 3,
-                    "text": "Carmen",
-                    "total_count": 1,
-                    "urls": [],
-                    "winner_position": null
-                }
-            ],
-            "description": "Test question",
-            "layout": "simple",
-            "max": 2,
-            "min": 0,
-            "num_winners": 1,
-            "randomize_answer_order": true,
-            "tally_type": "plurality-at-large",
-            "title": "Test question",
-            "totals": {
-                "blank_votes": 0,
-                "null_votes": 1,
-                "valid_votes": 6
-            },
-            "winners": []
-        }
-    ],
-    "total_votes": 7
-}"""
-        )
-
-
-    #def test_meek_stv(self):
-        ## make sure the shuffled sequence does not lose any elements
-        #tally_path = os.path.join(self.FIXTURES_PATH, self.MEEK_STV)
-        #result = do_dirtally(tally_path)
-        ## print(json.dumps(result, indent=4))
-
-        #self.assertEqual(result['a'], 'result')
-        #self.assertEqual(result['total_votes'], 7)
-
-        #question = result['counts'][0]
-        #self.assertEqual(question["winners"], ["Edward", "Bob"])
-        #self.assertEqual(question["invalid_votes"], 3)
-        #self.assertEqual(question["total_votes"], 4)
-
-        # should raise an exception for an immutable sequence
-        # self.assertRaises(TypeError, random.shuffle, (1,2,3))
-
+        self._test_method(self.PLURALITY_AT_LARGE)
 
 if __name__ == '__main__':
     unittest.main()
