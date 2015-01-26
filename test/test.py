@@ -16,11 +16,70 @@ class TestSequenceFunctions(unittest.TestCase):
     FIXTURES_PATH = os.path.join("test", "fixtures")
     PLURALITY_AT_LARGE = "plurality-at-large"
     MEEK_STV = "meek-stv"
+    BORDA_NAURU = "borda-nauru"
 
     def setUp(self):
         # http://effbot.org/zone/default-values.htm
         do_tally.func_defaults[0][:] = []
         pass
+
+    def test_borda_nauru(self):
+        tally_path = os.path.join(self.FIXTURES_PATH, self.BORDA_NAURU)
+        result = do_dirtally(tally_path)
+        self.assertEqual(
+            serialize(result),
+            """{
+    "questions": [
+        {
+            "answer_total_votes_percentage": "over-total-valid-votes",
+            "answers": [
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 1,
+                    "text": "Alice",
+                    "total_count": 3.0,
+                    "urls": [],
+                    "winner_position": null
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 2,
+                    "text": "Bob",
+                    "total_count": 3.5,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 3,
+                    "text": "Carmen",
+                    "total_count": 0.5,
+                    "urls": [],
+                    "winner_position": null
+                }
+            ],
+            "description": "Test question",
+            "layout": "simple",
+            "max": 2,
+            "min": 0,
+            "num_winners": 1,
+            "randomize_answer_order": true,
+            "tally_type": "borda-nauru",
+            "title": "Test question",
+            "totals": {
+                "blank_votes": 0,
+                "null_votes": 3,
+                "valid_votes": 6
+            },
+            "winners": []
+        }
+    ],
+    "total_votes": 9
+}"""
+        )
 
     def test_plurality_at_large(self):
         tally_path = os.path.join(self.FIXTURES_PATH, self.PLURALITY_AT_LARGE)

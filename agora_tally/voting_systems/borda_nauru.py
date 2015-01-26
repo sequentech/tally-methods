@@ -13,10 +13,10 @@ from openstv.plugins import getMethodPlugins
 
 from .base import BaseVotingSystem, BaseTally, BlankVoteException
 
-class PluralityAtLarge(BaseVotingSystem):
+class BordaNauru(BaseVotingSystem):
     '''
     Defines the helper functions that allows agora to manage an OpenSTV-based
-    Plurality at large voting system.
+    Nauru Borda voting system.
     '''
 
     @staticmethod
@@ -25,20 +25,20 @@ class PluralityAtLarge(BaseVotingSystem):
         Returns the identifier of the voting system, used internally to
         discriminate  the voting system used in an election
         '''
-        return 'plurality-at-large'
+        return 'borda-nauru'
 
     @staticmethod
     def get_description():
-        return _('Plurality at large voting')
+        return _('Nauru Borda Count voting')
 
     @staticmethod
     def create_tally(election, question_num):
         '''
         Create object that helps to compute the tally
         '''
-        return PluralityAtLargeTally(election, question_num)
+        return BordaNauruTally(election, question_num)
 
-class PluralityAtLargeTally(BaseTally):
+class BordaNauruTally(BaseTally):
     '''
     Class used to tally an election
     '''
@@ -59,10 +59,7 @@ class PluralityAtLargeTally(BaseTally):
     num_winners = -1
 
     # openstv options
-    method_name = "Approval"
-    # strong_tie_break_method = None # None means default
-    # weak_tie_break_method = None # None means default
-    # digits_precision = None # None means default
+    method_name = "BordaNauru"
 
     # report object
     report = None
@@ -202,11 +199,6 @@ class PluralityAtLargeTally(BaseTally):
                 return s.decode('utf-8')
             else:
                 return s
-
-        # we cant use ballots_count as there is more than one vote per ballot
-        total_votes = 0
-        for name in json_report['answers']:
-            total_votes += json_report['answers'][name]
 
         for answer in question['answers']:
             name = answer['text']
