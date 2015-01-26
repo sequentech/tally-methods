@@ -1,1 +1,1 @@
-git+https://github.com/OpenTechStrategies/openstv.git
+git+https://github.com/agoravoting/openstv.git
