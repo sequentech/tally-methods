@@ -1,0 +1,240 @@
+{
+    "questions": [
+        {
+            "answer_total_votes_percentage": "over-total-votes",
+            "answers": [
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 1,
+                    "text": "Natividad Salguero Cabello",
+                    "total_count": 15.165874029464339,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 2,
+                    "text": "Gemma Fornell Parra",
+                    "total_count": 93.68403622521275,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 3,
+                    "text": "Emilio Francisco Aguilar Vellisca",
+                    "total_count": 15.48784474562842,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 4,
+                    "text": "Jose María Domingo Fernandez Varela",
+                    "total_count": 36.580425534031356,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 5,
+                    "text": "Maria del Pilar Rojo Robles",
+                    "total_count": 28.054623085518894,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 6,
+                    "text": "Raul Rubalcaba Blanco",
+                    "total_count": 19.618308568833534,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 7,
+                    "text": "Rafael Ramirez Marti­n",
+                    "total_count": 24.0188497199619,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 8,
+                    "text": "Merche Pacheco Pacheco",
+                    "total_count": 25.347945585770333,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 9,
+                    "text": "Ruben Iglesias García",
+                    "total_count": 74.08843691119917,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 10,
+                    "text": "Hécctor Nicolas Gómez",
+                    "total_count": 30.20277169791068,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 11,
+                    "text": "Isabel Lopez Escudero",
+                    "total_count": 15.430747682194704,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 12,
+                    "text": "Rosario Galán García",
+                    "total_count": 80.39706070055045,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 13,
+                    "text": "Sonia Cruz Caballero",
+                    "total_count": 13.85837863677579,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 14,
+                    "text": "Sonia Trol Crespo",
+                    "total_count": 12.979303169236188,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 15,
+                    "text": "Luis Antonio Blanco Álvarez",
+                    "total_count": 34.65909087603294,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 16,
+                    "text": "Noelia Fernandez Marín",
+                    "total_count": 88.60908519566327,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 17,
+                    "text": "Ángela González Ruiz",
+                    "total_count": 28.63561873115144,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 18,
+                    "text": "Jorge Alonso Díaz",
+                    "total_count": 227.98940586977665,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 19,
+                    "text": "Javier Ramos Diaz",
+                    "total_count": 79.20867368878717,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 20,
+                    "text": "Juan Pedro García del Campo",
+                    "total_count": 45.565828243225994,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 21,
+                    "text": "Davíd Pobes Diaz",
+                    "total_count": 67.91347975621106,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 22,
+                    "text": "Iván Jiménez Bailón",
+                    "total_count": 43.96297414166578,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 23,
+                    "text": "Carlos García Piñeiro",
+                    "total_count": 45.139768425813045,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 24,
+                    "text": "Chus Alonso Lazareno",
+                    "total_count": 0,
+                    "urls": [],
+                    "winner_position": null
+                }
+            ],
+            "description": "Test question",
+            "layout": "simple",
+            "max": 24,
+            "min": 0,
+            "num_winners": 23,
+            "randomize_answer_order": true,
+            "tally_type": "borda-nauru",
+            "title": "Test question",
+            "totals": {
+                "blank_votes": 5,
+                "null_votes": 0,
+                "valid_votes": 431
+            },
+            "winners": []
+        }
+    ],
+    "total_votes": 436
+}
