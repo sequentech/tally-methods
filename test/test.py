@@ -83,6 +83,7 @@ class TestSequenceFunctions(unittest.TestCase):
     #MEEK_STV = "meek-stv"
     BORDA_NAURU = "borda-nauru"
     BORDA = "borda"
+    BORDA2 = "borda2"
     BORDA_NAURU2 = "borda-nauru2"
 
     def setUp(self):
@@ -155,9 +156,11 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_plurality_at_large(self):
           self._test_method(self.PLURALITY_AT_LARGE)
 
-
     def test_borda(self):
         self._test_method(self.BORDA)
+
+    def test_borda2(self):
+        self._test_method(self.BORDA2)
 
     #def test_meek_stv(self):
         #self._test_method(self.MEEK_STV)

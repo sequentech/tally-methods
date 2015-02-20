@@ -1,0 +1,94 @@
+{
+    "questions": [
+        {
+            "answer_total_votes_percentage": "over-total-valid-votes",
+            "answers": [
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 0,
+                    "sort_order": 0,
+                    "text": "a",
+                    "total_count": 0,
+                    "urls": [],
+                    "winner_position": null
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 1,
+                    "sort_order": 1,
+                    "text": "b",
+                    "total_count": 0,
+                    "urls": [],
+                    "winner_position": null
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 2,
+                    "sort_order": 2,
+                    "text": "c",
+                    "total_count": 0,
+                    "urls": [],
+                    "winner_position": null
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 3,
+                    "sort_order": 3,
+                    "text": "d",
+                    "total_count": 2,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 4,
+                    "sort_order": 4,
+                    "text": "e",
+                    "total_count": 1,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 5,
+                    "sort_order": 5,
+                    "text": "f",
+                    "total_count": 0,
+                    "urls": [],
+                    "winner_position": null
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 6,
+                    "sort_order": 6,
+                    "text": "g",
+                    "total_count": 0,
+                    "urls": [],
+                    "winner_position": null
+                }
+            ],
+            "description": "aaaaa",
+            "layout": "simple",
+            "max": 3,
+            "min": 1,
+            "num_winners": 2,
+            "randomize_answer_order": true,
+            "tally_type": "borda",
+            "title": "New question 0",
+            "totals": {
+                "blank_votes": 0,
+                "null_votes": 0,
+                "valid_votes": 1
+            },
+            "winners": []
+        }
+    ],
+    "total_votes": 1
+}

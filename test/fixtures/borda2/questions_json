@@ -1,0 +1,71 @@
+[
+    {
+        "answer_total_votes_percentage": "over-total-valid-votes",
+        "answers": [
+            {
+                "category": "",
+                "details": "",
+                "id": 0,
+                "sort_order": 0,
+                "text": "a",
+                "urls": []
+            },
+            {
+                "category": "",
+                "details": "",
+                "id": 1,
+                "sort_order": 1,
+                "text": "b",
+                "urls": []
+            },
+            {
+                "category": "",
+                "details": "",
+                "id": 2,
+                "sort_order": 2,
+                "text": "c",
+                "urls": []
+            },
+            {
+                "category": "",
+                "details": "",
+                "id": 3,
+                "sort_order": 3,
+                "text": "d",
+                "urls": []
+            },
+            {
+                "category": "",
+                "details": "",
+                "id": 4,
+                "sort_order": 4,
+                "text": "e",
+                "urls": []
+            },
+            {
+                "category": "",
+                "details": "",
+                "id": 5,
+                "sort_order": 5,
+                "text": "f",
+                "urls": []
+            },
+            {
+                "category": "",
+                "details": "",
+                "id": 6,
+                "sort_order": 6,
+                "text": "g",
+                "urls": []
+            }
+        ],
+        "description": "aaaaa",
+        "layout": "simple",
+        "max": 3,
+        "min": 1,
+        "num_winners": 2,
+        "randomize_answer_order": true,
+        "tally_type": "borda",
+        "title": "New question 0"
+    }
+]

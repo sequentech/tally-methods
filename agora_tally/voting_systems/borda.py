@@ -161,7 +161,7 @@ class BordaTally(BaseTally):
         self.ballots_file.write(q)
         self.ballots_file.close()
 
-    def perform_tally(self):
+    def perform_tally(self, questions):
         '''
         Actually calls to openstv to perform the tally
         '''
@@ -179,9 +179,10 @@ class BordaTally(BaseTally):
 
         # create and configure election
         e = methods[self.method_name](cleanBallots)
+        question = questions[self.question_num]
+        e.maxChosableOptions = question['max']
 
         # run election and generate the report
-        # from celery.contrib import rdb; rdb.set_trace()
         e.runElection()
 
         # generate report
@@ -225,7 +226,7 @@ class BordaTally(BaseTally):
         disk and then calls openstv to perform the tally
         '''
         self.finish_writing_ballots_file(questions)
-        self.perform_tally()
+        self.perform_tally(questions)
         self.fill_results(questions)
 
     def get_log(self):
