@@ -62,20 +62,38 @@ def do_dirtally(dir_path, ignore_invalid_votes=False, encrypted_invalid_votes=0)
                     encrypted_invalid_votes=encrypted_invalid_votes)
 
 def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
-             encrypted_invalid_votes=0, monkey_patcher=None):
+             encrypted_invalid_votes=0, monkey_patcher=None, question_indexes=None):
     # questions is in the same format as get_questions_pretty(). Initialized here
     questions = copy.deepcopy(questions)
     base_vote =[dict(choices=[]) for q in questions]
 
     # setup the initial data common to all voting system
     i = 0
-    for question in questions:
+    for qindex, question in enumerate(questions):
+
         tally_type = question['tally_type']
         voting_system = get_voting_system_by_id(tally_type)
         tally = voting_system.create_tally(None, i)
         if monkey_patcher:
             monkey_patcher(tally)
         tallies.append(tally)
+
+        # initialize to some defaults if not Initialized
+        if 'winners' not in question:
+            question['winners'] = []
+        if 'totals' not in question:
+            question['totals'] = dict(
+                blank_votes=0,
+                null_votes=encrypted_invalid_votes,
+                valid_votes=0
+            )
+        for answer in question['answers']:
+            if "total_count" not in answer:
+                answer['total_count'] = 0
+
+        if question_indexes is not None and qindex not in question_indexes:
+            i += 1
+            continue
 
         question['winners'] = []
         question['totals'] = dict(
@@ -126,7 +144,9 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
     extra_data = dict()
 
     # post process the tally
-    for tally in tallies:
+    for qindex, tally in enumerate(tallies):
+        if question_indexes is not None and qindex not in question_indexes:
+            continue
         tally.post_tally(questions)
 
     return dict(
