@@ -159,7 +159,7 @@ class PluralityAtLargeTally(BaseTally):
             ans = u'"%s"\n' % name
             self.ballots_file.write(ans)
 
-        q = '"%s"\n' % question['title'].replace("\n", "")
+        q = '"%s"\n' % question['title'].replace("\n", "").replace("\"", "")
         q.encode('utf-8')
         self.ballots_file.write(q)
         self.ballots_file.close()
