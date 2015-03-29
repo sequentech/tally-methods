@@ -62,7 +62,8 @@ def do_dirtally(dir_path, ignore_invalid_votes=False, encrypted_invalid_votes=0)
                     encrypted_invalid_votes=encrypted_invalid_votes)
 
 def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
-             encrypted_invalid_votes=0, monkey_patcher=None, question_indexes=None):
+             encrypted_invalid_votes=0, monkey_patcher=None,
+             question_indexes=None, withdrawals=[], truncate_votes=None):
     # questions is in the same format as get_questions_pretty(). Initialized here
     questions = copy.deepcopy(questions)
     base_vote =[dict(choices=[]) for q in questions]
@@ -110,6 +111,17 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
         plaintexts_path = glob.glob(plaintexts_path)[0]
         tally.question_id = plaintexts_path.split('/')[-2]
 
+        q_withdrawals = [
+          answer['answer_id']
+          for answer in withdrawals
+          if answer['question_index'] == qindex]
+
+        qtruncate_votes = None
+        if truncate_votes is not None:
+            for trunc in truncate_votes:
+                if trunc["question_index"] == qindex:
+                    qtruncate_votes = trunc['truncate_votes']
+
         with codecs.open(plaintexts_path, encoding='utf-8', mode='r') as plaintexts_file:
             total_count = encrypted_invalid_votes
             for line in plaintexts_file.readlines():
@@ -124,6 +136,10 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
                     # substract one
                     number = int(line[1:-2]) - 1
                     choices = tally.parse_vote(number, question)
+                    choices = [c for c in choices if c not in q_withdrawals]
+
+                    if qtruncate_votes is not None:
+                        choices = choices[:qtruncate_votes]
 
                     # craft the voter_answers in the format admitted by
                     # tally.add_vote
