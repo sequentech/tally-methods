@@ -91,9 +91,10 @@ class BordaNauruTally(BaseTally):
             ret.append(option)
 
         # detect invalid vote
-        if len(ret) < question['min'] or len(ret) > question['max'] or\
-                len(set(ret)) != len(ret):
+        if len(ret) < question['min'] or len(set(ret)) != len(ret):
             raise Exception()
+        if len(ret) < question['max']:
+            ret = ret[:question['max']]
 
         return ret
 
