@@ -7,6 +7,7 @@ import codecs
 import os
 import tempfile
 from operator import itemgetter
+from collections import defaultdict
 
 from openstv.ballots import Ballots
 from openstv.plugins import getMethodPlugins
@@ -93,8 +94,11 @@ class BordaNauruTally(BaseTally):
         # detect invalid vote
         if len(ret) < question['min'] or len(set(ret)) != len(ret):
             raise Exception()
-        if len(ret) < question['max']:
-            ret = ret[:question['max']]
+        if len(ret) > question['max']:
+            if "truncate-max-overload" in question and question["truncate-max-overload"]:
+                ret = ret[:question['max']]
+            else:
+                raise Exception()
 
         return ret
 
@@ -214,11 +218,18 @@ class BordaNauruTally(BaseTally):
         winner_answers.sort(key=itemgetter('total_count'), reverse=True)
         json_report['winners'] = [answ['text'] for answ in winner_answers]
 
+        votes_table = defaultdict(lambda:[0 for i in range(question['max'])])
+        for ballot in self.ballots:
+            votes = ballot['votes']
+            for opti, opt in enumerate(ballot['answers']):
+                votes_table[str(opt-1)][opti] += votes
+
         for answer in question['answers']:
+          answer['voters_by_position'] = votes_table[str(answer['id'])]
           if answer['text'] in json_report['winners']:
-            answer['winner_position'] = answer['text'].index(answer['text'])
+              answer['winner_position'] = answer['text'].index(answer['text'])
           else:
-            answer['winner_position'] = None
+              answer['winner_position'] = None
 
     def post_tally(self, questions):
         '''
