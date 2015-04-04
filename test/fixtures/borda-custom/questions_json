@@ -1,0 +1,44 @@
+[
+    {
+        "answer_total_votes_percentage": "over-total-valid-votes",
+        "answers": [
+            {
+                "category": "",
+                "details": "",
+                "id": 1,
+                "text": "Alice",
+                "urls": []
+            },
+            {
+                "category": "",
+                "details": "",
+                "id": 2,
+                "text": "Bob",
+                "urls": []
+            },
+            {
+                "category": "",
+                "details": "",
+                "id": 3,
+                "text": "Carmen",
+                "urls": []
+            },
+            {
+                "category": "",
+                "details": "",
+                "id": 4,
+                "text": "Manolo",
+                "urls": []
+            }
+        ],
+        "description": "Test question",
+        "layout": "simple",
+        "max": 4,
+        "min": 0,
+        "num_winners": 1,
+        "randomize_answer_order": true,
+        "tally_type": "borda-custom",
+        "title": "Test question",
+        "borda_custom_weights": [1.0, 0.3333333333333333, 0.2, 0.14285714285714285]
+    }
+]

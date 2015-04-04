@@ -39,7 +39,7 @@
                     "id": 3,
                     "sort_order": 3,
                     "text": "d",
-                    "total_count": 2,
+                    "total_count": 3,
                     "urls": [],
                     "winner_position": 0
                 },
@@ -49,7 +49,7 @@
                     "id": 4,
                     "sort_order": 4,
                     "text": "e",
-                    "total_count": 1,
+                    "total_count": 2,
                     "urls": [],
                     "winner_position": 0
                 },

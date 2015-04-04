@@ -88,6 +88,8 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
                 null_votes=encrypted_invalid_votes,
                 valid_votes=0
             )
+        if tally_type == 'borda-custom':
+            tally.weightByPosition = question['borda_custom_weights']
         for answer in question['answers']:
             if "total_count" not in answer:
                 answer['total_count'] = 0
