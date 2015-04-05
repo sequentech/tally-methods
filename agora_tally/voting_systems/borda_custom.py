@@ -64,6 +64,7 @@ class BordaCustomTally(BordaTally):
         e = methods[self.method_name](cleanBallots)
         question = questions[self.question_num]
         e.maxChosableOptions = question['max']
+        self.weightByPosition = question['borda_custom_weights']
         e.weightByPosition = self.weightByPosition
 
         # run election and generate the report
