@@ -6,28 +6,40 @@
                 {
                     "category": "",
                     "details": "",
-                    "id": 1,
+                    "id": 0,
                     "text": "Alice",
                     "total_count": 3.0,
                     "urls": [],
+                    "voters_by_position": [
+                        3,
+                        0
+                    ],
                     "winner_position": null
                 },
                 {
                     "category": "",
                     "details": "",
-                    "id": 2,
+                    "id": 1,
                     "text": "Bob",
                     "total_count": 3.5,
                     "urls": [],
+                    "voters_by_position": [
+                        3,
+                        1
+                    ],
                     "winner_position": 0
                 },
                 {
                     "category": "",
                     "details": "",
-                    "id": 3,
+                    "id": 2,
                     "text": "Carmen",
                     "total_count": 0.5,
                     "urls": [],
+                    "voters_by_position": [
+                        0,
+                        1
+                    ],
                     "winner_position": null
                 }
             ],

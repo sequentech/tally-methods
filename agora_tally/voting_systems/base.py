@@ -5,6 +5,7 @@ VOTING_METHODS = (
     'agora_tally.voting_systems.plurality_at_large.PluralityAtLarge',
     'agora_tally.voting_systems.borda_nauru.BordaNauru',
     'agora_tally.voting_systems.borda.Borda',
+    'agora_tally.voting_systems.borda_custom.BordaCustom',
 )
 
 def get_voting_system_classes():
