@@ -6,37 +6,61 @@
                 {
                     "category": "",
                     "details": "",
-                    "id": 1,
+                    "id": 0,
                     "text": "Alice",
                     "total_count": 2.342857142857143,
                     "urls": [],
+                    "voters_by_position": [
+                        2,
+                        0,
+                        1,
+                        1
+                    ],
                     "winner_position": 0
                 },
                 {
                     "category": "",
                     "details": "",
-                    "id": 2,
+                    "id": 1,
                     "text": "Bob",
                     "total_count": 1.8666666666666667,
                     "urls": [],
+                    "voters_by_position": [
+                        1,
+                        2,
+                        1,
+                        0
+                    ],
+                    "winner_position": null
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 2,
+                    "text": "Carmen",
+                    "total_count": 1.0666666666666667,
+                    "urls": [],
+                    "voters_by_position": [
+                        0,
+                        2,
+                        2,
+                        0
+                    ],
                     "winner_position": null
                 },
                 {
                     "category": "",
                     "details": "",
                     "id": 3,
-                    "text": "Carmen",
-                    "total_count": 1.0666666666666667,
-                    "urls": [],
-                    "winner_position": null
-                },
-                {
-                    "category": "",
-                    "details": "",
-                    "id": 4,
                     "text": "Manolo",
                     "total_count": 1.2857142857142856,
                     "urls": [],
+                    "voters_by_position": [
+                        1,
+                        0,
+                        0,
+                        2
+                    ],
                     "winner_position": null
                 }
             ],

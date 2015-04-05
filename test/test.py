@@ -124,7 +124,7 @@ class TestSequenceFunctions(unittest.TestCase):
             questions[0]['answers'].append({
                 "category": "",
                 "details": "",
-                "id": i + 1,
+                "id": i,
                 "text": option,
                 "urls": []
             })
