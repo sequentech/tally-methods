@@ -195,9 +195,9 @@ class PairwiseBetaTally(BaseTally):
             name.encode('utf-8')
 
             if id in report['answers']:
-                answer['score'] = report['answers'][id]['score']
+                answer['total_count'] = report['answers'][id]['score']
             else:
-                answer['score'] = 0.0
+                answer['total_count'] = 0.0
 
         for answer in question['answers']:
             id = answer['id']

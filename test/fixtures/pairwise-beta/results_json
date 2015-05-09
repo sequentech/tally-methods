@@ -7,9 +7,8 @@
                     "category": "",
                     "details": "",
                     "id": 1,
-                    "score": 0.6666666666666666,
                     "text": "Alice",
-                    "total_count": 0,
+                    "total_count": 0.6666666666666666,
                     "urls": [],
                     "winner_position": 0
                 },
@@ -17,9 +16,8 @@
                     "category": "",
                     "details": "",
                     "id": 2,
-                    "score": 0.5,
                     "text": "Bob",
-                    "total_count": 0,
+                    "total_count": 0.5,
                     "urls": [],
                     "winner_position": null
                 },
@@ -27,9 +25,8 @@
                     "category": "",
                     "details": "",
                     "id": 3,
-                    "score": 0.3333333333333333,
                     "text": "Carmen",
-                    "total_count": 0,
+                    "total_count": 0.3333333333333333,
                     "urls": [],
                     "winner_position": null
                 },
@@ -37,9 +34,8 @@
                     "category": "",
                     "details": "",
                     "id": 4,
-                    "score": 0.0,
                     "text": "Martin",
-                    "total_count": 0,
+                    "total_count": 0.0,
                     "urls": [],
                     "winner_position": null
                 },
@@ -47,9 +43,8 @@
                     "category": "",
                     "details": "",
                     "id": 5,
-                    "score": 0.0,
                     "text": "Susan",
-                    "total_count": 0,
+                    "total_count": 0.0,
                     "urls": [],
                     "winner_position": null
                 },
@@ -57,9 +52,8 @@
                     "category": "",
                     "details": "",
                     "id": 6,
-                    "score": 0.0,
                     "text": "Megan",
-                    "total_count": 0,
+                    "total_count": 0.0,
                     "urls": [],
                     "winner_position": null
                 }
