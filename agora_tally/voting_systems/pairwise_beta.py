@@ -83,9 +83,14 @@ class PairwiseBetaTally(BaseTally):
                 raise Exception()
             ret.append(option)
 
+        if len(ret) % 2 != 0:
+            raise Exception()
+
+        comparisons = len(ret) / 2
+
         # detect invalid vote
-        if len(ret) < question['min'] or len(ret) > question['max'] or\
-                len(set(ret)) != len(ret) or len(ret) % 2 != 0:
+        if comparisons < question['min'] or comparisons > question['max'] or\
+                len(set(ret)) != len(ret):
             raise Exception()
 
         return ret
@@ -164,9 +169,10 @@ class PairwiseBetaTally(BaseTally):
         self.num_winners = question['num_winners']
 
         # mark winners
-        for i in range(0, self.num_winners):
-            idx = sorted_answers[i][0]
-            report['answers'][idx]['winner_position'] = i
+        if len(sorted_answers) >= self.num_winners:
+            for i in range(0, self.num_winners):
+                idx = sorted_answers[i][0]
+                report['answers'][idx]['winner_position'] = i
 
     def fill_results(self, questions):
 
