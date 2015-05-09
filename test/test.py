@@ -86,6 +86,7 @@ class TestSequenceFunctions(unittest.TestCase):
     BORDA2 = "borda2"
     BORDA_NAURU2 = "borda-nauru2"
     BORDA_CUSTOM = "borda-custom"
+    PAIRWISE_BETA = "pairwise-beta"
     maxDiff = None
 
     def setUp(self):
@@ -163,9 +164,12 @@ class TestSequenceFunctions(unittest.TestCase):
 
     def test_borda2(self):
         self._test_method(self.BORDA2)
-    
-    def test_custom(self):
-        self._test_method(self.BORDA_CUSTOM)
+
+    def test_pairwise_beta(self):
+        self._test_method(self.PAIRWISE_BETA)
+
+    #def test_custom(self):
+    #    self._test_method(self.BORDA_CUSTOM)
 
     #def test_meek_stv(self):
         #self._test_method(self.MEEK_STV)

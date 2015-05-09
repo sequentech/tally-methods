@@ -6,6 +6,7 @@ VOTING_METHODS = (
     'agora_tally.voting_systems.borda_nauru.BordaNauru',
     'agora_tally.voting_systems.borda.Borda',
     'agora_tally.voting_systems.borda_custom.BordaCustom',
+    'agora_tally.voting_systems.pairwise_beta.PairwiseBeta',
 )
 
 def get_voting_system_classes():
