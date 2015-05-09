@@ -170,9 +170,13 @@ class PairwiseBetaTally(BaseTally):
 
         # mark winners
         if len(sorted_answers) >= self.num_winners:
-            for i in range(0, self.num_winners):
-                idx = sorted_answers[i][0]
-                report['answers'][idx]['winner_position'] = i
+            to_mark = self.num_winners
+        else:
+            to_mark = len(sorted_answers)
+
+        for i in range(0, to_mark):
+            idx = sorted_answers[i][0]
+            report['answers'][idx]['winner_position'] = i
 
     def fill_results(self, questions):
 
