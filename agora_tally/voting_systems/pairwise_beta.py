@@ -121,7 +121,7 @@ class PairwiseBetaTally(BaseTally):
         '''
         Add to the count a vote from a voter
         '''
-        answers = [choice+1 for choice in voter_answers[self.question_num]['choices']]
+        answers = [choice for choice in voter_answers[self.question_num]['choices']]
         # we got ourselves an invalid vote, don't count it
         if -1 in answers:
             return
