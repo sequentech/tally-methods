@@ -107,7 +107,7 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
             answer['total_count'] = 0
 
         tally.pre_tally(questions)
-        plaintexts_path = os.path.join(dir_path, "%d*" % i, "plaintexts_json")
+        plaintexts_path = os.path.join(dir_path, "%d-*" % i, "plaintexts_json")
         plaintexts_path = glob.glob(plaintexts_path)[0]
         tally.question_id = plaintexts_path.split('/')[-2]
 
