@@ -89,9 +89,14 @@ class PairwiseBetaTally(BaseTally):
         comparisons = len(ret) / 2
 
         # detect invalid vote
-        if comparisons < question['min'] or comparisons > question['max'] or\
-                len(set(ret)) != len(ret):
+        if comparisons < question['min']:
             raise Exception()
+
+        if comparisons > question['max']:
+            if "truncate-max-overload" in question and question["truncate-max-overload"]:
+                ret = ret[:question['max'] * 2]
+            else:
+                raise Exception()
 
         return ret
 
@@ -116,7 +121,7 @@ class PairwiseBetaTally(BaseTally):
         '''
         Add to the count a vote from a voter
         '''
-        answers = [choice+1 for choice in voter_answers[self.question_num]['choices']]
+        answers = [choice for choice in voter_answers[self.question_num]['choices']]
         # we got ourselves an invalid vote, don't count it
         if -1 in answers:
             return
@@ -190,9 +195,9 @@ class PairwiseBetaTally(BaseTally):
             name.encode('utf-8')
 
             if id in report['answers']:
-                answer['score'] = report['answers'][id]['score']
+                answer['total_count'] = report['answers'][id]['score']
             else:
-                answer['score'] = 0.0
+                answer['total_count'] = 0.0
 
         for answer in question['answers']:
             id = answer['id']

@@ -1,24 +1,24 @@
-Natividad Salguero Cabello		2
-Gemma Fornell Parra			3
-Emilio Francisco Aguilar Vellisca	4
-Jose María Domingo Fernandez Varela	5
-Maria del Pilar Rojo Robles		6
-Raul Rubalcaba Blanco			7
-Rafael Ramirez Marti­n			8
-Merche Pacheco Pacheco			9
-Ruben Iglesias García			10
-Hécctor Nicolas Gómez			11
-Isabel Lopez Escudero			12
-Rosario Galán García			13
-Sonia Cruz Caballero			14
-Sonia Trol Crespo			15
-Luis Antonio Blanco Álvarez		16
-Noelia Fernandez Marín			17
-Ángela González Ruiz			18
-Jorge Alonso Díaz			19
-Javier Ramos Diaz			20
-Juan Pedro García del Campo		21
-Davíd Pobes Diaz			22
-Iván Jiménez Bailón			23
-Carlos García Piñeiro			24
-Chus Alonso Lazareno			25
+Natividad Salguero Cabello		0
+Gemma Fornell Parra			1
+Emilio Francisco Aguilar Vellisca	2
+Jose María Domingo Fernandez Varela	3
+Maria del Pilar Rojo Robles		4
+Raul Rubalcaba Blanco			5
+Rafael Ramirez Marti­n			6
+Merche Pacheco Pacheco			7
+Ruben Iglesias García			8
+Hécctor Nicolas Gómez			9
+Isabel Lopez Escudero			10
+Rosario Galán García			11
+Sonia Cruz Caballero			12
+Sonia Trol Crespo			13
+Luis Antonio Blanco Álvarez		14
+Noelia Fernandez Marín			15
+Ángela González Ruiz			16
+Jorge Alonso Díaz			17
+Javier Ramos Diaz			18
+Juan Pedro García del Campo		19
+Davíd Pobes Diaz			20
+Iván Jiménez Bailón			21
+Carlos García Piñeiro			22
+Chus Alonso Lazareno			23

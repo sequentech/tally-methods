@@ -11,6 +11,11 @@
                     "text": "a",
                     "total_count": 0,
                     "urls": [],
+                    "voters_by_position": [
+                        0,
+                        0,
+                        0
+                    ],
                     "winner_position": null
                 },
                 {
@@ -21,6 +26,11 @@
                     "text": "b",
                     "total_count": 0,
                     "urls": [],
+                    "voters_by_position": [
+                        0,
+                        0,
+                        0
+                    ],
                     "winner_position": null
                 },
                 {
@@ -31,6 +41,11 @@
                     "text": "c",
                     "total_count": 0,
                     "urls": [],
+                    "voters_by_position": [
+                        0,
+                        0,
+                        0
+                    ],
                     "winner_position": null
                 },
                 {
@@ -39,8 +54,13 @@
                     "id": 3,
                     "sort_order": 3,
                     "text": "d",
-                    "total_count": 2,
+                    "total_count": 3,
                     "urls": [],
+                    "voters_by_position": [
+                        1,
+                        0,
+                        0
+                    ],
                     "winner_position": 0
                 },
                 {
@@ -49,8 +69,13 @@
                     "id": 4,
                     "sort_order": 4,
                     "text": "e",
-                    "total_count": 1,
+                    "total_count": 2,
                     "urls": [],
+                    "voters_by_position": [
+                        0,
+                        1,
+                        0
+                    ],
                     "winner_position": 0
                 },
                 {
@@ -61,6 +86,11 @@
                     "text": "f",
                     "total_count": 0,
                     "urls": [],
+                    "voters_by_position": [
+                        0,
+                        0,
+                        0
+                    ],
                     "winner_position": null
                 },
                 {
@@ -71,6 +101,11 @@
                     "text": "g",
                     "total_count": 0,
                     "urls": [],
+                    "voters_by_position": [
+                        0,
+                        0,
+                        0
+                    ],
                     "winner_position": null
                 }
             ],

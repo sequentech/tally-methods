@@ -8,23 +8,12 @@
                     "details": "",
                     "id": 0,
                     "text": "Alice",
-                    "total_count": 6,
+                    "total_count": 2.342857142857143,
                     "urls": [],
                     "voters_by_position": [
-                        3,
-                        0
-                    ],
-                    "winner_position": null
-                },
-                {
-                    "category": "",
-                    "details": "",
-                    "id": 1,
-                    "text": "Bob",
-                    "total_count": 7,
-                    "urls": [],
-                    "voters_by_position": [
-                        3,
+                        2,
+                        0,
+                        1,
                         1
                     ],
                     "winner_position": 0
@@ -32,32 +21,70 @@
                 {
                     "category": "",
                     "details": "",
+                    "id": 1,
+                    "text": "Bob",
+                    "total_count": 1.8666666666666667,
+                    "urls": [],
+                    "voters_by_position": [
+                        1,
+                        2,
+                        1,
+                        0
+                    ],
+                    "winner_position": null
+                },
+                {
+                    "category": "",
+                    "details": "",
                     "id": 2,
                     "text": "Carmen",
-                    "total_count": 1,
+                    "total_count": 1.0666666666666667,
                     "urls": [],
                     "voters_by_position": [
                         0,
-                        1
+                        2,
+                        2,
+                        0
+                    ],
+                    "winner_position": null
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 3,
+                    "text": "Manolo",
+                    "total_count": 1.2857142857142856,
+                    "urls": [],
+                    "voters_by_position": [
+                        1,
+                        0,
+                        0,
+                        2
                     ],
                     "winner_position": null
                 }
             ],
+            "borda_custom_weights": [
+                1.0,
+                0.3333333333333333,
+                0.2,
+                0.14285714285714285
+            ],
             "description": "Test question",
             "layout": "simple",
-            "max": 2,
+            "max": 4,
             "min": 0,
             "num_winners": 1,
             "randomize_answer_order": true,
-            "tally_type": "borda",
+            "tally_type": "borda-custom",
             "title": "Test question",
             "totals": {
                 "blank_votes": 0,
-                "null_votes": 3,
-                "valid_votes": 6
+                "null_votes": 0,
+                "valid_votes": 4
             },
             "winners": []
         }
     ],
-    "total_votes": 9
+    "total_votes": 4
 }

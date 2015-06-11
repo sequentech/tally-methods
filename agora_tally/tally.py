@@ -62,20 +62,39 @@ def do_dirtally(dir_path, ignore_invalid_votes=False, encrypted_invalid_votes=0)
                     encrypted_invalid_votes=encrypted_invalid_votes)
 
 def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
-             encrypted_invalid_votes=0, monkey_patcher=None):
+             encrypted_invalid_votes=0, monkey_patcher=None,
+             question_indexes=None, withdrawals=[]):
     # questions is in the same format as get_questions_pretty(). Initialized here
     questions = copy.deepcopy(questions)
     base_vote =[dict(choices=[]) for q in questions]
 
     # setup the initial data common to all voting system
     i = 0
-    for question in questions:
+    for qindex, question in enumerate(questions):
+
         tally_type = question['tally_type']
         voting_system = get_voting_system_by_id(tally_type)
         tally = voting_system.create_tally(None, i)
         if monkey_patcher:
             monkey_patcher(tally)
         tallies.append(tally)
+
+        # initialize to some defaults if not Initialized
+        if 'winners' not in question:
+            question['winners'] = []
+        if 'totals' not in question:
+            question['totals'] = dict(
+                blank_votes=0,
+                null_votes=encrypted_invalid_votes,
+                valid_votes=0
+            )
+        for answer in question['answers']:
+            if "total_count" not in answer:
+                answer['total_count'] = 0
+
+        if question_indexes is not None and qindex not in question_indexes:
+            i += 1
+            continue
 
         question['winners'] = []
         question['totals'] = dict(
@@ -88,9 +107,14 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
             answer['total_count'] = 0
 
         tally.pre_tally(questions)
-        plaintexts_path = os.path.join(dir_path, "%d*" % i, "plaintexts_json")
+        plaintexts_path = os.path.join(dir_path, "%d-*" % i, "plaintexts_json")
         plaintexts_path = glob.glob(plaintexts_path)[0]
         tally.question_id = plaintexts_path.split('/')[-2]
+
+        q_withdrawals = [
+          answer['answer_id']
+          for answer in withdrawals
+          if answer['question_index'] == qindex]
 
         with codecs.open(plaintexts_path, encoding='utf-8', mode='r') as plaintexts_file:
             total_count = encrypted_invalid_votes
@@ -106,6 +130,7 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
                     # substract one
                     number = int(line[1:-2]) - 1
                     choices = tally.parse_vote(number, question)
+                    choices = [c for c in choices if c not in q_withdrawals]
 
                     # craft the voter_answers in the format admitted by
                     # tally.add_vote
@@ -126,7 +151,9 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
     extra_data = dict()
 
     # post process the tally
-    for tally in tallies:
+    for qindex, tally in enumerate(tallies):
+        if question_indexes is not None and qindex not in question_indexes:
+            continue
         tally.post_tally(questions)
 
     return dict(
