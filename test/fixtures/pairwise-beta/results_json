@@ -6,7 +6,7 @@
                 {
                     "category": "",
                     "details": "",
-                    "id": 1,
+                    "id": 0,
                     "text": "Alice",
                     "total_count": 0.6666666666666666,
                     "urls": [],
@@ -15,7 +15,7 @@
                 {
                     "category": "",
                     "details": "",
-                    "id": 2,
+                    "id": 1,
                     "text": "Bob",
                     "total_count": 0.5,
                     "urls": [],
@@ -24,7 +24,7 @@
                 {
                     "category": "",
                     "details": "",
-                    "id": 3,
+                    "id": 2,
                     "text": "Carmen",
                     "total_count": 0.3333333333333333,
                     "urls": [],
@@ -33,7 +33,7 @@
                 {
                     "category": "",
                     "details": "",
-                    "id": 4,
+                    "id": 3,
                     "text": "Martin",
                     "total_count": 0.0,
                     "urls": [],
@@ -42,7 +42,7 @@
                 {
                     "category": "",
                     "details": "",
-                    "id": 5,
+                    "id": 4,
                     "text": "Susan",
                     "total_count": 0.0,
                     "urls": [],
@@ -51,7 +51,7 @@
                 {
                     "category": "",
                     "details": "",
-                    "id": 6,
+                    "id": 5,
                     "text": "Megan",
                     "total_count": 0.0,
                     "urls": [],
