@@ -184,7 +184,7 @@ class PairwiseBradleyTerryTally(BaseTally):
             pairs_file.write('%s %s %s\n' % (pair.replace('-', ' '), report['pairs'][pair]['wins1'], report['pairs'][pair]['wins2']))
 
         # FIXME point to location of go.r
-        output = subprocess.check_output(['Rscript', 'go.r', pairs_path], stderr=None)
+        output = subprocess.check_output(['Rscript', './agora_tally/voting_systems/go.r', pairs_path], stderr=None)
 
         os.remove(pairs_path)
 
