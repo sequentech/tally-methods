@@ -94,9 +94,13 @@ class PluralityAtLargeTally(BaseTally):
             ret.append(option)
 
         # detect invalid vote
-        if len(ret) < question['min'] or len(ret) > question['max'] or\
-                len(set(ret)) != len(ret):
+        if len(ret) < question['min'] or len(set(ret)) != len(ret):
             raise Exception()
+        if len(ret) > question['max']:
+            if "truncate-max-overload" in question and question["truncate-max-overload"]:
+                ret = ret[:question['max']]
+            else:
+                raise Exception()
 
         return ret
 
