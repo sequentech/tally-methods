@@ -97,7 +97,7 @@ class BaseTally(object):
         '''
         pass
 
-    def parse_vote(self, number, question):
+    def parse_vote(self, number, question, withdrawals=[]):
         '''
         parse vote
         '''

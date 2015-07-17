@@ -129,8 +129,7 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
                     # so we trim beginning and end, parse the int and
                     # substract one
                     number = int(line[1:-2]) - 1
-                    choices = tally.parse_vote(number, question)
-                    choices = [c for c in choices if c not in q_withdrawals]
+                    choices = tally.parse_vote(number, question, q_withdrawals)
 
                     # craft the voter_answers in the format admitted by
                     # tally.add_vote

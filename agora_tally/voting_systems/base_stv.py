@@ -81,7 +81,7 @@ class BaseSTVTally(BaseTally):
         self.ballots = []
         self.answer_to_ids_dict = dict()
 
-    def parse_vote(self, number, question):
+    def parse_vote(self, number, question, withdrawals=[]):
         vote_str = str(number)
         tab_size = len(str(len(question['answers']) + 2))
 
@@ -94,6 +94,10 @@ class BaseSTVTally(BaseTally):
         ret = []
         for i in range(int(len(vote_str) / tab_size)):
             option = int(vote_str[i*tab_size: (i+1)*tab_size]) - 1
+
+            if option in withdrawals:
+                continue
+
             if option < 0:
                 # invalid vote
                 raise Exception()
