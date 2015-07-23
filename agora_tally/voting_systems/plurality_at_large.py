@@ -89,7 +89,7 @@ class PluralityAtLargeTally(BaseTally):
                 continue
 
             # blank vote
-            if option == len(question['answers']) + 1:
+            if option == len(question['answers']) + 1  and int(len(vote_str) / tab_size) == 1:
                 raise BlankVoteException()
             # invalid vote
             elif option < 0 or option >= len(question['answers']):
