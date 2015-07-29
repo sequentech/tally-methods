@@ -87,16 +87,11 @@ class CupTally(BaseTally):
                 raise Exception()
             ret.append(option)
 
-        if len(ret) % 2 != 0:
-            raise Exception()
-
-        comparisons = len(ret) / 2
-
         # detect invalid vote
-        if comparisons < question['min']:
+        if len(ret) < question['min']:
             raise Exception()
 
-        if comparisons > question['max']:
+        if len(ret) > question['max']:
             if "truncate-max-overload" in question and question["truncate-max-overload"]:
                 ret = ret[:question['max'] * 2]
             else:
