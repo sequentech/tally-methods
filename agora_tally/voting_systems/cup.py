@@ -12,7 +12,7 @@ from .base import BaseVotingSystem, BaseTally, BlankVoteException
 
 
 
-class PairwiseBeta(BaseVotingSystem):
+class Cup(BaseVotingSystem):
     '''
     Defines the helper functions that allows agora to manage an pairwise-beta election
     '''
@@ -23,20 +23,20 @@ class PairwiseBeta(BaseVotingSystem):
         Returns the identifier of the voting system, used internally to
         discriminate  the voting system used in an election
         '''
-        return 'pairwise-beta'
+        return 'cup'
 
     @staticmethod
     def get_description():
-        return _('Pairwise Beta Binomial model')
+        return _('Cup')
 
     @staticmethod
     def create_tally(election, question_num):
         '''
         Create object that helps to compute the tally
         '''
-        return PairwiseBetaTally(election, question_num)
+        return CupTally(election, question_num)
 
-class PairwiseBetaTally(BaseTally):
+class CupTally(BaseTally):
     '''
     Class used to tally an election
     '''
@@ -87,16 +87,11 @@ class PairwiseBetaTally(BaseTally):
                 raise Exception()
             ret.append(option)
 
-        if len(ret) % 2 != 0:
-            raise Exception()
-
-        comparisons = len(ret) / 2
-
         # detect invalid vote
-        if comparisons < question['min']:
+        if len(ret) < question['min']:
             raise Exception()
 
-        if comparisons > question['max']:
+        if len(ret) > question['max']:
             if "truncate-max-overload" in question and question["truncate-max-overload"]:
                 ret = ret[:question['max'] * 2]
             else:
@@ -108,6 +103,7 @@ class PairwiseBetaTally(BaseTally):
         '''
         Function called once before the tally begins
         '''
+        pass
 
 
     def find_ballot(self, answers):
@@ -148,67 +144,105 @@ class PairwiseBetaTally(BaseTally):
         report = self.report
         report['valid_votes'] = 0
         report['answers'] = {}
-
-        # first collect wins and losses for each option
-        for ballot in self.ballots:
-            if len(ballot['answers']) % 2 == 0:
-                report['valid_votes'] = report['valid_votes'] + ballot['votes']
-
-                for idx, answer in enumerate(ballot['answers']):
-                    if answer not in report['answers']:
-                        report['answers'][answer] = dict(wins = 0, losses = 0, winner_position = None)
-                    if idx % 2 == 0:
-                        report['answers'][answer]['wins'] = report['answers'][answer]['wins'] + ballot['votes']
-                    else:
-                        report['answers'][answer]['losses'] = report['answers'][answer]['losses'] + ballot['votes']
-
-
-        # calculate the beta posterior, see eq 38 in
-        # http://www.cs.cmu.edu/~10701/lecture/technote2_betabinomial.pdf
-        for answer in report['answers']:
-            a = report['answers'][answer]
-            a['score'] = (a['wins'] + 1) / (a['wins'] + 1 + a['losses'] + 1)
-
-        ## obtain winners
-
-        # first sort
-        sorted_answers = sorted(report['answers'].items(), key = lambda a: a[1]['score'], reverse = True)
-
         question = questions[self.question_num]
-        self.num_winners = question['num_winners']
 
-        # mark winners
-        if len(sorted_answers) >= self.num_winners:
-            to_mark = self.num_winners
-        else:
-            to_mark = len(sorted_answers)
+        for a in question['answers']:
+            a['total_count'] = 0
+            a['total_votes'] = 0
 
-        for i in range(0, to_mark):
-            idx = sorted_answers[i][0]
-            report['answers'][idx]['winner_position'] = i
+        # get the presets in order
+        preset_ids = [
+          a['id'] for a in question['answers']
+          if len(a['urls']) > 0 and a['urls'][0]['url'] == "https://agoravoting.com/api/tag/preset"]
+
+        # count how many ballots have the preset
+        preset_count = 0
+        total_count = 0
+        for ballot in self.ballots:
+            if ballot['answers'][:len(preset_ids)] == preset_ids:
+                preset_count += ballot['votes']
+            total_count += ballot['votes']
+
+
+        preset_approved = preset_count/total_count >= 0.55
+        next_winner_pos = 0
+        if preset_approved:
+            next_winner_pos = len(preset_ids)
+            for preset in preset_ids:
+                question['answers'][preset]['winner_position'] = preset
+                question['answers'][preset]['total_count'] = preset_count
+
+            # withdraw candidates
+            for ballot in self.ballots:
+                ballot['answers'] = [a for a in ballot['answers'] if a not in preset_ids]
+
+        question['totals']['valid_votes'] = total_count
+        log = False
+        for ballot in self.ballots:
+            if log:
+                print("ballot x%d:" % ballot['votes'])
+            if ballot['answers'][:len(preset_ids)] == preset_ids:
+                for i, a in enumerate(ballot['answers']):
+                    answer = question['answers'][a]
+                    prev_val = answer['total_count']
+                    answer['total_votes'] += 1
+                    if answer['id'] < len(preset_ids):
+                        answer['total_count'] += 8*ballot['votes']
+                        if log:
+                            print("%d. %s = %d + %d*%d = %d" % (
+                                i+1,
+                                answer['text'].ljust(40),
+                                prev_val,
+                                8,
+                                ballot['votes'],
+                                answer['total_count']))
+                    else:
+                        answer['total_count'] += (len(ballot['answers']) - i)*ballot['votes']
+                        if log:
+                            print("%d. %s = %d + %d*%d = %d" % (
+                                i+1,
+                                answer['text'].ljust(40),
+                                prev_val,
+                                len(ballot['answers']) - i,
+                                ballot['votes'],
+                                answer['total_count']))
+            else:
+                for i, a in enumerate(ballot['answers']):
+                    answer = question['answers'][a]
+                    prev_val = answer['total_count']
+                    answer['total_count'] += (len(ballot['answers']) - i)*ballot['votes']
+                    answer['total_votes'] += 1
+                    if log:
+                        print("%d. %s = %d + %d*%d = %d" % (
+                            i,
+                            answer['text'].ljust(40),
+                            prev_val,
+                            len(ballot['answers']) - i,
+                            ballot['votes'],
+                            answer['total_count']))
+
+        # set winner winner_position
+        sorted_answers = sorted(question['answers'], key=itemgetter('total_count'), reverse=True)
+        for a in sorted_answers:
+            if a['id'] in preset_ids:
+              a["preset_count"] = preset_count
+            if preset_approved and a['id'] in preset_ids:
+                continue
+
+            if next_winner_pos >= question['num_winners']:
+                a['winner_position'] = None
+            else:
+                a['winner_position'] = next_winner_pos
+                next_winner_pos += 1
 
     def fill_results(self, questions):
-
         report = self.report
         question = questions[self.question_num]
-        question['totals']['valid_votes'] = report['valid_votes']
 
         for answer in question['answers']:
             name = answer['text']
             id = answer['id']
             name.encode('utf-8')
-
-            if id in report['answers']:
-                answer['total_count'] = report['answers'][id]['score']
-            else:
-                answer['total_count'] = 0.0
-
-        for answer in question['answers']:
-            id = answer['id']
-            if id in report['answers']:
-                answer['winner_position'] = report['answers'][id]['winner_position']
-            else:
-                answer['winner_position'] = None
 
     def post_tally(self, questions):
         '''

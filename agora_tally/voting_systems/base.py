@@ -5,6 +5,7 @@ VOTING_METHODS = (
     'agora_tally.voting_systems.plurality_at_large.PluralityAtLarge',
     'agora_tally.voting_systems.borda_nauru.BordaNauru',
     'agora_tally.voting_systems.borda.Borda',
+    'agora_tally.voting_systems.cup.Cup',
     'agora_tally.voting_systems.borda_custom.BordaCustom',
     'agora_tally.voting_systems.pairwise_beta.PairwiseBeta',
     'agora_tally.voting_systems.pairwise_bradleyterry.PairwiseBradleyTerry'
@@ -98,7 +99,7 @@ class BaseTally(object):
         '''
         pass
 
-    def parse_vote(self, number, question):
+    def parse_vote(self, number, question, withdrawals=[]):
         '''
         parse vote
         '''

@@ -70,7 +70,7 @@ class BordaTally(BaseTally):
 
         self.ballots = []
 
-    def parse_vote(self, number, question):
+    def parse_vote(self, number, question, withdrawals=[]):
         vote_str = str(number)
         tab_size = len(str(len(question['answers']) + 2))
 
@@ -83,8 +83,10 @@ class BordaTally(BaseTally):
         for i in range(int(len(vote_str) / tab_size)):
             option = int(vote_str[i*tab_size: (i+1)*tab_size]) - 1
 
+            if option in withdrawals:
+                continue
             # blank vote
-            if option == len(question['answers']) + 1:
+            elif option == len(question['answers']) + 1:
                 raise BlankVoteException()
             # invalid vote
             elif option < 0 or option >= len(question['answers']):
