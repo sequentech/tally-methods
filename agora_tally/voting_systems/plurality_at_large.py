@@ -161,6 +161,7 @@ class PluralityAtLargeTally(BaseTally):
 
         # write the candidates
         for answer in question['answers']:
+            answer['text'] = answer['text'].replace("\n", "").replace("\"", "")
             name = answer['text']
             name.encode('utf-8')
             ans = u'"%s"\n' % name
@@ -216,7 +217,7 @@ class PluralityAtLargeTally(BaseTally):
             total_votes += json_report['answers'][name]
 
         for answer in question['answers']:
-            name = answer['text']
+            name = answer['text'].replace("\n", "").replace("\"", "")
             name.encode('utf-8')
 
             answer['total_count'] = json_report['answers'][name]
