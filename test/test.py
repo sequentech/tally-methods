@@ -78,7 +78,7 @@ def _pretty_print_base(data, mark_winners, show_percent, filter_name):
     print("")
 
 class TestSequenceFunctions(unittest.TestCase):
-    FIXTURES_PATH = os.path.join("test", "fixtures")
+    FIXTURES_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "fixtures")
     PLURALITY_AT_LARGE = "plurality-at-large"
     #MEEK_STV = "meek-stv"
     BORDA_NAURU = "borda-nauru"
