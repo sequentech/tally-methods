@@ -8,7 +8,7 @@ from operator import itemgetter
 
 from agora_tally.tally import do_tartally, do_dirtally, do_tally
 from agora_tally.voting_systems.plurality_at_large import PluralityAtLarge
-#from agora_tally.voting_systems.meek_stv import MeekSTV
+from agora_tally.voting_systems.meek_stv import MeekSTV
 
 def serialize(data):
     return json.dumps(data,
@@ -80,7 +80,7 @@ def _pretty_print_base(data, mark_winners, show_percent, filter_name):
 class TestSequenceFunctions(unittest.TestCase):
     FIXTURES_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "fixtures")
     PLURALITY_AT_LARGE = "plurality-at-large"
-    #MEEK_STV = "meek-stv"
+    MEEK_STV = "meek-stv"
     BORDA_NAURU = "borda-nauru"
     BORDA = "borda"
     BORDA2 = "borda2"
@@ -170,14 +170,14 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_pairwise_beta(self):
         self._test_method(self.PAIRWISE_BETA)
 
-    def test_pairwise_bradleyterry(self):
-        self._test_method(self.PAIRWISE_BRADLEYTERRY)
+    #def test_pairwise_bradleyterry(self):
+    #    self._test_method(self.PAIRWISE_BRADLEYTERRY)
 
     #def test_custom(self):
     #    self._test_method(self.BORDA_CUSTOM)
 
-    #def test_meek_stv(self):
-        #self._test_method(self.MEEK_STV)
+    def test_meek_stv(self):
+        self._test_method(self.MEEK_STV)
 
 if __name__ == '__main__':
     unittest.main()
