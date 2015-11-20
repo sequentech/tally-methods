@@ -14,8 +14,8 @@
 
 __revision__ = "$Id: BordaCustom.py 715 2015-02-27 17:00:55Z edulix $"
 
-from openstv.STV import NonIterative
-from openstv.plugins import MethodPlugin
+from ..STV import NonIterative
+from ..plugins import MethodPlugin
 
 ##################################################################
 

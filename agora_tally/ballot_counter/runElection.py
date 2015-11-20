@@ -8,8 +8,8 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import getopt
 
-from openstv.ballots import Ballots
-from openstv.plugins import getMethodPlugins, getReportPlugins
+from ballots import Ballots
+from plugins import getMethodPlugins, getReportPlugins
 
 methods = getMethodPlugins("byName", exclude0=False)
 methodNames = methods.keys()

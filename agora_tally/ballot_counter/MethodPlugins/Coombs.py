@@ -14,8 +14,8 @@
 
 __revision__ = "$Id: Coombs.py 715 2010-02-27 17:00:55Z jeff.oneill $"
 
-from openstv.STV import NoSurplusSTV
-from openstv.plugins import MethodPlugin
+from ..STV import NoSurplusSTV
+from ..plugins import MethodPlugin
 
 ##################################################################
 

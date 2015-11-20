@@ -1,4 +1,4 @@
-from openstv.plugins import ReportPlugin
+from ..ballot_counter.plugins import ReportPlugin
 
 class JsonReport(ReportPlugin):
     "Return a JSON report."

@@ -9,8 +9,8 @@ import tempfile
 from operator import itemgetter
 from collections import defaultdict
 
-from openstv.ballots import Ballots
-from openstv.plugins import getMethodPlugins
+from ..ballot_counter.ballots import Ballots
+from ..ballot_counter.plugins import getMethodPlugins
 
 from .base import BaseVotingSystem, BaseTally, BlankVoteException
 
@@ -172,8 +172,8 @@ class BordaTally(BaseTally):
         '''
         Actually calls to openstv to perform the tally
         '''
-        from openstv.ballots import Ballots
-        from openstv.plugins import getMethodPlugins
+        from ..ballot_counter.ballots import Ballots
+        from ..ballot_counter.plugins import getMethodPlugins
 
         # get voting and report methods
         methods = getMethodPlugins("byName", exclude0=False)

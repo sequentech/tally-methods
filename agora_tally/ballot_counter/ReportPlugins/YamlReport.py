@@ -12,7 +12,7 @@
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU General Public License for more details.
 
-from openstv.plugins import ReportPlugin
+from ..plugins import ReportPlugin
 
 class YamlReport(ReportPlugin):
   "Return a YAML  report."

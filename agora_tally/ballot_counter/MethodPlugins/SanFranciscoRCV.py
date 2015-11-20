@@ -14,8 +14,8 @@
 
 __revision__ = "$Id: SanFranciscoRCV.py 821 2010-11-19 23:36:17Z jeff.oneill $"
 
-from openstv.STV import NoSurplusSTV
-from openstv.plugins import MethodPlugin
+from ..STV import NoSurplusSTV
+from ..plugins import MethodPlugin
 
 ##################################################################
 

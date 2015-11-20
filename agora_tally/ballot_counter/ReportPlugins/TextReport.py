@@ -18,8 +18,8 @@ import textwrap
 import math
 import os
 
-from openstv.version import v as OpenSTV_version
-from openstv.plugins import ReportPlugin
+from ..version import v as OpenSTV_version
+from ..plugins import ReportPlugin
 
 ##################################################################
 

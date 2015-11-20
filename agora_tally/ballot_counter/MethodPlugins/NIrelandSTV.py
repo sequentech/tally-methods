@@ -14,8 +14,8 @@
 
 __revision__ = "$Id: NIrelandSTV.py 715 2010-02-27 17:00:55Z jeff.oneill $"
 
-from openstv.STV import GregorySTV
-from openstv.plugins import MethodPlugin
+from ..STV import GregorySTV
+from ..plugins import MethodPlugin
 
 ##################################################################
 

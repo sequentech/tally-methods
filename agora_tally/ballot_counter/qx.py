@@ -14,7 +14,7 @@
 
 __revision__ = "$Id: qx.py 710 2010-02-22 00:19:20Z jlundell $"
 
-from openstv.STV import RecursiveSTV
+from STV import RecursiveSTV
 
 #  class QX: quasi-exact fixed-point arithmetic support
 #

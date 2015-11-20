@@ -14,9 +14,9 @@
 
 __revision__ = "$Id: MeekSTV.py 537 2009-05-16 18:45:21Z jeff.oneill $"
 
-from openstv.STV import RecursiveSTV
-from openstv.MethodPlugins.MeekSTV import MeekSTV
-from openstv.plugins import MethodPlugin
+from ..STV import RecursiveSTV
+from ..MethodPlugins.MeekSTV import MeekSTV
+from ..plugins import MethodPlugin
 
 ##################################################################
 

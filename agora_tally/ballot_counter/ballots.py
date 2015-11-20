@@ -15,7 +15,7 @@
 __revision__ = "$Id: ballots.py 821 2010-11-19 23:36:17Z jeff.oneill $"
 
 import os
-from openstv.plugins import getLoaderPlugins, getLoaderPluginClass
+from plugins import getLoaderPlugins, getLoaderPluginClass
 
 ##################################################################
 

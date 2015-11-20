@@ -14,9 +14,9 @@
 
 __revision__ = "$Id: QPQ.py 715 2010-02-27 17:00:55Z jeff.oneill $"
 
-from openstv.STV import Iterative
-from openstv.plugins import MethodPlugin
-from openstv.qx import QX
+from ..STV import Iterative
+from ..plugins import MethodPlugin
+from ..qx import QX
 
 ##  Procedure (from Woodall paper http://www.votingmatters.org.uk/ISSUE17/I17P1.PDF)
 ##

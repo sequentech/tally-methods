@@ -14,8 +14,8 @@
 
 __revision__ = "$Id: Bucklin.py 715 2010-02-27 17:00:55Z jeff.oneill $"
 
-from openstv.STV import Iterative
-from openstv.plugins import MethodPlugin
+from ..STV import Iterative
+from ..plugins import MethodPlugin
 
 ##################################################################
 

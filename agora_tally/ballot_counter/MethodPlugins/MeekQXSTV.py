@@ -14,9 +14,9 @@
 
 __revision__ = "$Id: MeekQXSTV.py 715 2010-02-27 17:00:55Z jeff.oneill $"
 
-from openstv.qx import RecursiveQXSTV
-from openstv.MethodPlugins.MeekSTV import MeekSTV
-from openstv.plugins import MethodPlugin
+from ..qx import RecursiveQXSTV
+from ..MethodPlugins.MeekSTV import MeekSTV
+from ..plugins import MethodPlugin
 
 ##################################################################
 

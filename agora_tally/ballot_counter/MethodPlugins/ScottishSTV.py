@@ -14,8 +14,8 @@
 
 __revision__ = "$Id: ScottishSTV.py 715 2010-02-27 17:00:55Z jeff.oneill $"
 
-from openstv.STV import WeightedInclusiveSTV
-from openstv.plugins import MethodPlugin
+from ..STV import WeightedInclusiveSTV
+from ..plugins import MethodPlugin
 
 ##################################################################
 

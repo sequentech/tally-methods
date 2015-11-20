@@ -14,8 +14,8 @@
 
 __revision__ = "$Id: MinneapolisSTV.py 718 2010-02-28 21:02:44Z jlundell $"
 
-from openstv.STV import WeightedInclusiveSTV
-from openstv.plugins import MethodPlugin
+from ..STV import WeightedInclusiveSTV
+from ..plugins import MethodPlugin
 
 ##################################################################
 

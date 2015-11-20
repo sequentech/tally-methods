@@ -14,10 +14,10 @@
 
 __revision__ = "$Id: Condorcet.py 715 2010-02-27 17:00:55Z jeff.oneill $"
 
-from openstv.STV import NonIterative
-from openstv.plugins import MethodPlugin
-from openstv.MethodPlugins.Borda import Borda
-from openstv.MethodPlugins.IRV import IRV
+from ..STV import NonIterative
+from ..plugins import MethodPlugin
+from ..MethodPlugins.Borda import Borda
+from ..MethodPlugins.IRV import IRV
 
 ##################################################################
 

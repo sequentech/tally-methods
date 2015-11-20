@@ -16,8 +16,8 @@ __revision__ = "$Id: report.py 570 2009-08-20 17:46:56Z jeff.oneill $"
 
 import os
 
-from openstv.plugins import ReportPlugin
-from openstv.version import v as OpenSTV_version
+from ..plugins import ReportPlugin
+from ..version import v as OpenSTV_version
 
 ##################################################################
 

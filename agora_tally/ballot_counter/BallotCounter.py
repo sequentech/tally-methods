@@ -28,13 +28,13 @@ try:
 except:
     pass
 
-from openstv.BFE import BFEFrame
-from openstv.ballots import Ballots
-from openstv.ReportPlugins.TextReport import TextReport
-from openstv.ReportPlugins.HtmlReport import HtmlReport
-from openstv.ReportPlugins.CsvReport import CsvReport
-from openstv.plugins import getMethodPlugins
-from openstv.utils import getHome
+from BFE import BFEFrame
+from ballots import Ballots
+from ReportPlugins.TextReport import TextReport
+from ReportPlugins.HtmlReport import HtmlReport
+from ReportPlugins.CsvReport import CsvReport
+from plugins import getMethodPlugins
+from utils import getHome
 
 ##################################################################
 
@@ -150,7 +150,7 @@ to break the tie randomly.""" % what
 class Frame(wx.Frame):
 
   def __init__(self, parent):
-    wx.Frame.__init__(self, parent, -1, "OpenSTV", size=(900, 600))
+    wx.Frame.__init__(self, parent, -1, "BallotCounter", size=(900, 600))
 
     warnings.showwarning = self.catchWarnings
 
@@ -273,8 +273,8 @@ to www.OpenSTV.org, or send an email to OpenSTV@googlegroups.com.
     # Help menu
     HelpMenu = wx.Menu()
     
-    self.AddMenuItem(HelpMenu, 'OpenSTV Help',
-                     'OpenSTV Help', self.OnHelp, "Help")
+    self.AddMenuItem(HelpMenu, 'BallotCounter Help',
+                     'BallotCounter Help', self.OnHelp, "Help")
 
     self.AddMenuItem(HelpMenu, 'License',
                      'GNU General Public License', self.OnLicense)
@@ -297,7 +297,7 @@ to www.OpenSTV.org, or send an email to OpenSTV@googlegroups.com.
     # About OpenSTV
     if wx.Platform != "__WXMAC__":
       HelpMenu.AppendSeparator()
-    itemId = self.AddMenuItem(HelpMenu, '&About', 'About OpenSTV', self.OnAbout, 
+    itemId = self.AddMenuItem(HelpMenu, '&About', 'About BallotCounter', self.OnAbout, 
                           "About")
     if wx.Platform == "__WXMAC__":
       wx.App.SetMacAboutMenuItemId(itemId)
@@ -565,7 +565,7 @@ to www.OpenSTV.org, or send an email to OpenSTV@googlegroups.com.
     frame.Show(True)
 
   def OnHelp(self, event):
-    frame = HTMLFrame(self, "OpenSTV Help", fName="Help.html")
+    frame = HTMLFrame(self, "BallotCounter Help", fName="Help.html")
     frame.Show(True)
 
   def OnLicense(self, event):
@@ -858,7 +858,7 @@ class AboutDialog(wx.Dialog):
   "Dialog for about OpenSTV box."
 
   def __init__(self, parent):
-    wx.Dialog.__init__(self, parent, -1, "About OpenSTV")
+    wx.Dialog.__init__(self, parent, -1, "About BallotCounter")
 
     sizer = wx.BoxSizer(wx.VERTICAL)
 

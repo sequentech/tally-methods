@@ -16,8 +16,8 @@ __revision__ = "$Id: RTSTV.py 715 2010-02-27 17:00:55Z jeff.oneill $"
 
 import string
 
-from openstv.STV import OrderDependentSTV
-from openstv.plugins import MethodPlugin
+from ..STV import OrderDependentSTV
+from ..plugins import MethodPlugin
 
 ##################################################################
 

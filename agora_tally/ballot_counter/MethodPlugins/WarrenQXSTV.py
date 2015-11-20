@@ -14,9 +14,9 @@
 
 __revision__ = "$Id: WarrenQXSTV.py 715 2010-02-27 17:00:55Z jeff.oneill $"
 
-from openstv.qx import RecursiveQXSTV
-from openstv.MethodPlugins.WarrenSTV import WarrenSTV
-from openstv.plugins import MethodPlugin
+from ..qx import RecursiveQXSTV
+from ..MethodPlugins.WarrenSTV import WarrenSTV
+from ..plugins import MethodPlugin
 
 ##################################################################
 
