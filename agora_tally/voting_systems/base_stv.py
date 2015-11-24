@@ -10,8 +10,8 @@ import codecs
 import os
 import tempfile
 
-from openstv.ballots import Ballots
-from openstv.plugins import getMethodPlugins
+from ..ballot_counter.ballots import Ballots
+from ..ballot_counter.plugins import getMethodPlugins
 
 from .base import BaseVotingSystem, BaseTally
 
