@@ -109,7 +109,7 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
         tally.pre_tally(questions)
         plaintexts_path = os.path.join(dir_path, "%d-*" % i, "plaintexts_json")
         plaintexts_path = glob.glob(plaintexts_path)[0]
-        tally.question_id = plaintexts_path.split('/')[-2]
+        tally.question_id = plaintexts_path.split(os.sep)[-2]
 
         q_withdrawals = [
           answer['answer_id']
@@ -119,6 +119,7 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
         with codecs.open(plaintexts_path, encoding='utf-8', mode='r') as plaintexts_file:
             total_count = encrypted_invalid_votes
             for line in plaintexts_file.readlines():
+                line = line.replace("\r\n", "\n")
                 total_count += 1
                 voter_answers = copy.deepcopy(base_vote)
                 try:

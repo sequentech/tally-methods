@@ -19,7 +19,7 @@ def _open(path, mode):
 
 def _read_file(path):
     with _open(path, mode='r') as f:
-        return f.read()
+        return f.read().replace('\r\n', "\n")
 
 def _write_file(path, data):
     with _open(path, mode='w') as f:
