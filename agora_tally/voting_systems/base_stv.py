@@ -147,7 +147,7 @@ class BaseSTVTally(BaseTally):
 
         return None
 
-    def add_vote(self, voter_answers, result, is_delegated):
+    def add_vote(self, voter_answers, questions, is_delegated):
         '''
         Add to the count a vote from a voter
         '''
