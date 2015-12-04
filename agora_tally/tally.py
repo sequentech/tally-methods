@@ -53,6 +53,9 @@ def do_tartally(tally_path):
     return do_tally(dir_path, questions)
 
 def do_dirtally(dir_path, ignore_invalid_votes=False, encrypted_invalid_votes=0):
+    """SOD: do_dirtally receives the path of the file where a determinate json is and returns the out
+    value of the method do_tally (a dictionary where the pars key/value are questions/number of votes)
+    from the file questions_json"""
     res_path = os.path.join(dir_path, 'questions_json')
     with codecs.open(res_path, encoding='utf-8', mode='r') as res_f:
         questions = json.loads(res_f.read())
@@ -64,6 +67,9 @@ def do_dirtally(dir_path, ignore_invalid_votes=False, encrypted_invalid_votes=0)
 def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
              encrypted_invalid_votes=0, monkey_patcher=None,
              question_indexes=None, withdrawals=[]):
+    """SOD: do_tally method analyses the questions_json file and, with the data about its attributes,
+    returns a dictionary in which the par key-value is a question and its number of votes"""
+
     # questions is in the same format as get_questions_pretty(). Initialized here
     questions = copy.deepcopy(questions)
     base_vote =[dict(choices=[]) for q in questions]
