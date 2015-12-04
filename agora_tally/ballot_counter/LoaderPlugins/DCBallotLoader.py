@@ -17,7 +17,7 @@
 __revision__ = "$Id: DCBallotLoader.py 693 2010-01-03 19:12:05Z jeff.oneill $"
 
 import re
-from ..plugins import LoaderPlugin
+from agora_tally.ballot_counter.plugins import LoaderPlugin
 
 class DCBallotLoader(LoaderPlugin):
   "Ballot loader class for DemoChoice ballot files."

@@ -16,8 +16,8 @@ __revision__ = "$Id: FTSTV.py 715 2010-02-27 17:00:55Z jeff.oneill $"
 
 import string
 
-from ..STV import WeightedInclusiveSTV
-from ..plugins import MethodPlugin
+from agora_tally.ballot_counter.STV import WeightedInclusiveSTV
+from agora_tally.ballot_counter.plugins import MethodPlugin
 
 ##################################################################
 

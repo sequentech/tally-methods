@@ -115,7 +115,7 @@ import time
 import random
 from types import *
 
-import STV
+from agora_tally.ballot_counter import STV
 
 NOTA = 1
 noNOTA = 0

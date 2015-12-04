@@ -14,8 +14,8 @@
 
 __revision__ = "$Id: ERS97STV.py 715 2010-02-27 17:00:55Z jeff.oneill $"
 
-from ..STV import GregorySTV
-from ..plugins import MethodPlugin
+from agora_tally.ballot_counter.STV import GregorySTV
+from agora_tally.ballot_counter.plugins import MethodPlugin
 
 ##################################################################
 

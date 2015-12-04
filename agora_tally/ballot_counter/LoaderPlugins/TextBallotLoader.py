@@ -15,7 +15,7 @@
 __revision__ = "$Id: TextBallotLoader.py 719 2010-03-01 03:43:54Z jeff.oneill $"
 
 import re
-from ..plugins import LoaderPlugin
+from agora_tally.ballot_counter.plugins import LoaderPlugin
 
 class TextBallotLoader(LoaderPlugin):
   "Class for ballots with a simple text format."

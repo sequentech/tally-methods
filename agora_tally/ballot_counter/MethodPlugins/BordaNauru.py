@@ -14,8 +14,8 @@
 
 __revision__ = "$Id: Borda.py 715 2015-02-27 17:00:55Z edulix $"
 
-from ..STV import NonIterative
-from ..plugins import MethodPlugin
+from agora_tally.ballot_counter.STV import NonIterative
+from agora_tally.ballot_counter.plugins import MethodPlugin
 
 ##################################################################
 

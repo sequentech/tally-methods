@@ -14,9 +14,9 @@
 
 __revision__ = "$Id: MeekQXSTV.py 715 2010-02-27 17:00:55Z jeff.oneill $"
 
-from ..qx import RecursiveQXSTV
-from ..MethodPlugins.MeekSTV import MeekSTV
-from ..plugins import MethodPlugin
+from agora_tally.ballot_counter.qx import RecursiveQXSTV
+from agora_tally.ballot_counter.MethodPlugins.MeekSTV import MeekSTV
+from agora_tally.ballot_counter.plugins import MethodPlugin
 
 ##################################################################
 

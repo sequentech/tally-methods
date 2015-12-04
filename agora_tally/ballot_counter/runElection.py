@@ -8,8 +8,8 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import getopt
 
-from ballots import Ballots
-from plugins import getMethodPlugins, getReportPlugins
+from agora_tally.ballot_counter.ballots import Ballots
+from agora_tally.ballot_counter.plugins import getMethodPlugins, getReportPlugins
 
 methods = getMethodPlugins("byName", exclude0=False)
 methodNames = methods.keys()

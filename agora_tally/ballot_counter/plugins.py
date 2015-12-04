@@ -20,7 +20,7 @@ import os.path
 import textwrap
 import pkgutil
 
-from utils import getHome
+from agora_tally.ballot_counter.utils import getHome
 
 ##################################################################
 
@@ -296,16 +296,16 @@ def getPlugins(package, baseClass, format, exclude0):
     assert(0)
 
 def getMethodPlugins(format, exclude0 = True):
-  import MethodPlugins
-  return getPlugins(MethodPlugins, MethodPlugin, format, exclude0)
+  import agora_tally.ballot_counter.MethodPlugins
+  return getPlugins(agora_tally.ballot_counter.MethodPlugins, MethodPlugin, format, exclude0)
   
 def getReportPlugins(format, exclude0 = True):
-  import ReportPlugins
-  return getPlugins(ReportPlugins, ReportPlugin, format, exclude0)
+  import agora_tally.ballot_counter.ReportPlugins
+  return getPlugins(agora_tally.ballot_counter.ReportPlugins, ReportPlugin, format, exclude0)
   
 def getLoaderPlugins(format, exclude0 = True):
-  import LoaderPlugins
-  return getPlugins(LoaderPlugins, LoaderPlugin, format, exclude0)
+  import agora_tally.ballot_counter.LoaderPlugins
+  return getPlugins(agora_tally.ballot_counter.LoaderPlugins, LoaderPlugin, format, exclude0)
 
 def getLoaderPluginClass(extension, exclude0 = True):
   "Return the most appropriate loader for a given file extension."

@@ -22,9 +22,9 @@ try:
 except:
     pass
 
-from STV import *
-from ballots import Ballots
-from utils import getHome
+from agora_tally.ballot_counter.STV import *
+from agora_tally.ballot_counter.ballots import Ballots
+from agora_tally.ballot_counter.utils import getHome
 
 ##################################################################
 

@@ -14,9 +14,9 @@
 
 __revision__ = "$Id: QPQ.py 715 2010-02-27 17:00:55Z jeff.oneill $"
 
-from ..STV import Iterative
-from ..plugins import MethodPlugin
-from ..qx import QX
+from agora_tally.ballot_counter.STV import Iterative
+from agora_tally.ballot_counter.plugins import MethodPlugin
+from agora_tally.ballot_counter.qx import QX
 
 ##  Procedure (from Woodall paper http://www.votingmatters.org.uk/ISSUE17/I17P1.PDF)
 ##
