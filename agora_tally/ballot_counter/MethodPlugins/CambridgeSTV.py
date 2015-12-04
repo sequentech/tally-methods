@@ -17,9 +17,9 @@ __revision__ = "$Id: CambridgeSTV.py 715 2010-02-27 17:00:55Z jeff.oneill $"
 import os.path
 import string
 
-from ..STV import OrderDependentSTV
-from ..plugins import MethodPlugin
-from ..ballots import Ballots
+from agora_tally.ballot_counter.STV import OrderDependentSTV
+from agora_tally.ballot_counter.plugins import MethodPlugin
+from agora_tally.ballot_counter.ballots import Ballots
 
 ##################################################################
 

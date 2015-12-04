@@ -14,8 +14,8 @@
 
 __revision__ = "$Id: MinneapolisSTV.py 718 2010-02-28 21:02:44Z jlundell $"
 
-from ..STV import WeightedInclusiveSTV
-from ..plugins import MethodPlugin
+from agora_tally.ballot_counter.STV import WeightedInclusiveSTV
+from agora_tally.ballot_counter.plugins import MethodPlugin
 
 ##################################################################
 

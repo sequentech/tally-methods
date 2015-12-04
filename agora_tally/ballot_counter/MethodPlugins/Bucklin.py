@@ -14,8 +14,8 @@
 
 __revision__ = "$Id: Bucklin.py 715 2010-02-27 17:00:55Z jeff.oneill $"
 
-from ..STV import Iterative
-from ..plugins import MethodPlugin
+from agora_tally.ballot_counter.STV import Iterative
+from agora_tally.ballot_counter.plugins import MethodPlugin
 
 ##################################################################
 

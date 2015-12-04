@@ -14,8 +14,8 @@
 
 __revision__ = "$Id: SanFranciscoRCV.py 821 2010-11-19 23:36:17Z jeff.oneill $"
 
-from ..STV import NoSurplusSTV
-from ..plugins import MethodPlugin
+from agora_tally.ballot_counter.STV import NoSurplusSTV
+from agora_tally.ballot_counter.plugins import MethodPlugin
 
 ##################################################################
 

@@ -28,13 +28,13 @@ try:
 except:
     pass
 
-from BFE import BFEFrame
-from ballots import Ballots
-from ReportPlugins.TextReport import TextReport
-from ReportPlugins.HtmlReport import HtmlReport
-from ReportPlugins.CsvReport import CsvReport
-from plugins import getMethodPlugins
-from utils import getHome
+from agora_tally.ballot_counter.BFE import BFEFrame
+from agora_tally.ballot_counter.ballots import Ballots
+from agora_tally.ballot_counter.ReportPlugins.TextReport import TextReport
+from agora_tally.ballot_counter.ReportPlugins.HtmlReport import HtmlReport
+from agora_tally.ballot_counter.ReportPlugins.CsvReport import CsvReport
+from agora_tally.ballot_counter.plugins import getMethodPlugins
+from agora_tally.ballot_counter.utils import getHome
 
 ##################################################################
 
