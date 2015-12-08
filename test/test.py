@@ -97,9 +97,12 @@ class TestSequenceFunctions(unittest.TestCase):
 
 
     def _test_method(self, dirname):
-        '''
-        Generic method to do a tally
-        '''
+        """Agora-Voting:  Generic method to do a tally
+        SOD: this method compares the results of applies do_dirtally method to a specific questions_json (in the
+        path determined from tally_path) with the results save in the results_json file and, if they are the same
+        result, returns one of them (in the method, it returns the variable called results but it could be
+        should_results too)"""
+
         tally_path = os.path.join(self.FIXTURES_PATH, dirname)
         results_path = os.path.join(tally_path, "results_json")
         results = do_dirtally(tally_path)
