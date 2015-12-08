@@ -10,7 +10,7 @@
                     "elected": true,
                     "media_url": "https://agora.confederacionpirata.org/static/img/cands/46.jpg",
                     "seat_number": 1,
-                    "total_count": 0,
+                    "total_count": 3,
                     "urls": [
                         {
                             "title": "Preguntas",
@@ -38,7 +38,7 @@
                     "elected": false,
                     "media_url": "https://agora.confederacionpirata.org/static/img/cands/7.jpg",
                     "seat_number": 0,
-                    "total_count": 0,
+                    "total_count": 1,
                     "urls": [
                         {
                             "title": "Preguntas",
@@ -62,7 +62,7 @@
                     "elected": false,
                     "media_url": "https://agora.confederacionpirata.org/static/img/cands/34.jpg",
                     "seat_number": 0,
-                    "total_count": 0,
+                    "total_count": 1,
                     "urls": [
                         {
                             "title": "Preguntas",
@@ -110,7 +110,7 @@
                     "elected": true,
                     "media_url": "",
                     "seat_number": 2,
-                    "total_count": 0,
+                    "total_count": 2,
                     "urls": [
                         {
                             "title": "Preguntas",
@@ -302,7 +302,7 @@
                     "elected": false,
                     "media_url": "https://agora.confederacionpirata.org/static/img/cands/10.jpg",
                     "seat_number": 0,
-                    "total_count": 0,
+                    "total_count": 1,
                     "urls": [
                         {
                             "title": "Preguntas",
@@ -486,7 +486,7 @@
                     "elected": true,
                     "media_url": "https://agora.confederacionpirata.org/static/img/cands/13.jpg",
                     "seat_number": 3,
-                    "total_count": 0,
+                    "total_count": 2,
                     "urls": [
                         {
                             "title": "Preguntas",

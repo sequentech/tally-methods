@@ -243,6 +243,9 @@ class BaseSTVTally(BaseTally):
             name.encode('utf-8')
             it_answer = last_iteration['candidates'][i - 1]
             answer['elected'] = ('won' in it_answer['status'])
+            ballot = self.find_ballot([i])
+            if ballot:
+                answer['total_count'] = ballot['votes']
 
             if answer['elected']:
                 answer['seat_number'] = json_report['winners'].index(name) + 1
