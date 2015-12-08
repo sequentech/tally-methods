@@ -7,9 +7,9 @@
                     "a": "ballot/answer",
                     "details": "Soy recién estudiante de derecho, con inglés superior y técnico de informática. Actualmente trabajo en la Administración de Justicia en Vinaroz.<p></p>Hace años que me introduje en el movimiento Pirata y mi primera acción importante fue llevar la territorial de Castellón a las generales dentro del Partido Pirata. Creo en el movimiento, no en unas siglas, por lo que cualquier cosa que entorpezca el crecimiento de este movimiento, para mí es prescindible. Creo en la unión y no en que cada cual vaya por su lado.<p></p>Me mueve sobretodo esta guerra cibernética contra la neutralidad en la red que se vive desde hace unos años. Sin una información libre, no hay una democracia real, por lo tanto, creo firmemente en la necesidad de que la gente pueda disponer de unos medios para comunicarse libremente, ya sea con mala o buena información, y donde pueda expresarse sin tapujos.<p></p>También veo que la casta política que nos gobierna hoy en día no tiene conciencia sobre los derechos humanos, sino sobre el dinero que pueden ganar con ello.<p></p>Creo que la gente ha de tener el derecho a decidir y a equivocarse, por ello creo en una democracia directa. Pero me vale cualquier tipo de democracia que mejore la actual, de momento.<p></p>No sé si seré el más indicado para estar como candidato principal, pero sí creo que ha de haber diversidad para que la gente pueda opinar sobre lo que quiere.",
                     "details_title": "Presentación y motivos",
-                    "elected": false,
+                    "elected": true,
                     "media_url": "https://agora.confederacionpirata.org/static/img/cands/46.jpg",
-                    "seat_number": 0,
+                    "seat_number": 1,
                     "total_count": 0,
                     "urls": [
                         {
@@ -107,9 +107,9 @@
                     "a": "ballot/answer",
                     "details": "Nací en 1983 en el seno de una familia obrera: mi madre trabajaba en un videoclub y mi padre era el sargento más joven de la Guardia Urbana de Barcelona. A los 9 años mi padre abandonó a mi madre, y dos años más tarde fue despedido fulminantemente de su empleo por... bueno, básicamente por corrupto e imbécil.<p></p>Mientras tanto mi madre nos sacó adelante a mi hermano siete años menor y a mí, trabajando horas y horas, pasando hambre muchas veces, trabajando y trabajando para pasar el día a día, para cubrir las deudas que mi padre dejó, para pagar como podía la luz, el agua, etc.<p></p>Ello me enseñó como nada podría enseñar lo importante que es ser responsable, honesto e íntegro. Cada vez que alguien hace algo deshonesto hace daño a otra persona. Crea una pirámide de dolor que puede y debe evitarse.<p></p>Con su actitud mi madre también me enseñó a ser consecuente, fiel, a ver las cosas con actitud lógica y fría, pero al mismo tiempo a buscar la calidez y la humanidad de cada acción. A amar cada acción que emprendo, a luchar por aquello en lo que creo y a no ser cerrado de mente.<p></p>Ese soy yo: la consecuencia de mis elecciones, el resultado de mi lucha y la de otros. Y creo que ahora me toca a mí luchar para que otros se puedan beneficiar de mi experiencia sin tener que sufrirla.<p></p>Creo en un mundo mejor. Y creo que puedo y debo ayudar a construirlo.",
                     "details_title": "Presentación y motivos",
-                    "elected": false,
+                    "elected": true,
                     "media_url": "",
-                    "seat_number": 0,
+                    "seat_number": 2,
                     "total_count": 0,
                     "urls": [
                         {
@@ -483,9 +483,9 @@
                     "a": "ballot/answer",
                     "details": "He sido representante de los trabajadores en la Universidad de Alcalá en la cual trabajo. Quisiera poner patas arriba este estado en el que vivimos. Me considero anarquista.",
                     "details_title": "Presentación y motivos",
-                    "elected": false,
+                    "elected": true,
                     "media_url": "https://agora.confederacionpirata.org/static/img/cands/13.jpg",
-                    "seat_number": 0,
+                    "seat_number": 3,
                     "total_count": 0,
                     "urls": [
                         {
@@ -547,9 +547,9 @@
                     "a": "ballot/answer",
                     "details": "NTengo 41 años y llevo involucrado con el movimiento pirata desde el 2009 cuando formé parte de la junta de PIRATA.<p></p>Acudí en 2 ocasiones a la asamblea anual del PPI en calidad de delegado de PP-ES. Asimismo serví 2 años en el Court of Arbitration del PPI.<p></p>Me caracterizo por mi talante afable y conciliador. He vivido 15 años en Inglaterra y 5 en Alemania, por ello en parte me siento un ciudadano europeo.",
                     "details_title": "Presentación y motivos",
-                    "elected": true,
+                    "elected": false,
                     "media_url": "https://agora.confederacionpirata.org/static/img/cands/33.jpg",
-                    "seat_number": 1,
+                    "seat_number": 0,
                     "total_count": 0,
                     "urls": [
                         {
@@ -564,7 +564,7 @@
                     "value": "Arturo Martínez Nieves"
                 }
             ],
-            "dirty_votes": 6,
+            "dirty_votes": 0,
             "layout": "PRIMARY",
             "max": 3,
             "min": 0,
@@ -572,16 +572,18 @@
             "question": "¿Quién quieres que encabece la lista pirata para el Parlamento Europeo?",
             "randomize_answer_order": true,
             "tally_type": "meek-stv",
-            "total_votes": 1,
+            "total_votes": 10,
             "totals": {
                 "blank_votes": 0,
-                "null_votes": 6,
+                "null_votes": 0,
                 "valid_votes": 0
             },
             "winners": [
-                "Arturo Martínez Nieves"
+                "Juan Bautista Esteve Ramos",
+                "Andrés Roca Pascual",
+                "Virginia Rubio López"
             ]
         }
     ],
-    "total_votes": 7
+    "total_votes": 10
 }
