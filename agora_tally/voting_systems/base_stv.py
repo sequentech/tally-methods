@@ -225,6 +225,7 @@ class BaseSTVTally(BaseTally):
 
         question = result[self.question_num]
         question['total_votes'] = json_report['ballots_count']
+        question['totals']['valid_votes'] = question['total_votes'] - question['totals']['blank_votes'] - question['totals']['null_votes']
         question['dirty_votes'] = json_report['dirty_ballots_count'] - json_report['ballots_count']
         json_report['winners'] = [winner.decode('utf-8') for winner in json_report['winners']]
         question['winners'] = []
@@ -242,6 +243,9 @@ class BaseSTVTally(BaseTally):
             name.encode('utf-8')
             it_answer = last_iteration['candidates'][i - 1]
             answer['elected'] = ('won' in it_answer['status'])
+            ballot = self.find_ballot([i])
+            if ballot:
+                answer['total_count'] = ballot['votes']
 
             if answer['elected']:
                 answer['seat_number'] = json_report['winners'].index(name) + 1
