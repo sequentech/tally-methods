@@ -576,7 +576,7 @@
             "totals": {
                 "blank_votes": 0,
                 "null_votes": 0,
-                "valid_votes": 0
+                "valid_votes": 10
             },
             "winners": [
                 "Juan Bautista Esteve Ramos",
