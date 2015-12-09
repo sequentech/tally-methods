@@ -120,6 +120,7 @@ class BaseSTVTally(BaseTally):
         self.num_seats = question['num_seats']
 
         # fill answer to dict
+        # SOD: Assign an index to every question starting with the number 1
         i = 1
         for answer in question['answers']:
             self.answer_to_ids_dict[answer['value']] = i

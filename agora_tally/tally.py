@@ -77,7 +77,9 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
     # setup the initial data common to all voting system
     i = 0
     for qindex, question in enumerate(questions):
-
+        # SOD: tally_type receives the string which determined the type of tally, we are working over meek-stv module
+        # so, in our specific case, this value must be meek-stv. With this tally_type, the system can check the
+        # counting method with get_voting_system_by_id
         tally_type = question['tally_type']
         voting_system = get_voting_system_by_id(tally_type)
         tally = voting_system.create_tally(None, i)
@@ -135,6 +137,8 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
                     # because number 0 cannot be encrypted with elgammal
                     # so we trim beginning and end, parse the int and
                     # substract one
+                    # SOD: number attribute is defined after recovering the vote's value. Remember that the system uses
+                    # a method to encrypted the vote's value to guarantee the homogeneity in the vote's structure
                     number = int(line[1:-2]) - 1
                     choices = tally.parse_vote(number, question, q_withdrawals)
 
