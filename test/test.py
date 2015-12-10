@@ -104,8 +104,8 @@ class TestSequenceFunctions(unittest.TestCase):
         should_results too)"""
 
         tally_path = os.path.join(self.FIXTURES_PATH, dirname)
-        results_path = os.path.join(tally_path, "results_json")
         results = do_dirtally(tally_path)
+        results_path = os.path.join(tally_path, "results_json")
         should_results = _read_file(results_path)
         self.assertEqual(serialize(results), should_results)
         return results
@@ -193,6 +193,13 @@ class TestSequenceFunctions(unittest.TestCase):
                 print(stringI + ". " + winner)
                 i = i+1
         print("")
+
+    def test_invalid_votesMeekstv(self):
+
+        tally_path = os.path.join(self.FIXTURES_PATH+'/meek-stv-invalidVotes')
+        results = do_dirtally(tally_path)
+        self.assertTrue('"null_votes": 2,' in serialize(results))
+
 
 
 if __name__ == '__main__':
