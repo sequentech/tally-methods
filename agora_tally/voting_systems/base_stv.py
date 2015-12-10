@@ -9,6 +9,7 @@ import sys
 import codecs
 import os
 import tempfile
+import base
 
 from openstv.ballots import Ballots
 from openstv.plugins import getMethodPlugins
@@ -105,7 +106,7 @@ class BaseSTVTally(BaseTally):
                 option_str = question['answers'][option]['value']
             if option >= len(question['answers']):
                 # invalid/blank vote
-                raise Exception()
+                raise base.BlankVoteException()
             ret.append(option_str)
 
         return ret
