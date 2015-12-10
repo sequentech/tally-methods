@@ -180,7 +180,20 @@ class TestSequenceFunctions(unittest.TestCase):
     #    self._test_method(self.BORDA_CUSTOM)
 
     def test_meek_stv(self):
-        self._test_method(self.MEEK_STV)
+        results = self._test_method(self.MEEK_STV)
+        print("MEEK-STV TEST")
+        for question in results['questions']:
+            varQuestion = question['question']
+            varWinners = question['winners']
+            print("Question: " + varQuestion)
+            print("Winners:")
+            i = 1
+            for winner in varWinners:
+                stringI = str(i)
+                print(stringI + ". " + winner)
+                i = i+1
+        print("")
+
 
 if __name__ == '__main__':
     unittest.main()
