@@ -206,6 +206,11 @@ class TestSequenceFunctions(unittest.TestCase):
         results = do_dirtally(tally_path)
         self.assertTrue('"null_votes": 2,' in serialize(results))
 
+
+    """Agora-Voting:  method to testing the blank votes
+        JAAL: this method compares the results of applies do_dirtally method,
+        to a specific purposely value since the 'plaintexts_json' file.
+        if the comparison result is correct, the test is verified."""
     def test_blank_votesMeekstv(self):
 
         tally_path = os.path.join(self.FIXTURES_PATH+'/meek-stv-blankVotes')
