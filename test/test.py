@@ -194,6 +194,12 @@ class TestSequenceFunctions(unittest.TestCase):
                 i = i+1
         print("")
 
+
+
+    """Agora-Voting:  method to testing the invalid votes
+        JAAL: this method compares the results of applies do_dirtally method,
+        to a specific purposely value since the 'plaintexts_json' file.
+        if the comparison result is correct, the test is verified."""
     def test_invalid_votesMeekstv(self):
 
         tally_path = os.path.join(self.FIXTURES_PATH+'/meek-stv-invalidVotes')
