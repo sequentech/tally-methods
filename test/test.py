@@ -200,6 +200,12 @@ class TestSequenceFunctions(unittest.TestCase):
         results = do_dirtally(tally_path)
         self.assertTrue('"null_votes": 2,' in serialize(results))
 
+    def test_blank_votesMeekstv(self):
+
+        tally_path = os.path.join(self.FIXTURES_PATH+'/meek-stv-blankVotes')
+        results = do_dirtally(tally_path)
+        self.assertTrue('"blank_votes": 1,' in serialize(results))
+
 
 
 if __name__ == '__main__':
