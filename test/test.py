@@ -200,7 +200,57 @@ class TestSequenceFunctions(unittest.TestCase):
         results = do_dirtally(tally_path)
         self.assertTrue('"null_votes": 2,' in serialize(results))
 
+    def test_many_votes(self):
 
+        tally_path = os.path.join(self.FIXTURES_PATH+'/meek-stv-manyVotes')
+
+        # We generate 5238 random votes, where we want 3 candidates to have different weight than the others
+        generateVotes({4:50, 3:20, 15:12}, 5238, 25, tally_path)
+        results = do_dirtally(tally_path)
+        winners = serialize(results).split('"winners": ')[1]
+        #Now we just check if the three candidates with more votes are the winners
+        self.assertTrue("Eduardo Bondad" in winners)
+        self.assertTrue("Juan Jesus Lopez Aguilar" in winners)
+        self.assertTrue("Javier" in winners)
+        '''You can check the different votes in the plaintexts_json in meek-stv-manyVotes to check that the result is
+        randomly generated. It even includes blank votes and invalid votes. The results are generated in a file as well
+        if you want to check some statistics or just to see if they're being generated correctly.'''
+        _write_file(tally_path+"/results_json", serialize(results))
 
 if __name__ == '__main__':
     unittest.main()
+
+# Method for generating a result file with random votes:
+
+import random
+
+def weighted_choice(choices):
+    #A simple algorithm that takes a dictionary with Choice : Weight and gives a weighted random choice.
+    r = random.uniform(0, sum(choices.itervalues()))
+    s = 0
+    for k, w in choices.iteritems():
+        s+=w
+        if r < s: return k
+    return k
+
+
+
+def generateVotes(weights, numberOfVotes, numberOfAnswers, filedir):
+    target = ""
+    #We create a great enough weight for having hundreds of blank votes
+    weights[numberOfAnswers+1]=5
+    #Then we assign an equal weight to all the options without weights
+    while numberOfAnswers>0:
+        if not numberOfAnswers in weights:
+            weights[numberOfAnswers]= 1
+        numberOfAnswers-=1
+    weights[0]=1
+    #Finally for every vote we calculate a random weighted choice
+    for x in xrange(numberOfVotes):
+        vote = weighted_choice(weights)+1
+        if vote == 1:
+            vote = "garbage"
+        target += '"'+str(vote)+'"\n'
+    #And write it in a file for reading
+    _write_file(filedir+"/0-question/plaintexts_json", target)
+
