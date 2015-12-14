@@ -192,7 +192,30 @@ class TestSequenceFunctions(unittest.TestCase):
                 stringI = str(i)
                 print(stringI + ". " + winner)
                 i = i+1
-        print("")
+        print("-----------")
+
+
+    #SOD: We use this test to check the correct performance of the meek-stv recount when we have more than one question.
+    #In this case, the system reads the votes of the plaintexts_json according to the question's index. If the question is
+    #in the first position (index=0), the system reads the votes of the directory "0-question"
+    def test_meek_stvMultipleQuestions(self):
+        tally_path = os.path.join(self.FIXTURES_PATH+'/meek-stv-multipleQuestions')
+        results = do_dirtally(tally_path)
+        index = 0
+        print("MEEK-STV TEST MULTIPLE QUESTIONS")
+        for question in results['questions']:
+            varQuestion = question['question']
+            varWinners = question['winners']
+            varBlankVotes = question['totals']['blank_votes']
+            print("Question: " + varQuestion)
+            print("Blank Votes: " + str(varBlankVotes))
+            print("Winners:")
+            i = 1
+            for winner in varWinners:
+                stringI = str(i)
+                print(stringI + ". " + winner)
+                i = i+1
+        print("----------------")
 
 
 
