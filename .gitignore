@@ -1,2 +1,7 @@
 *pyc
 *.kdev4
+.idea/
+test/fixtures/meek-stv-hundred-thousand-votes/0-question/plaintexts_json
+test/fixtures/meek-stv-hundred-thousand-votes/results_json
+test/fixtures/meek-stv-manyVotes/0-question/plaintexts_json
+test/fixtures/meek-stv-manyVotes/results_json
