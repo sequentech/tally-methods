@@ -180,8 +180,8 @@ class TestSequenceFunctions(unittest.TestCase):
     #    self._test_method(self.BORDA_CUSTOM)
 
     def test_meek_stv(self):
+        print("TEST MEEK-STV")
         results = self._test_method(self.MEEK_STV)
-        print("MEEK-STV TEST")
         for question in results['questions']:
             varQuestion = question['question']
             varWinners = question['winners']
@@ -199,10 +199,10 @@ class TestSequenceFunctions(unittest.TestCase):
     #In this case, the system reads the votes of the plaintexts_json according to the question's index. If the question is
     #in the first position (index=0), the system reads the votes of the directory "0-question"
     def test_meek_stvMultipleQuestions(self):
+        print("TEST MEEK-STV MULTIPLE QUESTIONS")
         tally_path = os.path.join(self.FIXTURES_PATH+'/meek-stv-multipleQuestions')
         results = do_dirtally(tally_path)
         index = 0
-        print("MEEK-STV TEST MULTIPLE QUESTIONS")
         for question in results['questions']:
             varQuestion = question['question']
             varWinners = question['winners']
@@ -224,7 +224,7 @@ class TestSequenceFunctions(unittest.TestCase):
         to a specific purposely value since the 'plaintexts_json' file.
         if the comparison result is correct, the test is verified."""
     def test_invalid_votesMeekstv(self):
-
+        print("TEST MEEK-STV INVALID VOTES")
         tally_path = os.path.join(self.FIXTURES_PATH+'/meek-stv-invalidVotes')
         results = do_dirtally(tally_path)
         self.assertTrue('"null_votes": 2,' in serialize(results))
@@ -234,15 +234,17 @@ class TestSequenceFunctions(unittest.TestCase):
         to a specific purposely value since the 'plaintexts_json' file.
         if the comparison result is correct, the test is verified."""
     def test_blank_votesMeekstv(self):
+        print("TEST MEEK-STV BLANK VOTES")
         tally_path = os.path.join(self.FIXTURES_PATH+'/meek-stv-blankVotes')
         results = do_dirtally(tally_path)
         self.assertTrue('"blank_votes": 1,' in serialize(results))
 
     def test_many_votes(self):
+        print("TEST MEEK-STV MANY VOTES")
         tally_path = os.path.join(self.FIXTURES_PATH+'/meek-stv-manyVotes')
 
         # We generate 5238 random votes, where we want 3 candidates to have different weight than the others
-        generateVotes({4:50, 3:20, 15:12}, 5238, 25, tally_path)
+        generateVotes({4:50, 3:20, 15:12}, 5238, 24, tally_path)
         results = do_dirtally(tally_path)
         winners = serialize(results).split('"winners": ')[1]
         #Now we just check if the three candidates with more votes are the winners
@@ -252,6 +254,23 @@ class TestSequenceFunctions(unittest.TestCase):
         '''You can check the different votes in the plaintexts_json in meek-stv-manyVotes to check that the result is
         randomly generated. It even includes blank votes and invalid votes. The results are generated in a file as well
         if you want to check some statistics or just to see if they're being generated correctly.'''
+        _write_file(tally_path+"/results_json", serialize(results))
+
+    def test_hundred_thousand_votes(self):
+        print("TEST MEEK-STV HUNDRED THOUSAND VOTES")
+        tally_path = os.path.join(self.FIXTURES_PATH+'/meek-stv-hundred-thousand-votes')
+
+        # We generate 100.000 random votes, where we want 10 candidates to have different weight than the others
+        generateVotes({4:50, 3:20, 15:12, 17:5, 20:10, 5:13, 8:18, 13:4, 16:8, 22:11}, 100000, 24, tally_path)
+        results = do_dirtally(tally_path)
+        winners = serialize(results).split('"winners": ')[1]
+        #Now we just check if the three candidates with more votes are the winners
+        self.assertTrue("Eduardo Bondad" in winners)
+        self.assertTrue("Borja Bethencourt" in winners)
+        self.assertTrue("Juan Jesus Lopez Aguilar" in winners)
+        '''You can check the different votes in the plaintexts_json in meek-stv-hundred-thousand-votes to check that
+        the result is randomly generated. It even includes blank votes and invalid votes. The results are generated
+        in a file as well if you want to check some statistics or just to see if they're being generated correctly.'''
         _write_file(tally_path+"/results_json", serialize(results))
 
 if __name__ == '__main__':
@@ -274,9 +293,10 @@ def weighted_choice(choices):
 
 def generateVotes(weights, numberOfVotes, numberOfAnswers, filedir):
     target = ""
-    #We create a great enough weight for having hundreds of blank votes
+    #We create a great enough weight,for example 5, for having hundreds of blank votes
     weights[numberOfAnswers+1]=5
-    #Then we assign an equal weight to all the options without weights
+    '''Then we assign an equal weight,for example 1, to all the options without weights.
+    We have decided to choose the ratio of 5:1 for blank votes with respect to valid votes'''
     while numberOfAnswers>0:
         if not numberOfAnswers in weights:
             weights[numberOfAnswers]= 1
