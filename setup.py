@@ -18,9 +18,9 @@ from pip.req import parse_requirements
 
 setup(
     name='Agora Tally',
-    version='0.0.1',
-    author='Eduardo Robles Elvira',
-    author_email='edulix@wadobo.com',
+    version='3.2.0',
+    author='Agora Voting Team',
+    author_email='agora@agoravoting.com',
     packages=['agora_tally', 'agora_tally.voting_systems'],
     scripts=[],
     url='http://pypi.python.org/pypi/agora_tally/',
