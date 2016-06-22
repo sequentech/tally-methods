@@ -1,3 +1,18 @@
+# This file is part of agora-tally.
+# Copyright (C) 2013-2016  Agora Voting SL <agora@agoravoting.com>
+
+# agora-tally is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License.
+
+# agora-tally  is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with agora-tally.  If not, see <http://www.gnu.org/licenses/>.
+
 from __future__ import unicode_literals
 import random
 import copy
@@ -8,8 +23,8 @@ import os
 import tempfile
 from operator import itemgetter
 
-from openstv.ballots import Ballots
-from openstv.plugins import getMethodPlugins
+from ..ballot_counter.ballots import Ballots
+from ..ballot_counter.plugins import getMethodPlugins
 
 from .base import BaseVotingSystem, BaseTally, BlankVoteException
 
@@ -161,6 +176,7 @@ class PluralityAtLargeTally(BaseTally):
 
         # write the candidates
         for answer in question['answers']:
+            answer['text'] = answer['text'].replace("\n", "").replace("\"", "")
             name = answer['text']
             name.encode('utf-8')
             ans = u'"%s"\n' % name
@@ -175,8 +191,8 @@ class PluralityAtLargeTally(BaseTally):
         '''
         Actually calls to openstv to perform the tally
         '''
-        from openstv.ballots import Ballots
-        from openstv.plugins import getMethodPlugins
+        from ..ballot_counter.ballots import Ballots
+        from ..ballot_counter.plugins import getMethodPlugins
 
         # get voting and report methods
         methods = getMethodPlugins("byName", exclude0=False)
@@ -216,7 +232,7 @@ class PluralityAtLargeTally(BaseTally):
             total_votes += json_report['answers'][name]
 
         for answer in question['answers']:
-            name = answer['text']
+            name = answer['text'].replace("\n", "").replace("\"", "")
             name.encode('utf-8')
 
             answer['total_count'] = json_report['answers'][name]
