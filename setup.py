@@ -3,7 +3,7 @@ from pip.req import parse_requirements
 
 setup(
     name='Agora Tally',
-    version='0.0.1',
+    version='3.4.0',
     author='Eduardo Robles Elvira',
     author_email='edulix@wadobo.com',
     packages=['agora_tally', 'agora_tally.voting_systems'],
