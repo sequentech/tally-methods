@@ -1,18 +1,3 @@
-# This file is part of agora-tally.
-# Copyright (C) 2013-2016  Agora Voting SL <agora@agoravoting.com>
-
-# agora-tally is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License.
-
-# agora-tally  is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License for more details.
-
-# You should have received a copy of the GNU Affero General Public License
-# along with agora-tally.  If not, see <http://www.gnu.org/licenses/>.
-
 from __future__ import unicode_literals, division
 import random
 import copy
@@ -22,14 +7,22 @@ import codecs
 import os
 import tempfile
 from operator import itemgetter
+import subprocess
 
 from .base import BaseVotingSystem, BaseTally, BlankVoteException
 
+'''
+R must be installed, as well as the BradleyTerry2 package
 
+see http://www.jstatsoft.org/v48/i09/paper
 
-class PairwiseBeta(BaseVotingSystem):
+> apt-get install r-base
+> R
+> install.packages('BradleyTerry2')
+'''
+class PairwiseBradleyTerry(BaseVotingSystem):
     '''
-    Defines the helper functions that allows agora to manage an pairwise-beta election
+    Defines the helper functions that allows agora to manage a pairwise-bradleyterry election
     '''
 
     @staticmethod
@@ -38,20 +31,20 @@ class PairwiseBeta(BaseVotingSystem):
         Returns the identifier of the voting system, used internally to
         discriminate  the voting system used in an election
         '''
-        return 'pairwise-beta'
+        return 'pairwise-bradleyterry'
 
     @staticmethod
     def get_description():
-        return _('Pairwise Beta Binomial model')
+        return _('Pairwise Bradley-Terry model')
 
     @staticmethod
     def create_tally(election, question_num):
         '''
         Create object that helps to compute the tally
         '''
-        return PairwiseBetaTally(election, question_num)
+        return PairwiseBradleyTerryTally(election, question_num)
 
-class PairwiseBetaTally(BaseTally):
+class PairwiseBradleyTerryTally(BaseTally):
     '''
     Class used to tally an election
     '''
@@ -77,8 +70,7 @@ class PairwiseBetaTally(BaseTally):
     def init(self):
         self.ballots = []
 
-
-    def parse_vote(self, number, question, withdrawals=[]):
+    def parse_vote(self, number, question):
         vote_str = str(number)
         tab_size = len(str(len(question['answers']) + 2))
 
@@ -90,10 +82,6 @@ class PairwiseBetaTally(BaseTally):
         ret = []
         for i in range(int(len(vote_str) / tab_size)):
             option = int(vote_str[i*tab_size: (i+1)*tab_size]) - 1
-
-            if option in withdrawals:
-                continue
-
             # blank vote
             if option == len(question['answers']) + 1:
                 raise BlankVoteException()
@@ -156,33 +144,57 @@ class PairwiseBetaTally(BaseTally):
 
     def perform_tally(self, questions):
         '''
-        Runs the beta calculation
+        Fits the bradley-terry model
         '''
 
         self.report = {}
         report = self.report
         report['valid_votes'] = 0
         report['answers'] = {}
+        report['pairs'] = {}
 
-        # first collect wins and losses for each option
+        # first collect wins and losses for each pair of options
         for ballot in self.ballots:
             if len(ballot['answers']) % 2 == 0:
                 report['valid_votes'] = report['valid_votes'] + ballot['votes']
 
                 for idx, answer in enumerate(ballot['answers']):
-                    if answer not in report['answers']:
-                        report['answers'][answer] = dict(wins = 0, losses = 0, winner_position = None)
                     if idx % 2 == 0:
-                        report['answers'][answer]['wins'] = report['answers'][answer]['wins'] + ballot['votes']
-                    else:
-                        report['answers'][answer]['losses'] = report['answers'][answer]['losses'] + ballot['votes']
+                        answer2 = ballot['answers'][idx + 1]
 
+                        if answer < answer2:
+                            key = "%s-%s" % (answer,answer2)
+                            if key not in report['pairs']:
+                                report['pairs'][key] = dict(wins1 = 0, wins2 = 0)
 
-        # calculate the beta posterior, see eq 38 in
-        # http://www.cs.cmu.edu/~10701/lecture/technote2_betabinomial.pdf
-        for answer in report['answers']:
-            a = report['answers'][answer]
-            a['score'] = (a['wins'] + 1) / (a['wins'] + 1 + a['losses'] + 1)
+                            report['pairs'][key]['wins1'] = report['pairs'][key]['wins1'] + ballot['votes']
+
+                        else:
+                            key = "%s-%s" % (answer2,answer)
+                            if key not in report['pairs']:
+                                report['pairs'][key] = dict(wins1 = 0, wins2 = 0)
+
+                            report['pairs'][key]['wins2'] = report['pairs'][key]['wins2'] + ballot['votes']
+
+        # write pairs ready for bradleyterry
+        pairs_path = tempfile.mktemp()
+        pairs_file = codecs.open(pairs_path, encoding='utf-8', mode='w')
+
+        for pair in report['pairs']:
+            pairs_file.write('%s %s %s\n' % (pair.replace('-', ' '), report['pairs'][pair]['wins1'], report['pairs'][pair]['wins2']))
+
+        # FIXME point to location of go.r
+        output = subprocess.check_output(['Rscript', './agora_tally/voting_systems/go.r', pairs_path], stderr=None)
+
+        os.remove(pairs_path)
+
+        lines = output.split('\n')
+        for line in lines:
+            split = line.split()
+            if len(split) == 3:
+                option = int(split[0])
+                score = float(split[1])
+                report['answers'][option] = dict(score = score, winner_position = None)
 
         ## obtain winners
 
@@ -201,6 +213,7 @@ class PairwiseBetaTally(BaseTally):
         for i in range(0, to_mark):
             idx = sorted_answers[i][0]
             report['answers'][idx]['winner_position'] = i
+
 
     def fill_results(self, questions):
 
