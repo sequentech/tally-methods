@@ -123,7 +123,7 @@ def create_desborda_test(test_data, fixtures_path):
             }
             test_struct["indexed_candidates"][candidate] = cand_index
             question["answers"].append(answer)
-            cand_index = cand_index + 1
+            cand_index += 1
 
     questions_json = [question]
 
@@ -141,7 +141,7 @@ def create_desborda_test(test_data, fixtures_path):
             "winner_position": winner_position,
             "voters_by_position": copy.deepcopy(voters_by_position)
         }
-        winner_position = winner_position + 1
+        winner_position += 1
 
     # encode ballots in plaintexts_json format, and recreate voters_by_position
     plaintexts_json = ""
@@ -150,14 +150,13 @@ def create_desborda_test(test_data, fixtures_path):
         preference_position = 0
         for candidate in ballot:
             if candidate in test_struct["indexed_results"]:
-               foo = test_struct["indexed_results"][candidate]["voters_by_position"][preference_position]
-               test_struct["indexed_results"][candidate]["voters_by_position"][preference_position] = foo + 1
-            preference_position = preference_position + 1
+               test_struct["indexed_results"][candidate]["voters_by_position"][preference_position] += 1
+            preference_position += 1
         encoded_ballot = encode_ballot(ballot, test_struct["indexed_candidates"])
         plaintexts_json = plaintexts_json + '"' + encoded_ballot + '"'
         if num_ballots is not ballot_index:
             plaintexts_json = plaintexts_json + '\n'
-        ballot_index = ballot_index + 1
+        ballot_index += 1
 
 
     for answer in results_json["questions"][0]["answers"]:
@@ -190,48 +189,3 @@ def create_desborda_test(test_data, fixtures_path):
         file_helpers.remove_tree(desborda_test_path)
         raise
     return desborda_test_path
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -20,7 +20,6 @@ import uuid
 import sys
 import codecs
 import os
-import tempfile
 from operator import itemgetter
 from collections import defaultdict
 
@@ -64,6 +63,10 @@ from .base import BaseVotingSystem, BaseTally, BlankVoteException
 # A1 (80 points), A2 (79 points)...
 # because all candidates from team B are withdrawn for the second round, even
 # those that didn't get elected.
+# On this second round, or on the first if there are no minorities corrections,
+# if there are more male winners than female winners then the zip correction
+# will be applied so that there is as many female as male winners, starting with
+# a female.
 
 class Desborda(BaseVotingSystem):
     '''
@@ -97,29 +100,28 @@ class DesbordaTally(BaseTally):
     ballots_file = None
     ballots_path = ""
 
-    # list containing the current list of ballots.
+    # dict containing the current list of ballots.
+    # each dict key is the str of the choices, so if the choices are [2, 1, 4]
+    # then the dict key of those ballots is '[2, 1, 4]'
     # In each iteration this list is modified. For efficiency, ballots with the
     # same ordered choices are grouped. The format of each item in this list is
     # the following:
     #
-    #{
-        #'votes': 12, # number of ballots with this selection of choices
-        #'answers': [2, 1, 4] # list of ids of the choices
+    #'[2, 1, 4]': {
+    #    'votes': 12, # number of ballots with this selection of choices
+    #    'answers': [2, 1, 4] # list of ids of the choices
     #}
-    ballots = []
+    ballots = dict()
 
     num_winners = -1
 
-    # openstv options
-    method_name = "Borda"
+    method_name = "Desborda"
 
     # report object
     report = None
 
     def init(self):
-        self.ballots_path = tempfile.mktemp(".blt")
-
-        self.ballots = []
+        self.ballots = dict()
 
     def parse_vote(self, number, question, withdrawals=[]):
         vote_str = str(number)
@@ -164,135 +166,39 @@ class DesbordaTally(BaseTally):
         if not os.path.exists(os.path.dirname(self.ballots_path)):
             os.makedirs(os.path.dirname(self.ballots_path))
 
-    def find_ballot(self, answers):
-        '''
-        Find a ballot with the same answers as the one given in self.ballots.
-        Returns the ballot or None if not found.
-        '''
-        for ballot in self.ballots:
-            if ballot['answers'] == answers:
-                return ballot
-
-        return None
-
     def add_vote(self, voter_answers, questions, is_delegated):
         '''
         Add to the count a vote from a voter
         '''
-        answers = [choice+1 for choice in voter_answers[self.question_num]['choices']]
+        answers = [choice for choice in voter_answers[self.question_num]['choices']]
         # we got ourselves an invalid vote, don't count it
         if -1 in answers:
             return
+        key_answers = str(answers)
 
-        ballot = self.find_ballot(answers)
         # if ballot found, increment the count. Else, create a ballot and add it
-        if ballot:
-            ballot['votes'] += 1
+        if key_answers in self.ballots:
+            self.ballots[key_answers]['votes'] += 1
         else:
-            self.ballots.append(dict(votes=1, answers=answers))
+            self.ballots[key_answers] = dict(votes=1, answers=answers)
 
-    def finish_writing_ballots_file(self, questions):
-        # write the ballots
-        self.ballots_file = codecs.open(self.ballots_path, encoding='utf-8', mode='w')
-        question = questions[self.question_num]
-        self.num_winners = question['num_winners']
-
-        # write the header of the BLT File
-        # See format here: https://code.google.com/p/droop/wiki/BltFileFormat
-        self.ballots_file.write('%d %d\n' % (len(question['answers']), question['num_winners']))
-
-        question = questions[self.question_num]
-        for ballot in self.ballots:
-            self.ballots_file.write('%d %s 0\n' % (ballot['votes'],
-                ' '.join([str(a) for a in ballot['answers']])))
-        self.ballots_file.write('0\n')
-
-        # write the candidates
+    def borda_tally(question, ballots):
+        question['answers'].sort(key = lamda x: x['id'])
+        voters_by_position = [0] * question['max']
         for answer in question['answers']:
-            name = answer['text']
-            name.encode('utf-8')
-            ans = u'"%s"\n' % name
-            self.ballots_file.write(ans)
-
-        q = '"%s"\n' % question['title'].replace("\n", "").replace("\"", "")
-        q.encode('utf-8')
-        self.ballots_file.write(q)
-        self.ballots_file.close()
+            answer['voters_by_position'] = copy.deepcopy(voters_by_position)
+        pass
 
     def perform_tally(self, questions):
-        '''
-        Actually calls to openstv to perform the tally
-        '''
-        from ..ballot_counter.ballots import Ballots
-        from ..ballot_counter.plugins import getMethodPlugins
-
-        # get voting and report methods
-        methods = getMethodPlugins("byName", exclude0=False)
-
-        # generate ballots
-        dirtyBallots = Ballots()
-        dirtyBallots.loadKnown(self.ballots_path, exclude0=False)
-        dirtyBallots.numSeats = self.num_winners
-        cleanBallots = dirtyBallots.getCleanBallots()
-
-        # create and configure election
-        e = methods[self.method_name](cleanBallots)
+        self.report = {}
+        report = self.report
         question = questions[self.question_num]
-        e.maxChosableOptions = question['max']
-
-        # run election and generate the report
-        e.runElection()
-
-        # generate report
-        from .json_report import JsonReport
-        self.report = JsonReport(e)
-        self.report.generateReport()
-
-    def fill_results(self, questions):
-
-        json_report = self.report.json
-        question = questions[self.question_num]
-        question['totals']['valid_votes'] = json_report['ballots_count']
-        def decode(s):
-            if hasattr(s, 'decode'):
-                return s.decode('utf-8')
-            else:
-                return s
-
-        for answer in question['answers']:
-            name = answer['text']
-            name.encode('utf-8')
-
-            answer['total_count'] = json_report['answers'][name]
-
-        json_report['winners'] = [decode(winner) for winner in json_report['winners']]
-        winner_answers = [answ for answ in question['answers'] if answ['text'] in json_report['winners']]
-        # sort first by name then by total_count, that makes it reproducible
-        winner_answers.sort(key=itemgetter('text'))
-        winner_answers.sort(key=itemgetter('total_count'), reverse=True)
-        json_report['winners'] = [answ['text'] for answ in winner_answers]
-
-        votes_table = defaultdict(lambda:[0 for i in range(question['max'])])
-        for ballot in self.ballots:
-            votes = ballot['votes']
-            for opti, opt in enumerate(ballot['answers']):
-                votes_table[str(opt-1)][opti] += votes
-
-        for answer in question['answers']:
-          answer['voters_by_position'] = votes_table[str(answer['id'])]
-          if answer['text'] in json_report['winners']:
-            answer['winner_position'] = answer['text'].index(answer['text'])
-          else:
-            answer['winner_position'] = None
+        round1 = borda_tally(question, self.ballots)
 
     def post_tally(self, questions):
         '''
-        Once all votes have been added, this function actually save them to
-        disk and then calls openstv to perform the tally
         '''
-        self.finish_writing_ballots_file(questions)
         self.perform_tally(questions)
-        self.fill_results(questions)
 
     def get_log(self):
         '''

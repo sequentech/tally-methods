@@ -179,17 +179,19 @@ class TestDesborda(unittest.TestCase):
     def test_borda(self):
         # from the variables passed as arguments, create a folder with the data
         # in a format usable for tests
-        desborda_test_path = test.desborda_test.create_desborda_test(test.desborda_test_data.test_desborda_1, self.FIXTURES_PATH)
+        tally_path = test.desborda_test.create_desborda_test(test.desborda_test_data.test_desborda_1, self.FIXTURES_PATH)
         try:
-            print("hey")
+            results_path = os.path.join(tally_path, "results_json")
+            results = do_dirtally(tally_path)
+            should_results = file_helpers.read_file(results_path)
+            self.assertEqual(file_helpers.serialize(results), should_results)
         except:
-            # if there was an error, recover at least to remove the previously
-            # created temp folder for the test
-            file_helpers.remove_tree(desborda_test_path)
+            # if there was an error, recover from the exception at least to 
+            # remove the previously created temp folder for the test
+            file_helpers.remove_tree(tally_path)
             raise
         # remove the temp test folder also in a successful test
-        file_helpers.remove_tree(desborda_test_path)
-        self.assertEqual(True, True)
+        file_helpers.remove_tree(tally_path)
 
 if __name__ == '__main__':
     unittest.main()
