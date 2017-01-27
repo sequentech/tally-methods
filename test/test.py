@@ -184,15 +184,15 @@ class TestDesborda(unittest.TestCase):
             results = do_dirtally(tally_path)
             serialized_results = file_helpers.serialize(results)
             should_results = file_helpers.read_file(results_path)
-            file_helpers.write_file('/agora/test/napas/shouldresults_json', should_results)
-            file_helpers.write_file('/agora/test/napas/results_json', serialized_results)
+            #file_helpers.write_file('/agora/test/napas/shouldresults_json', should_results)
+            #file_helpers.write_file('/agora/test/napas/results_json', serialized_results)
 
-            copied_results = copy.deepcopy(results['questions'][0]['answers'])
-            sorted_results = sorted(copied_results, key = lambda x: x['winner_position'])
-            test_out = ""
-            for answer in sorted_results:
-                test_out += "%s, %i\n" % (answer['text'], answer['total_count'])
-            file_helpers.write_file('/agora/test/napas/test_out', test_out)
+            #copied_results = copy.deepcopy(results['questions'][0]['answers'])
+            #sorted_results = sorted(copied_results, key = lambda x: x['winner_position'])
+            #test_out = ""
+            #for answer in sorted_results:
+                #test_out += "%s, %i\n" % (answer['text'], answer['total_count'])
+            #file_helpers.write_file('/agora/test/napas/test_out', test_out)
             self.assertEqual(serialized_results, should_results)
         except:
             # if there was an error, recover from the exception at least to 
