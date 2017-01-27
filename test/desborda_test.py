@@ -23,18 +23,19 @@ import json
 import os
 from os import urandom
 from test import file_helpers
+import tempfile
 
 def remove_spaces(in_str):
     return re.sub(r"[ \t\r\f\v]*", "", in_str)
 
 def has_input_format(in_str):
      # example: "A1f, B2m \nB3f"
-     m = re.fullmatch(r"((\s*[A-Z][0-9]+[fm]\s*,)*\s*[A-Z][0-9]+[fm]\s*\n)*(\s*[A-Z][0-9]+[fm]\s*,)*\s*[A-Z][0-9]+[fm]\s*", in_str)
+     m = re.fullmatch(r"((\s*[A-Z][0-9]+[fm]\s*,)*\s*[A-Z][0-9]+[fm]\s*\n)*(\s*[A-Z][0-9]+[fm]\s*,)*\s*[A-Z][0-9]+[fm]\s*\n?", in_str)
      return m is not None
 
 def has_output_format(out_str):
      # example: "A1f, 1,  3\n B33m, 4"
-     m = re.fullmatch(r"(\s*[A-Z][0-9]+[fm]\s*,\s*[0-9]+\s*(,\s*[0-9]+\s*)?\n)*\s*[A-Z][0-9]+[fm]\s*,\s*[0-9]+\s*(,\s*[0-9]+\s*)?", out_str)
+     m = re.fullmatch(r"(\s*[A-Z][0-9]+[fm]\s*,\s*[0-9]+\s*\n)*\s*[A-Z][0-9]+[fm]\s*,\s*[0-9]+\s*\n?", out_str)
      return m is not None
 
 def encode_ballot(ballot, indexed_candidates):
@@ -53,17 +54,12 @@ def gen_pass(length):
   alphabet = string.ascii_letters + string.digits
   return ''.join(alphabet[c % len(alphabet)] for c in urandom(length))
 
-def create_rand_folder(base_path, add):
-    if not (os.path.exists(base_path) and os.path.isdir(base_path)):
-       raise Exception("base path %s doesn't exist, is not a folder or doesn't have the right permissions"  % base_path)
-    folder_name = add + gen_pass(22)
-    while os.path.exists(os.path.join(base_path, folder_name)):
-        folder_name = add + gen_pass(22)
-    final_path = os.path.join(base_path, folder_name)
-    os.mkdir(final_path)
-    return final_path
+def create_temp_folder():
+    temp_folder = tempfile.mkdtemp()
+    print("temp folder created at: %s" % temp_folder)
+    return temp_folder
 
-def create_desborda_test(test_data, fixtures_path):
+def create_desborda_test(test_data):
     if not has_input_format(test_data["input"]):
         raise Exception("Error: test data input with format errors")
     if not has_output_format(test_data["output"]):
@@ -86,11 +82,14 @@ def create_desborda_test(test_data, fixtures_path):
                 if other_sex in test_struct["teams"][team]:
                     raise Exception("Error: candidate %s repeated: %s" % (candidate, other_sex))
 
-            if female:
-                test_struct["women"].append(candidate)
+            if candidate not in test_struct["teams"][team]:
+                if female:
+                    test_struct["women"].append(candidate)
+                test_struct["teams"][team].append(candidate)
+                test_struct["all_candidates"].append(candidate)
 
-            test_struct["teams"][team].append(candidate)
-            test_struct["all_candidates"].append(candidate)
+    if len(test_struct["all_candidates"]) != len(set(test_struct["all_candidates"])):
+        raise Exception("Error: test_struct['all_candidates'] might have duplicate values")
 
     set_all = set(test_struct["all_candidates"])
     set_results = set([x[0] for x in test_struct["results"]])
@@ -145,19 +144,12 @@ def create_desborda_test(test_data, fixtures_path):
 
     # encode ballots in plaintexts_json format, and recreate voters_by_position
     plaintexts_json = ""
-    ballot_index = 1
     for ballot in test_struct["ballots"]:
-        preference_position = 0
-        for candidate in ballot:
+        for preference_position, candidate in enumerate(ballot):
             if candidate in test_struct["indexed_results"]:
                test_struct["indexed_results"][candidate]["voters_by_position"][preference_position] += 1
-            preference_position += 1
         encoded_ballot = encode_ballot(ballot, test_struct["indexed_candidates"])
-        plaintexts_json = plaintexts_json + '"' + encoded_ballot + '"'
-        if num_ballots is not ballot_index:
-            plaintexts_json = plaintexts_json + '\n'
-        ballot_index += 1
-
+        plaintexts_json = plaintexts_json + '"' + encoded_ballot + '"\n'
 
     for answer in results_json["questions"][0]["answers"]:
         candidate_name = answer["text"]
@@ -167,7 +159,7 @@ def create_desborda_test(test_data, fixtures_path):
             answer["voters_by_position"] = copy.deepcopy(voters_by_position)
         else:
             answer["winner_position"] = test_struct["indexed_results"][candidate_name]["winner_position"]
-            answer["total_count"] = test_struct["indexed_results"][candidate_name]["rounds"][-1]
+            answer["total_count"] = int(test_struct["indexed_results"][candidate_name]["rounds"][-1])
             answer["voters_by_position"] = copy.deepcopy(test_struct["indexed_results"][candidate_name]["voters_by_position"])
 
     results_json["questions"][0]["totals"] = {
@@ -178,7 +170,7 @@ def create_desborda_test(test_data, fixtures_path):
     results_json["questions"][0]["winners"] = []
 
     # create folder
-    desborda_test_path = create_rand_folder(fixtures_path, "desborda_")
+    desborda_test_path = create_temp_folder()
     try:
         plaintexts_folder = os.path.join(desborda_test_path, "0-question")
         os.mkdir(plaintexts_folder)

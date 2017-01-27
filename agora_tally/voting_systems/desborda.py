@@ -30,43 +30,6 @@ from .base import BaseVotingSystem, BaseTally, BlankVoteException
 
 # Definition of this system: 
 # http://pabloechenique.info/wp-content/uploads/2016/12/DesBorda-sistema-Echenique.pdf
-#
-# Description:
-# It's a modification of the Borda Count https://en.wikipedia.org/wiki/Borda_count
-# It's a multiple winner election method in which voters rank candidates in order of preference.
-# There will be 62 winners.
-# Although each voter can create their ballot choosing the individual candidates,
-# candidates are grouped into teams.
-# Each team consists of 20 to 62 candidates, and they are presented in order, 
-# although the voter can of course alter the order however he wants.
-# Candidates can be either male or female. The first candidate of each team is
-# a female and males and females are presented in a zipped way (f,m,f,m...)
-# Each ballot can contain up to 62 candidates.
-# On each ballot, the first candidate gets 80 points, and the last one 20.
-# A second round can be done after correcting the minorities from the first  round.
-# On the first round, teams that get more than 5% of all points and less than 2
-# candidates elected will get their two most voted candidates  (female and male)
-# elected.
-# Also on the first round, teams that get more than 15% of the votes and less
-# than 4 candidates elected, will get their 4 most voted candidates (2 females
-# and 2 males).
-# If there have been minorities corrections on the first round, there will be a
-# second round. On the second round, the number of seats will be 62 minus the
-# number of seats given to the minorities by the corrections.
-# Likewise, on this second round all candidates from all teams that got seats on
-# the first round because of the corrections will be withdrawn from all ballots
-# on the second round. This means that if a ballot on the first round is:
-# A1 (80 points), B6 (79 points), A2 (78 points)...
-# and team B got elected B1 and B2 (but not B6, for example) on the first round
-# because of a minorities correction, then on the second round this ballot
-# would be:
-# A1 (80 points), A2 (79 points)...
-# because all candidates from team B are withdrawn for the second round, even
-# those that didn't get elected.
-# On this second round, or on the first if there are no minorities corrections,
-# if there are more male winners than female winners then the zip correction
-# will be applied so that there is as many female as male winners, starting with
-# a female.
 
 class Desborda(BaseVotingSystem):
     '''
@@ -161,16 +124,12 @@ class DesbordaTally(BaseTally):
         '''
         Function called once before the tally begins
         '''
-        import codecs
-        import os
-        if not os.path.exists(os.path.dirname(self.ballots_path)):
-            os.makedirs(os.path.dirname(self.ballots_path))
 
     def add_vote(self, voter_answers, questions, is_delegated):
         '''
         Add to the count a vote from a voter
         '''
-        answers = [choice for choice in voter_answers[self.question_num]['choices']]
+        answers = copy.deepcopy(voter_answers[self.question_num]['choices'])
         # we got ourselves an invalid vote, don't count it
         if -1 in answers:
             return
@@ -182,18 +141,46 @@ class DesbordaTally(BaseTally):
         else:
             self.ballots[key_answers] = dict(votes=1, answers=answers)
 
-    def borda_tally(question, ballots):
-        question['answers'].sort(key = lamda x: x['id'])
+    def desborda_tally(self, question, ballots):
         voters_by_position = [0] * question['max']
         for answer in question['answers']:
             answer['voters_by_position'] = copy.deepcopy(voters_by_position)
-        pass
+            answer['total_count'] = 0
+            answer['winner_position'] = None
+        qlen = len(question['answers'])
+        # fill the 'voters_by_position' field on each answer
+        for ballot_name in ballots:
+            # "[50, 1, 4, 8]" : 
+            # {
+            #   'votes': 4
+            #   'answers': [50, 1, 4, 8]
+            # }
+            ballot = ballots[ballot_name]
+            question['totals']['valid_votes'] += ballot['votes']
+            for index, option in enumerate(ballot['answers']):
+                question['answers'][option]['voters_by_position'][index] += ballot['votes']
+        # do the total count, assigning 80, 79, 78... points for each vote
+        # on each answer depending on the position of the vote
+        for answer in question['answers']:
+            for index, num_voters in enumerate(answer['voters_by_position']):
+                answer['total_count'] += (80-index) * num_voters
+        # first order by the name of the eligible answers
+        sorted_winners = sorted(
+            question['answers'],
+            key = lambda x: x['text'])
+        # then order in reverse by the total count
+        sorted_winners = sorted(
+            sorted_winners,
+            key = lambda x: x['total_count'],
+            reverse = True)
+        for winner_pos, winner in enumerate(sorted_winners):
+            winner['winner_position'] = winner_pos
 
     def perform_tally(self, questions):
         self.report = {}
         report = self.report
         question = questions[self.question_num]
-        round1 = borda_tally(question, self.ballots)
+        self.desborda_tally(question, self.ballots)
 
     def post_tally(self, questions):
         '''
