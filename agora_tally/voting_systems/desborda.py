@@ -191,4 +191,4 @@ class DesbordaTally(BaseTally):
         '''
         Returns the tally log. Called after post_tally()
         '''
-        return self.report.json
+        return self.report

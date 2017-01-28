@@ -175,7 +175,7 @@ class TestDesborda(unittest.TestCase):
         six.get_function_defaults(do_tally)[0][:] = []
         pass
 
-    def test_borda(self):
+    def test_borda(self):  
         # from the variables passed as arguments, create a folder with the data
         # in a format usable for tests
         tally_path = test.desborda_test.create_desborda_test(test.desborda_test_data.test_desborda_1)
