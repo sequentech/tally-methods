@@ -147,32 +147,35 @@ class DesbordaTally(BaseTally):
             answer['voters_by_position'] = copy.deepcopy(voters_by_position)
             answer['total_count'] = 0
             answer['winner_position'] = None
-        qlen = len(question['answers'])
+
         # fill the 'voters_by_position' field on each answer
-        for ballot_name in ballots:
+        for ballot_name, ballot in ballots.items():
             # "[50, 1, 4, 8]" : 
             # {
             #   'votes': 4
             #   'answers': [50, 1, 4, 8]
             # }
-            ballot = ballots[ballot_name]
             question['totals']['valid_votes'] += ballot['votes']
             for index, option in enumerate(ballot['answers']):
                 question['answers'][option]['voters_by_position'][index] += ballot['votes']
+
         # do the total count, assigning 80, 79, 78... points for each vote
         # on each answer depending on the position of the vote
         for answer in question['answers']:
             for index, num_voters in enumerate(answer['voters_by_position']):
                 answer['total_count'] += (80-index) * num_voters
+
         # first order by the name of the eligible answers
-        sorted_winners = sorted(
+        sorted_by_text = sorted(
             question['answers'],
             key = lambda x: x['text'])
+
         # then order in reverse by the total count
         sorted_winners = sorted(
-            sorted_winners,
+            sorted_by_text,
             key = lambda x: x['total_count'],
-            reverse = True)
+            reverse = True)# [:question['num_winners']]
+
         for winner_pos, winner in enumerate(sorted_winners):
             winner['winner_position'] = winner_pos
 

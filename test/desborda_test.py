@@ -65,34 +65,33 @@ def create_desborda_test(test_data):
     if not has_output_format(test_data["output"]):
         raise Exception("Error: test data output with format errors")
 
-    test_struct = {}
-    test_struct["ballots"] = [re.split(r",", line) for line in remove_spaces(test_data["input"]).splitlines()]
-    test_struct["results"] = [re.split(r",", line) for line in remove_spaces(test_data["output"]).splitlines()]
-    test_struct["teams"] = {}
-    test_struct["all_candidates"] = []
-    test_struct["women"] = []
-    for ballot in test_struct["ballots"]:
+    ballots = [re.split(r",", line) for line in remove_spaces(test_data["input"]).splitlines()]
+    results = [re.split(r",", line) for line in remove_spaces(test_data["output"]).splitlines()]
+    teams = {}
+    all_candidates = []
+    women = []
+    for ballot in ballots:
         for candidate in ballot:
             team = candidate[:1]
             female = "f" is candidate[-1]
-            if team not in test_struct["teams"]:
-                test_struct["teams"][team] = []
+            if team not in teams:
+                teams[team] = []
             else:
                 other_sex = candidate[:-1] + ("m" if female else "f")
-                if other_sex in test_struct["teams"][team]:
+                if other_sex in teams[team]:
                     raise Exception("Error: candidate %s repeated: %s" % (candidate, other_sex))
 
-            if candidate not in test_struct["teams"][team]:
+            if candidate not in teams[team]:
                 if female:
-                    test_struct["women"].append(candidate)
-                test_struct["teams"][team].append(candidate)
-                test_struct["all_candidates"].append(candidate)
+                    women.append(candidate)
+                teams[team].append(candidate)
+                all_candidates.append(candidate)
 
-    if len(test_struct["all_candidates"]) != len(set(test_struct["all_candidates"])):
-        raise Exception("Error: test_struct['all_candidates'] might have duplicate values")
+    if len(all_candidates) != len(set(all_candidates)):
+        raise Exception("Error: all_candidates might have duplicate values")
 
-    set_all = set(test_struct["all_candidates"])
-    set_results = set([x[0] for x in test_struct["results"]])
+    set_all = set(all_candidates)
+    set_results = set([x[0] for x in results])
     if len(set_results) is not len(set_all & set_results):
         raise Exception("Error: there are some answers in the results that are not candidates: %s " % str(set_results - set_all))
 
@@ -109,9 +108,9 @@ def create_desborda_test(test_data):
         "title": "Desborda question"
     }
     cand_index = 0
-    test_struct["indexed_candidates"] = {}
-    for team_name in test_struct["teams"]:
-        team_candidates = test_struct["teams"][team_name]
+    indexed_candidates = {}
+    for team_name in teams:
+        team_candidates = teams[team_name]
         for candidate in team_candidates:
             answer = {
                 "category": team_name,
@@ -120,22 +119,22 @@ def create_desborda_test(test_data):
                 "text": candidate,
                 "urls": []
             }
-            test_struct["indexed_candidates"][candidate] = cand_index
+            indexed_candidates[candidate] = cand_index
             question["answers"].append(answer)
             cand_index += 1
 
     questions_json = [question]
 
-    num_ballots = len(test_struct["ballots"])
+    num_ballots = len(ballots)
     results_json = {
       "questions": copy.deepcopy(questions_json),
       "total_votes": num_ballots
     }
-    test_struct["indexed_results"] = {}
+    indexed_results = {}
     winner_position = 0
     voters_by_position = [0] * questions_json[0]["max"]
-    for winner in test_struct["results"]:
-        test_struct["indexed_results"][winner[0]] = {
+    for winner in results:
+        indexed_results[winner[0]] = {
             "rounds": winner[1:],
             "winner_position": winner_position,
             "voters_by_position": copy.deepcopy(voters_by_position)
@@ -144,23 +143,23 @@ def create_desborda_test(test_data):
 
     # encode ballots in plaintexts_json format, and recreate voters_by_position
     plaintexts_json = ""
-    for ballot in test_struct["ballots"]:
+    for ballot in ballots:
         for preference_position, candidate in enumerate(ballot):
-            if candidate in test_struct["indexed_results"]:
-               test_struct["indexed_results"][candidate]["voters_by_position"][preference_position] += 1
-        encoded_ballot = encode_ballot(ballot, test_struct["indexed_candidates"])
+            if candidate in indexed_results:
+               indexed_results[candidate]["voters_by_position"][preference_position] += 1
+        encoded_ballot = encode_ballot(ballot, indexed_candidates)
         plaintexts_json = plaintexts_json + '"' + encoded_ballot + '"\n'
 
     for answer in results_json["questions"][0]["answers"]:
         candidate_name = answer["text"]
-        if candidate_name not in test_struct["indexed_results"]:
+        if candidate_name not in indexed_results:
             answer["winner_position"] = None
             answer["total_count"] = 0
             answer["voters_by_position"] = copy.deepcopy(voters_by_position)
         else:
-            answer["winner_position"] = test_struct["indexed_results"][candidate_name]["winner_position"]
-            answer["total_count"] = int(test_struct["indexed_results"][candidate_name]["rounds"][-1])
-            answer["voters_by_position"] = copy.deepcopy(test_struct["indexed_results"][candidate_name]["voters_by_position"])
+            answer["winner_position"] = indexed_results[candidate_name]["winner_position"]
+            answer["total_count"] = int(indexed_results[candidate_name]["rounds"][-1])
+            answer["voters_by_position"] = copy.deepcopy(indexed_results[candidate_name]["voters_by_position"])
 
     results_json["questions"][0]["totals"] = {
         "blank_votes": 0,
