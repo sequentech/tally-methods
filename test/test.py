@@ -8,22 +8,11 @@ from operator import itemgetter
 
 from agora_tally.tally import do_tartally, do_dirtally, do_tally
 from agora_tally.voting_systems.plurality_at_large import PluralityAtLarge
+from test import file_helpers
+import test.desborda_test
+import test.desborda_test_data
+import six
 #from agora_tally.voting_systems.meek_stv import MeekSTV
-
-def serialize(data):
-    return json.dumps(data,
-        indent=4, ensure_ascii=False, sort_keys=True, separators=(',', ': '))
-
-def _open(path, mode):
-    return codecs.open(path, encoding='utf-8', mode=mode)
-
-def _read_file(path):
-    with _open(path, mode='r') as f:
-        return f.read()
-
-def _write_file(path, data):
-    with _open(path, mode='w') as f:
-        return f.write(data)
 
 def _pretty_print_base(data, mark_winners, show_percent, filter_name):
     '''
@@ -92,7 +81,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
     def setUp(self):
         # http://effbot.org/zone/default-values.htm
-        do_tally.func_defaults[0][:] = []
+        six.get_function_defaults(do_tally)[0][:] = []
         pass
 
 
@@ -103,8 +92,8 @@ class TestSequenceFunctions(unittest.TestCase):
         tally_path = os.path.join(self.FIXTURES_PATH, dirname)
         results_path = os.path.join(tally_path, "results_json")
         results = do_dirtally(tally_path)
-        should_results = _read_file(results_path)
-        self.assertEqual(serialize(results), should_results)
+        should_results = file_helpers.read_file(results_path)
+        self.assertEqual(file_helpers.serialize(results), should_results)
         return results
 
     def test_borda_nauru(self):
@@ -118,8 +107,8 @@ class TestSequenceFunctions(unittest.TestCase):
 
         # first, generate questions_json
         base_path = os.path.join(self.FIXTURES_PATH, self.BORDA_NAURU2)
-        candidates = _read_file(os.path.join(base_path, "raw_candidates.txt"))
-        questions = json.loads(_read_file(os.path.join(base_path, "questions_base_json")))
+        candidates = file_helpers.read_file(os.path.join(base_path, "raw_candidates.txt"))
+        questions = json.loads(file_helpers.read_file(os.path.join(base_path, "questions_base_json")))
         options = [line.split("\t")[0].strip() for line in candidates.split("\n")]
 
         for i, option in enumerate(options):
@@ -132,15 +121,15 @@ class TestSequenceFunctions(unittest.TestCase):
             })
         questions[0]['max'] = len(options)
         questions[0]['num_winners'] = len(options) - 1
-        _write_file(os.path.join(base_path, "questions_json"),
-          serialize(questions))
+        file_helpers.write_file(os.path.join(base_path, "questions_json"),
+          file_helpers.serialize(questions))
 
         # serialize plaintexts
         raw_plaintexts_path = os.path.join(base_path, "0-question", "raw_plaintexts.txt")
         dst_plaintexts_path = os.path.join(base_path, "0-question", "plaintexts_json")
-        fw = _open(dst_plaintexts_path, "w")
+        fw = file_helpers.open(dst_plaintexts_path, "w")
 
-        with _open(raw_plaintexts_path, "r") as fr:
+        with file_helpers.open(raw_plaintexts_path, "r") as fr:
             for line in fr:
                 num = "".join([str(int(opt.strip())-1).zfill(2)
                                for opt in line.split(",")
@@ -178,6 +167,42 @@ class TestSequenceFunctions(unittest.TestCase):
 
     #def test_meek_stv(self):
         #self._test_method(self.MEEK_STV)
+
+class TestDesborda(unittest.TestCase):
+
+    def setUp(self):
+        # http://effbot.org/zone/default-values.htm
+        six.get_function_defaults(do_tally)[0][:] = []
+        pass
+
+    def test_borda(self):  
+        # from the variables passed as arguments, create a folder with the data
+        # in a format usable for tests
+        tally_path = test.desborda_test.create_desborda_test(test.desborda_test_data.test_desborda_1)
+        try:
+            results_path = os.path.join(tally_path, "results_json")
+            results = do_dirtally(tally_path)
+            serialized_results = file_helpers.serialize(results)
+            should_results = file_helpers.read_file(results_path)
+            # ====================================================== #
+            #file_helpers.write_file('/agora/test/napas/shouldresults_json', should_results)
+            #file_helpers.write_file('/agora/test/napas/results_json', serialized_results)
+
+            #copied_results = copy.deepcopy(results['questions'][0]['answers'])
+            #sorted_results = sorted(copied_results, key = lambda x: 62 if x['winner_position'] is None else x['winner_position'])
+            #test_out = ""
+            #for answer in sorted_results:
+                #test_out += "%s, %i\n" % (answer['text'], answer['total_count'])
+            #file_helpers.write_file('/agora/test/napas/test_out', test_out)
+            # ====================================================== #
+            self.assertEqual(serialized_results, should_results)
+        except:
+            # if there was an error, recover from the exception at least to 
+            # remove the previously created temp folder for the test
+            file_helpers.remove_tree(tally_path)
+            raise
+        # remove the temp test folder also in a successful test
+        file_helpers.remove_tree(tally_path)
 
 if __name__ == '__main__':
     unittest.main()
