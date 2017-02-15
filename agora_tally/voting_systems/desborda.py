@@ -133,6 +133,9 @@ class DesbordaTally(BaseTally):
         # we got ourselves an invalid vote, don't count it
         if -1 in answers:
             return
+        # we got ourselves a blank vote, don't count it
+        if 0 == len(answers):
+            return
         key_answers = str(answers)
 
         # if ballot found, increment the count. Else, create a ballot and add it
