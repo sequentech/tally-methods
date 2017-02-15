@@ -196,13 +196,13 @@ class TestDesborda(unittest.TestCase):
             #file_helpers.write_file('/agora/test/napas/test_out', test_out)
             # ====================================================== #
             self.assertEqual(serialized_results, should_results)
+            # remove the temp test folder also in a successful test
+            file_helpers.remove_tree(tally_path)
         except:
             # if there was an error, recover from the exception at least to 
             # remove the previously created temp folder for the test
             file_helpers.remove_tree(tally_path)
             raise
-        # remove the temp test folder also in a successful test
-        file_helpers.remove_tree(tally_path)
 
     def test_desborda_blank_invalid(self):
         # from the variables passed as arguments, create a folder with the data
