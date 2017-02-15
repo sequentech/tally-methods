@@ -133,16 +133,14 @@ class DesbordaTally(BaseTally):
         # we got ourselves an invalid vote, don't count it
         if -1 in answers:
             return
-        # we got ourselves a blank vote, don't count it
-        if 0 == len(answers):
-            return
         key_answers = str(answers)
 
-        # if ballot found, increment the count. Else, create a ballot and add it
-        if key_answers in self.ballots:
-            self.ballots[key_answers]['votes'] += 1
-        else:
-            self.ballots[key_answers] = dict(votes=1, answers=answers)
+        if len(answers) > 0:
+            # if ballot found, increment the count. Else, create a ballot and add it
+            if key_answers in self.ballots:
+                self.ballots[key_answers]['votes'] += 1
+            else:
+                self.ballots[key_answers] = dict(votes=1, answers=answers)
 
     def desborda_tally(self, question, ballots):
         voters_by_position = [0] * question['max']

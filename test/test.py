@@ -175,7 +175,7 @@ class TestDesborda(unittest.TestCase):
         six.get_function_defaults(do_tally)[0][:] = []
         pass
 
-    def test_borda(self):  
+    def test_borda(self):
         # from the variables passed as arguments, create a folder with the data
         # in a format usable for tests
         tally_path = test.desborda_test.create_desborda_test(test.desborda_test_data.test_desborda_1)
@@ -203,6 +203,26 @@ class TestDesborda(unittest.TestCase):
             raise
         # remove the temp test folder also in a successful test
         file_helpers.remove_tree(tally_path)
+
+    def test_desborda_blank_invalid(self):
+        # from the variables passed as arguments, create a folder with the data
+        # in a format usable for tests
+        tally_path = test.desborda_test.create_desborda_test(test.desborda_test_data.test_desborda_2)
+        try:
+            results_path = os.path.join(tally_path, "results_json")
+            results_path2 = os.path.join(tally_path, "results_json2")
+            results = do_dirtally(tally_path)
+            serialized_results = file_helpers.serialize(results)
+            should_results = file_helpers.read_file(results_path)
+            file_helpers.write_file(results_path2, serialized_results)
+            self.assertEqual(serialized_results, should_results)
+            # remove the temp test folder also in a successful test
+            file_helpers.remove_tree(tally_path)
+        except:
+            # if there was an error, recover from the exception at least to 
+            # remove the previously created temp folder for the test
+            file_helpers.remove_tree(tally_path)
+            raise
 
 if __name__ == '__main__':
     unittest.main()
