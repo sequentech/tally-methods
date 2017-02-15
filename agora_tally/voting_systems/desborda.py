@@ -135,11 +135,13 @@ class DesbordaTally(BaseTally):
             return
         key_answers = str(answers)
 
-        # if ballot found, increment the count. Else, create a ballot and add it
-        if key_answers in self.ballots:
-            self.ballots[key_answers]['votes'] += 1
-        else:
-            self.ballots[key_answers] = dict(votes=1, answers=answers)
+        # don't count blank/invalid votes
+        if len(answers) > 0:
+            # if ballot found, increment the count. Else, create a ballot and add it
+            if key_answers in self.ballots:
+                self.ballots[key_answers]['votes'] += 1
+            else:
+                self.ballots[key_answers] = dict(votes=1, answers=answers)
 
     def desborda_tally(self, question, ballots):
         voters_by_position = [0] * question['max']

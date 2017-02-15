@@ -30,7 +30,7 @@ def remove_spaces(in_str):
 
 def has_input_format(in_str):
      # example: "A1f, B2m \nB3f"
-     m = re.fullmatch(r"((\s*[A-Z][0-9]+[fm]\s*,)*\s*[A-Z][0-9]+[fm]\s*\n)*(\s*[A-Z][0-9]+[fm]\s*,)*\s*[A-Z][0-9]+[fm]\s*\n?", in_str)
+     m = re.fullmatch(r"(((\s*[A-Z][0-9]+[fm]\s*,)*\s*[A-Z][0-9]+[fm]\s*\n)|(\s*(b|i)\s*\n))*(((\s*[A-Z][0-9]+[fm]\s*,)*\s*[A-Z][0-9]+[fm]\s*\n?)|(\s*(b|i)\s*\n?))", in_str)
      return m is not None
 
 def has_output_format(out_str):
@@ -70,7 +70,15 @@ def create_desborda_test(test_data):
     teams = {}
     all_candidates = []
     women = []
+    num_blank_votes = 0
+    num_invalid_votes = 0
     for ballot in ballots:
+        if ['b'] == ballot:
+           num_blank_votes += 1
+           continue
+        elif ['i'] == ballot:
+           num_invalid_votes += 1
+           continue
         for candidate in ballot:
             team = candidate[:1]
             female = "f" is candidate[-1]
@@ -144,10 +152,15 @@ def create_desborda_test(test_data):
     # encode ballots in plaintexts_json format, and recreate voters_by_position
     plaintexts_json = ""
     for ballot in ballots:
-        for preference_position, candidate in enumerate(ballot):
-            if candidate in indexed_results:
-               indexed_results[candidate]["voters_by_position"][preference_position] += 1
-        encoded_ballot = encode_ballot(ballot, indexed_candidates)
+        if ['i'] == ballot:
+           encoded_ballot = str(len(question["answers"])+3)
+        elif ['b'] == ballot:
+           encoded_ballot = str(len(question["answers"])+2)
+        else:
+            for preference_position, candidate in enumerate(ballot):
+                if candidate in indexed_results:
+                   indexed_results[candidate]["voters_by_position"][preference_position] += 1
+            encoded_ballot = encode_ballot(ballot, indexed_candidates)
         plaintexts_json = plaintexts_json + '"' + encoded_ballot + '"\n'
 
     for answer in results_json["questions"][0]["answers"]:
@@ -162,9 +175,9 @@ def create_desborda_test(test_data):
             answer["voters_by_position"] = copy.deepcopy(indexed_results[candidate_name]["voters_by_position"])
 
     results_json["questions"][0]["totals"] = {
-        "blank_votes": 0,
-        "null_votes": 0,
-        "valid_votes": num_ballots
+        "blank_votes": num_blank_votes,
+        "null_votes": num_invalid_votes,
+        "valid_votes": num_ballots - num_invalid_votes - num_blank_votes
     }
     results_json["questions"][0]["winners"] = []
 

@@ -145,6 +145,7 @@ class PairwiseBetaTally(BaseTally):
         if -1 in answers:
             return
 
+        # don't count blank/invalid votes
         if len(answers) > 0:
             ballot = self.find_ballot(answers)
             # if ballot found, increment the count. Else, create a ballot and add it
