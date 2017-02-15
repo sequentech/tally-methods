@@ -135,6 +135,7 @@ class DesbordaTally(BaseTally):
             return
         key_answers = str(answers)
 
+        # don't count blank/invalid votes
         if len(answers) > 0:
             # if ballot found, increment the count. Else, create a ballot and add it
             if key_answers in self.ballots:
