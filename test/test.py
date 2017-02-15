@@ -210,11 +210,9 @@ class TestDesborda(unittest.TestCase):
         tally_path = test.desborda_test.create_desborda_test(test.desborda_test_data.test_desborda_2)
         try:
             results_path = os.path.join(tally_path, "results_json")
-            results_path2 = os.path.join(tally_path, "results_json2")
             results = do_dirtally(tally_path)
             serialized_results = file_helpers.serialize(results)
             should_results = file_helpers.read_file(results_path)
-            file_helpers.write_file(results_path2, serialized_results)
             self.assertEqual(serialized_results, should_results)
             # remove the temp test folder also in a successful test
             file_helpers.remove_tree(tally_path)
