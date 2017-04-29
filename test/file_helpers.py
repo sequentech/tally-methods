@@ -1,5 +1,8 @@
+#!/usr/bin/env python3
+# -*- coding:utf-8 -*-
+
 # This file is part of agora-tally.
-# Copyright (C) 2013-2016  Agora Voting SL <agora@agoravoting.com>
+# Copyright (C) 2017  Agora Voting SL <agora@agoravoting.com>
 
 # agora-tally is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -13,19 +16,24 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with agora-tally.  If not, see <http://www.gnu.org/licenses/>.
 
-from setuptools import setup
-from pip.req import parse_requirements
+import codecs
+import json
+import shutil
 
-setup(
-    name='Agora Tally',
-    version='17.04',
-    author='Eduardo Robles Elvira',
-    author_email='edulix@nvotes.com',
-    packages=['agora_tally', 'agora_tally.voting_systems'],
-    scripts=[],
-    url='http://pypi.python.org/pypi/agora_tally/',
-    license='LICENSE.txt',
-    description='agora voting tally system',
-    long_description=open('README.md').read(),
-    install_requires=[]
-)
+def serialize(data):
+    return json.dumps(data,
+        indent=4, ensure_ascii=False, sort_keys=True, separators=(',', ': '))
+
+def open(path, mode):
+    return codecs.open(path, encoding='utf-8', mode=mode)
+
+def read_file(path):
+    with open(path, mode='r') as f:
+        return f.read()
+
+def write_file(path, data):
+    with open(path, mode='w') as f:
+        return f.write(data)
+
+def remove_tree(path):
+    shutil.rmtree(path)

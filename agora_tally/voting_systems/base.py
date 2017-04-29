@@ -23,7 +23,8 @@ VOTING_METHODS = (
     'agora_tally.voting_systems.cup.Cup',
     'agora_tally.voting_systems.borda_custom.BordaCustom',
     'agora_tally.voting_systems.pairwise_beta.PairwiseBeta',
-    'agora_tally.voting_systems.pairwise_bradleyterry.PairwiseBradleyTerry'
+    'agora_tally.voting_systems.pairwise_bradleyterry.PairwiseBradleyTerry',
+    'agora_tally.voting_systems.desborda.Desborda'
 )
 
 def get_voting_system_classes():
