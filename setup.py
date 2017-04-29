@@ -18,7 +18,7 @@ from pip.req import parse_requirements
 
 setup(
     name='Agora Tally',
-    version='3.4.0',
+    version='17.04',
     author='Eduardo Robles Elvira',
     author_email='edulix@nvotes.com',
     packages=['agora_tally', 'agora_tally.voting_systems'],
