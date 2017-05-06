@@ -222,5 +222,33 @@ class TestDesborda(unittest.TestCase):
             file_helpers.remove_tree(tally_path)
             raise
 
+class TestDesborda2(unittest.TestCase):
+
+    def setUp(self):
+        # http://effbot.org/zone/default-values.htm
+        six.get_function_defaults(do_tally)[0][:] = []
+        pass
+
+    def test_borda(self):
+        # from the variables passed as arguments, create a folder with the data
+        # in a format usable for tests
+        tally_path = test.desborda_test.create_desborda_test(
+            test.desborda_test_data.test_desborda2_1,
+            tally_type = "desborda2",
+            num_winners = 10)
+        try:
+            results_path = os.path.join(tally_path, "results_json")
+            results = do_dirtally(tally_path)
+            serialized_results = file_helpers.serialize(results)
+            should_results = file_helpers.read_file(results_path)
+            self.assertEqual(serialized_results, should_results)
+            # remove the temp test folder also in a successful test
+            file_helpers.remove_tree(tally_path)
+        except:
+            # if there was an error, recover from the exception at least to 
+            # remove the previously created temp folder for the test
+            file_helpers.remove_tree(tally_path)
+            raise
+
 if __name__ == '__main__':
     unittest.main()

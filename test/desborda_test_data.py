@@ -16,6 +16,36 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with agora-tally.  If not, see <http://www.gnu.org/licenses/>.
 
+test_desborda2_1 = {
+"input":
+"""A1f,A2m,A3f,A4m,A5f,A6m,A7f,A8m,A9f,A10m
+A1f,A2m,A3f,A4m,A5f,A6m,A7f,A8m,A9f,A10m
+B1f,B2m,B3f,B4m,B5f,B6m,B7f,B8m,B9f,B10m
+""",
+"output":
+"""A1f, 26
+A2m, 24
+A3f, 22
+A4m, 20
+A5f, 18
+A6m, 16
+A7f, 14
+B1f, 13
+A8m, 12
+B2m, 12
+B3f, 11
+A9f, 10
+B4m, 10
+B5f, 9
+A10m, 8
+B6m, 8
+B7f, 7
+B8m, 6
+B9f, 5
+B10m, 4
+""",
+}
+
 test_desborda_1 = {
 "input":
 """A1f,A2m,A3f,A4m,A5f,A6m,A7f,A8m,A9f,A10m,A11f,A12m,A13f,A14m,A15f,A16m,A17f,A18m,A19f,A20m,A21f,A22m,A23f,A24m,A25f,A26m,A27f,A28m,A29f,A30m,A31f,A32m,A33f,A34m,A35f,A36m,A37f,A38m,A39f,A40m,A41f,A42m,A43f,A44m,A45f,A46m,A47f,A48m,A49f,A50m,A51f,A52m,A53f,A54m,A55f,A56m,A57f,A58m,A59f,A60m,A61f,A62m

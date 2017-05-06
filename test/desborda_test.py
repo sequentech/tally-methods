@@ -59,7 +59,7 @@ def create_temp_folder():
     print("temp folder created at: %s" % temp_folder)
     return temp_folder
 
-def create_desborda_test(test_data):
+def create_desborda_test(test_data, tally_type = "desborda", num_winners = 62):
     if not has_input_format(test_data["input"]):
         raise Exception("Error: test data input with format errors")
     if not has_output_format(test_data["output"]):
@@ -108,11 +108,11 @@ def create_desborda_test(test_data):
         "answers": [],
         "description": "Desborda question",
         "layout": "simple",
-        "max": 62,
+        "max": num_winners,
         "min": 0,
-        "num_winners": 62,
+        "num_winners": num_winners,
         "randomize_answer_order": True,
-        "tally_type": "desborda",
+        "tally_type": tally_type,
         "title": "Desborda question"
     }
     cand_index = 0
