@@ -44,6 +44,26 @@ B8m, 6
 B9f, 5
 B10m, 4
 """,
+"num_winners":10
+}
+
+test_desborda2_2 = {
+"input":
+"""A1f,A2m,A3f,A4m,A5f,A6m,A7f,A8m,A9f,A10m
+""",
+"output":
+"""A1f, 6
+A2m, 5
+A3f, 4
+A4m, 3
+A5f, 2
+A10m, 1
+A6m, 1
+A7f, 1
+A8m, 1
+A9f, 1
+""",
+"num_winners":5
 }
 
 test_desborda_1 = {

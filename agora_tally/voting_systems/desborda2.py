@@ -153,11 +153,6 @@ class Desborda2Tally(BaseTally):
 
         # fill the 'voters_by_position' field on each answer
         for ballot_name, ballot in ballots.items():
-            # "[50, 1, 4, 8]" : 
-            # {
-            #   'votes': 4
-            #   'answers': [50, 1, 4, 8]
-            # }
             question['totals']['valid_votes'] += ballot['votes']
             for index, option in enumerate(ballot['answers']):
                 question['answers'][option]['voters_by_position'][index] += ballot['votes']
@@ -169,7 +164,7 @@ class Desborda2Tally(BaseTally):
         # on each answer depending on the position of the vote
         for answer in question['answers']:
             for index, num_voters in enumerate(answer['voters_by_position']):
-                answer['total_count'] += (max_points-index) * num_voters
+                answer['total_count'] += max(1, max_points-index) * num_voters
 
         # first order by the name of the eligible answers
         sorted_by_text = sorted(

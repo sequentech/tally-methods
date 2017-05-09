@@ -229,18 +229,22 @@ class TestDesborda2(unittest.TestCase):
         six.get_function_defaults(do_tally)[0][:] = []
         pass
 
-    def test_borda(self):
+    def _do_test(self, data = None):
+        if not data:
+            return
         # from the variables passed as arguments, create a folder with the data
         # in a format usable for tests
         tally_path = test.desborda_test.create_desborda_test(
-            test.desborda_test_data.test_desborda2_1,
-            tally_type = "desborda2",
-            num_winners = 10)
+            data, # test.desborda_test_data.test_desborda2_1,
+            tally_type = "desborda2")
         try:
             results_path = os.path.join(tally_path, "results_json")
             results = do_dirtally(tally_path)
             serialized_results = file_helpers.serialize(results)
             should_results = file_helpers.read_file(results_path)
+            if serialized_results != should_results:
+                print("results:\n" + serialized_results)
+                print("shouldresults:\n" + should_results)
             self.assertEqual(serialized_results, should_results)
             # remove the temp test folder also in a successful test
             file_helpers.remove_tree(tally_path)
@@ -249,6 +253,12 @@ class TestDesborda2(unittest.TestCase):
             # remove the previously created temp folder for the test
             file_helpers.remove_tree(tally_path)
             raise
+
+    def test1(self):
+        self._do_test(test.desborda_test_data.test_desborda2_1)
+
+    def test2(self):
+        self._do_test(test.desborda_test_data.test_desborda2_2)
 
 if __name__ == '__main__':
     unittest.main()
