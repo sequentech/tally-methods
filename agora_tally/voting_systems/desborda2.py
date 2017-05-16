@@ -175,7 +175,7 @@ class Desborda2Tally(BaseTally):
         sorted_winners = sorted(
             sorted_by_text,
             key = lambda x: x['total_count'],
-            reverse = True)# [:question['num_winners']]
+            reverse = True)
 
         for winner_pos, winner in enumerate(sorted_winners):
             winner['winner_position'] = winner_pos
