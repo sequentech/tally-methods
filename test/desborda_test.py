@@ -59,7 +59,7 @@ def create_temp_folder():
     print("temp folder created at: %s" % temp_folder)
     return temp_folder
 
-def create_desborda_test(test_data):
+def create_desborda_test(test_data, tally_type = "desborda"):
     if not has_input_format(test_data["input"]):
         raise Exception("Error: test data input with format errors")
     if not has_output_format(test_data["output"]):
@@ -67,12 +67,19 @@ def create_desborda_test(test_data):
 
     ballots = [re.split(r",", line) for line in remove_spaces(test_data["input"]).splitlines()]
     results = [re.split(r",", line) for line in remove_spaces(test_data["output"]).splitlines()]
+    num_winners = 62
+    if "num_winners" in test_data:
+        num_winners = test_data["num_winners"]
     teams = {}
     all_candidates = []
     women = []
     num_blank_votes = 0
     num_invalid_votes = 0
+    max_num = 0
     for ballot in ballots:
+        len_ballot = len(ballot)
+        if len_ballot > max_num:
+            max_num = len_ballot
         if ['b'] == ballot:
            num_blank_votes += 1
            continue
@@ -108,11 +115,11 @@ def create_desborda_test(test_data):
         "answers": [],
         "description": "Desborda question",
         "layout": "simple",
-        "max": 62,
+        "max": max_num,
         "min": 0,
-        "num_winners": 62,
+        "num_winners": num_winners,
         "randomize_answer_order": True,
-        "tally_type": "desborda",
+        "tally_type": tally_type,
         "title": "Desborda question"
     }
     cand_index = 0
