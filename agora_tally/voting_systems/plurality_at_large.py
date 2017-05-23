@@ -209,7 +209,7 @@ class PluralityAtLargeTally(BaseTally):
 
         # create and configure election
         e = methods[self.method_name](cleanBallots)
-        if strongTieBreakMethod is not None:
+        if self.strongTieBreakMethod is not None:
             e.strongTieBreakMethod = self.strongTieBreakMethod
 
         # run election and generate the report
