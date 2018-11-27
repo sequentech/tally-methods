@@ -192,7 +192,10 @@ class Desborda2Tally(BaseTally):
 
         # if N is the number of winners, then the points start is
         # max_points = floor(N + 3N/10)
-        max_points = int(math.floor(question['num_winners'] + 3*question['num_winners']/10))
+        #
+        # NOTE: Using here 'max' instead of 'num_winners' as requested in
+        # https://gitlab.nvotes.com/nvotes/pode-22/issues/15
+        max_points = int(math.floor(question['max'] + 3*question['max']/10))
         # do the total count, assigning max_points, max_points-1, max_points-2... points for each vote
         # on each answer depending on the position of the vote
         for answer in question['answers']:
