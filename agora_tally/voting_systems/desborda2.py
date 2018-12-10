@@ -195,7 +195,13 @@ class Desborda2Tally(BaseTally):
         #
         # NOTE: Using here 'max' instead of 'num_winners' as requested in
         # https://gitlab.nvotes.com/nvotes/pode-22/issues/15
-        max_points = int(math.floor(question['max'] + 3*question['max']/10))
+        if 'bordas-max-points' not in question:
+            base_max_points = question['max']
+        else:
+            base_max_points = question['bordas-max-points']
+
+        max_points = int(math.floor(base_max_points + 3*base_max_points/10))
+
         # do the total count, assigning max_points, max_points-1, max_points-2... points for each vote
         # on each answer depending on the position of the vote
         for answer in question['answers']:
