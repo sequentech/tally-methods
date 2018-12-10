@@ -202,7 +202,11 @@ class BordaTally(BaseTally):
         # create and configure election
         e = methods[self.method_name](cleanBallots)
         question = questions[self.question_num]
-        e.maxChosableOptions = question['max']
+
+        if 'bordas-max-points' not in question:
+            e.maxChosableOptions = question['max']
+        else:
+            e.maxChosableOptions = question['bordas-max-points']
 
         # run election and generate the report
         e.runElection()
