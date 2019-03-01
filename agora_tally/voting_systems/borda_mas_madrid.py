@@ -165,8 +165,8 @@ class BordaMasMadridTally(BaseTally):
                 categories[category].append(answer['id'])
 
         # finally, init the self.ballots with those that are category ballots
-        for cat_name, category in categories.items():
-            self.ballots[cat_name] = dict(
+        for category in categories.values():
+            self.ballots[str(category)] = dict(
                 votes=0,
                 answers=category,
                 is_block_category_ballot=True
@@ -235,6 +235,9 @@ class BordaMasMadridTally(BaseTally):
             # }
             question['totals']['valid_votes'] += ballot['votes']
             for index, option in enumerate(ballot['answers']):
+                if ballot['votes'] == 0:
+                    continue
+
                 question['answers'][option]['voters_by_position'][index] += ballot['votes']
 
                 multiplier = 1
@@ -245,7 +248,7 @@ class BordaMasMadridTally(BaseTally):
                 # do the total count, assigning base_points, base_points - 1,
                 # etc for each vote, multiplying for 5 if it's a block category
                 # ballot
-                question['answers'][option]['total_count'] += (base_max_points - index) * multipler
+                question['answers'][option]['total_count'] += (base_max_points - index) * multipler * ballot['votes']
 
         # first order by the name of the eligible answers
         sorted_by_text = sorted(
