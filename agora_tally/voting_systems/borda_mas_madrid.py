@@ -141,15 +141,13 @@ class BordaMasMadridTally(BaseTally):
 
         return ret
 
-    def init_block_category_ballots(self):
+    def init_block_category_ballots(self, question):
         '''
         init the self.ballots with those that are category ballots
         '''
         # we will iterate the sorted list of answers to fill the dict of
         # categories with their ordered answer ids, then iterate the list of
         # categories to fill the self.ballots with the category ballots
-
-        question = questions[self.question_num]
 
         # ordered answers by id
         sorted_by_id = sorted(
@@ -178,7 +176,8 @@ class BordaMasMadridTally(BaseTally):
         '''
         Function called once before the tally begins
         '''
-        self.init_block_category_ballots()
+        question = questions[self.question_num]
+        self.init_block_category_ballots(question)
 
     def add_vote(self, voter_answers, questions, is_delegated):
         '''
