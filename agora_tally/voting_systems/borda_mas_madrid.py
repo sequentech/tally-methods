@@ -149,6 +149,8 @@ class BordaMasMadridTally(BaseTally):
         # categories with their ordered answer ids, then iterate the list of
         # categories to fill the self.ballots with the category ballots
 
+        question = questions[self.question_num]
+
         # ordered answers by id
         sorted_by_id = sorted(
             copy.deepcopy(question['answers']),
