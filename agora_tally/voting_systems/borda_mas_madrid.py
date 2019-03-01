@@ -248,7 +248,7 @@ class BordaMasMadridTally(BaseTally):
                 # do the total count, assigning base_points, base_points - 1,
                 # etc for each vote, multiplying for 5 if it's a block category
                 # ballot
-                question['answers'][option]['total_count'] += (base_max_points - index) * multipler * ballot['votes']
+                question['answers'][option]['total_count'] += (base_max_points - index) * multiplier * ballot['votes']
 
         # first order by the name of the eligible answers
         sorted_by_text = sorted(
