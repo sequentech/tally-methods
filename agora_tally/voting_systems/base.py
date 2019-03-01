@@ -26,7 +26,8 @@ VOTING_METHODS = (
     'agora_tally.voting_systems.pairwise_bradleyterry.PairwiseBradleyTerry',
     'agora_tally.voting_systems.desborda.Desborda',
     'agora_tally.voting_systems.desborda2.Desborda2',
-    'agora_tally.voting_systems.desborda3.Desborda3'
+    'agora_tally.voting_systems.desborda3.Desborda3',
+    'agora_tally.voting_systems.borda_mas_madrid.BordaMasMadrid'
 )
 
 def get_voting_system_classes():
