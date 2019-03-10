@@ -242,7 +242,7 @@ class BordaMasMadridTally(BaseTally):
 
                 multiplier = 1
                 if ballot['is_block_category_ballot']:
-                    question['answers']['voters_as_block_category'] += ballot['votes']
+                    question['answers'][option]['voters_as_block_category'] += ballot['votes']
                     multiplier = self.BLOCK_CATEGORY_VOTE_MULTIPLIER
 
                 # do the total count, assigning base_points, base_points - 1,
