@@ -14,11 +14,15 @@
 # along with agora-tally.  If not, see <http://www.gnu.org/licenses/>.
 
 from setuptools import setup
-from pip.req import parse_requirements
+try: # for pip >= 10
+    from pip._internal.req import parse_requirements
+except ImportError: # for pip <= 9.0.3
+    from pip.req import parse_requirements
+
 
 setup(
     name='Agora Tally',
-    version='17.04',
+    version='103111.8',
     author='Eduardo Robles Elvira',
     author_email='edulix@nvotes.com',
     packages=['agora_tally', 'agora_tally.voting_systems'],

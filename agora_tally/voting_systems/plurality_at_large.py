@@ -81,6 +81,10 @@ class PluralityAtLargeTally(BaseTally):
 
     # report object
     report = None
+    
+    # break ties with the name of the candidates instead of randomly
+    # this makes the algorithm stable and verifiable
+    strongTieBreakMethod = "alpha"
 
     def init(self):
         self.ballots_path = tempfile.mktemp(".blt")
@@ -205,6 +209,8 @@ class PluralityAtLargeTally(BaseTally):
 
         # create and configure election
         e = methods[self.method_name](cleanBallots)
+        if self.strongTieBreakMethod is not None:
+            e.strongTieBreakMethod = self.strongTieBreakMethod
 
         # run election and generate the report
         # from celery.contrib import rdb; rdb.set_trace()
