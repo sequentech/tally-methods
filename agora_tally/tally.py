@@ -63,10 +63,11 @@ def do_dirtally(dir_path, ignore_invalid_votes=False, encrypted_invalid_votes=0)
 
 def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
              encrypted_invalid_votes=0, monkey_patcher=None,
-             question_indexes=None, withdrawals=[]):
+             question_indexes=None, withdrawals=[], allow_empty_tally=False):
     # questions is in the same format as get_questions_pretty(). Initialized here
     questions = copy.deepcopy(questions)
     base_vote =[dict(choices=[]) for q in questions]
+    total_count = encrypted_invalid_votes
 
     # setup the initial data common to all voting system
     i = 0
@@ -108,43 +109,49 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
 
         tally.pre_tally(questions)
         plaintexts_path = os.path.join(dir_path, "%d-*" % i, "plaintexts_json")
-        plaintexts_path = glob.glob(plaintexts_path)[0]
-        tally.question_id = plaintexts_path.split('/')[-2]
+        try:
+            plaintexts_path = glob.glob(plaintexts_path)[0]
+            tally.question_id = plaintexts_path.split('/')[-2]
+        except IndexError as e:
+            if not allow_empty_tally:
+                raise e
+            else:
+                pass
+        else:
+            q_withdrawals = [
+            answer['answer_id']
+            for answer in withdrawals
+            if answer['question_index'] == qindex]
 
-        q_withdrawals = [
-          answer['answer_id']
-          for answer in withdrawals
-          if answer['question_index'] == qindex]
+            with codecs.open(plaintexts_path, encoding='utf-8', mode='r') as plaintexts_file:
+                total_count = encrypted_invalid_votes
+                for line in plaintexts_file.readlines():
+                    total_count += 1
+                    voter_answers = copy.deepcopy(base_vote)
+                    try:
+                        # Note line starts with " (1 character) and ends with
+                        # "\n (2 characters). It contains the index of the
+                        # option selected by the user but starting with 1
+                        # because number 0 cannot be encrypted with elgammal
+                        # so we trim beginning and end, parse the int and
+                        # substract one
+                        number = int(line[1:-2]) - 1
+                        choices = tally.parse_vote(number, question, q_withdrawals)
 
-        with codecs.open(plaintexts_path, encoding='utf-8', mode='r') as plaintexts_file:
-            total_count = encrypted_invalid_votes
-            for line in plaintexts_file.readlines():
-                total_count += 1
-                voter_answers = copy.deepcopy(base_vote)
-                try:
-                    # Note line starts with " (1 character) and ends with
-                    # "\n (2 characters). It contains the index of the
-                    # option selected by the user but starting with 1
-                    # because number 0 cannot be encrypted with elgammal
-                    # so we trim beginning and end, parse the int and
-                    # substract one
-                    number = int(line[1:-2]) - 1
-                    choices = tally.parse_vote(number, question, q_withdrawals)
+                        # craft the voter_answers in the format admitted by
+                        # tally.add_vote
+                        voter_answers[i]['choices'] = choices
+                    except BlankVoteException:
+                        question['totals']['blank_votes'] += 1
+                    except Exception as e:
+                        question['totals']['null_votes'] += 1
+                        if not ignore_invalid_votes:
+                            print("invalid vote: " + line)
 
-                    # craft the voter_answers in the format admitted by
-                    # tally.add_vote
-                    voter_answers[i]['choices'] = choices
-                except BlankVoteException:
-                    question['totals']['blank_votes'] += 1
-                except Exception as e:
-                    question['totals']['null_votes'] += 1
-                    if not ignore_invalid_votes:
-                        print("invalid vote: " + line)
+                    tally.add_vote(voter_answers=voter_answers,
+                        questions=questions, is_delegated=False)
 
-                tally.add_vote(voter_answers=voter_answers,
-                    questions=questions, is_delegated=False)
-
-        i += 1
+            i += 1
 
 
     extra_data = dict()
