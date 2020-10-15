@@ -88,10 +88,12 @@ class CupTally(BaseTally):
             vote_str = "0" * num_zeros + vote_str
 
         ret = []
+        withdrawed_options = []
         for i in range(int(len(vote_str) / tab_size)):
             option = int(vote_str[i*tab_size: (i+1)*tab_size]) - 1
 
             if option in withdrawals:
+                withdrawed_options.append(option)
                 continue
 
             # blank vote
@@ -101,6 +103,12 @@ class CupTally(BaseTally):
             elif option < 0 or option >= len(question['answers']):
                 raise Exception()
             ret.append(option)
+
+        # after removing withdrawed options, the vote might be empty but it 
+        # would not have raised the BlankVoteException. Detect this case and
+        # raise the exception in that case.
+        if len(ret) == 0 and len(withdrawed_options) > 0:
+            raise BlankVoteException()
 
         # detect invalid vote
         if len(ret) < question['min']:
