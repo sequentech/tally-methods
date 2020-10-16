@@ -121,7 +121,7 @@ class PluralityAtLargeTally(BaseTally):
         # would not have raised the BlankVoteException. Detect this case and
         # raise the exception in that case.
         if len(ret) == 0 and len(withdrawed_options) > 0:
-            raise BlankVoteException()
+            raise Exception()
 
         # detect invalid vote
         if len(ret) < question['min'] or len(set(ret)) != len(ret):
