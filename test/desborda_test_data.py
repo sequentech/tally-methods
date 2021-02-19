@@ -52,16 +52,16 @@ test_desborda2_2 = {
 """A1f,A2m,A3f,A4m,A5f,A6m,A7f,A8m,A9f,A10m
 """,
 "output":
-"""A1f, 6
-A2m, 5
-A3f, 4
-A4m, 3
-A5f, 2
-A10m, 1
-A6m, 1
-A7f, 1
-A8m, 1
-A9f, 1
+"""A1f, 13
+A2m, 12
+A3f, 11
+A4m, 10
+A5f, 9
+A6m, 8
+A7f, 7
+A8m, 6
+A9f, 5
+A10m, 4
 """,
 "num_winners":5
 }

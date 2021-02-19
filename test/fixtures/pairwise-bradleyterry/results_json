@@ -8,7 +8,7 @@
                     "details": "",
                     "id": 0,
                     "text": "Alice",
-                    "total_count": 73.69821,
+                    "total_count": 24.56607,
                     "urls": [],
                     "winner_position": 0
                 },
@@ -17,7 +17,7 @@
                     "details": "",
                     "id": 1,
                     "text": "Bob",
-                    "total_count": 49.13214,
+                    "total_count": 0.0,
                     "urls": [],
                     "winner_position": null
                 },
@@ -26,7 +26,7 @@
                     "details": "",
                     "id": 2,
                     "text": "Carmen",
-                    "total_count": 24.56607,
+                    "total_count": -24.56607,
                     "urls": [],
                     "winner_position": null
                 },
@@ -35,7 +35,7 @@
                     "details": "",
                     "id": 3,
                     "text": "Martin",
-                    "total_count": 1.186101e-06,
+                    "total_count": -49.13214,
                     "urls": [],
                     "winner_position": null
                 },
@@ -44,7 +44,7 @@
                     "details": "",
                     "id": 4,
                     "text": "Susan",
-                    "total_count": -24.56607,
+                    "total_count": -73.69821,
                     "urls": [],
                     "winner_position": null
                 },
@@ -53,7 +53,7 @@
                     "details": "",
                     "id": 5,
                     "text": "Megan",
-                    "total_count": 0.0,
+                    "total_count": -49.13214,
                     "urls": [],
                     "winner_position": null
                 }
