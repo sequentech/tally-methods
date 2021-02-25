@@ -1,0 +1,34 @@
+name: Test python
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  py:
+    runs-on: ubuntu-20.04
+    container: ubuntu:20.04
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        apt update
+        apt install -y python3-dev libssl-dev gcc
+        apt install -y r-base r-base-dev
+
+        python -m pip install --upgrade pip
+        python -m pip install six
+        R --no-save < rdeps.r
+      env:
+        DEBIAN_FRONTEND: noninteractive
+
+    - name: tests
+      run: |
+        python -m unittest

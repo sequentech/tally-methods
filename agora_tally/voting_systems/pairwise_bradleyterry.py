@@ -70,7 +70,7 @@ class PairwiseBradleyTerryTally(BaseTally):
     def init(self):
         self.ballots = []
 
-    def parse_vote(self, number, question):
+    def parse_vote(self, number, question, q_withdrawals):
         vote_str = str(number)
         tab_size = len(str(len(question['answers']) + 2))
 
@@ -179,17 +179,16 @@ class PairwiseBradleyTerryTally(BaseTally):
 
         # write pairs ready for bradleyterry
         pairs_path = tempfile.mktemp()
-        pairs_file = codecs.open(pairs_path, encoding='utf-8', mode='w')
-
-        for pair in report['pairs']:
-            pairs_file.write('%s %s %s\n' % (pair.replace('-', ' '), report['pairs'][pair]['wins1'], report['pairs'][pair]['wins2']))
+        with codecs.open(pairs_path, encoding='utf-8', mode='w') as pairs_file:
+            for pair in report['pairs']:
+                pairs_file.write('%s %s %s\n' % (pair.replace('-', ' '), report['pairs'][pair]['wins1'], report['pairs'][pair]['wins2']))
 
         # FIXME point to location of go.r
         output = subprocess.check_output(['Rscript', './agora_tally/voting_systems/go.r', pairs_path], stderr=None)
 
         os.remove(pairs_path)
 
-        lines = output.split('\n')
+        lines = output.split(b'\n')
         for line in lines:
             split = line.split()
             if len(split) == 3:
