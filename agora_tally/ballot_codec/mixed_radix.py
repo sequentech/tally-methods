@@ -63,9 +63,10 @@ def decode(base_list, encoded_value, last_base=None):
     if index >= len(base_list) and last_base is None:
       raise Exception('Error decoding: last_base was needed but not provided')
 
-    modulus = accumulator % base
-    decoded_values.append(modulus)
-    accumulator = int((accumulator - modulus) / base)
+    remainder = accumulator % base
+    decoded_values.append(remainder)
+    # use // to ensure it's treated as a big int division
+    accumulator = (accumulator - remainder) // base
     index += 1
 
   # If we didn't run all the bases, fill the rest with zeros
@@ -106,6 +107,42 @@ class TestMixedRadix(unittest.TestCase):
         base_list=el["base_list"]
       )
       self.assertEqual(encoded_value, el["encoded_value"])
+  
+  def test_encode_error(self):
+    '''
+    Ensure encode function raises exception when value_list and base_list don't
+    have the same length.
+    '''
+    self.assertRaises(
+      Exception,
+      encode, 
+      value_list=[1,2], 
+      base_list=[5, 5, 5]
+    )
+    self.assertRaises(
+      Exception, 
+      encode, 
+      value_list=[1,2, 3, 3],
+      base_list=[5, 5, 5]
+    )
+  
+  def test_decode_error(self):
+    '''
+    Ensure that decode raises an exception if last_base is not given but is
+    required.
+    '''
+    self.assertRaises(
+      Exception, 
+      encode,
+      base_list=[2],
+      encoded_value=3
+    )
+    self.assertRaises(
+      Exception, 
+      encode,
+      base_list=[2,3],
+      encoded_value=(2*3 + 1)
+    )
 
   def test_decode(self):
     for el in self.data_list:
@@ -116,4 +153,56 @@ class TestMixedRadix(unittest.TestCase):
       )
       self.assertEqual(decoded_value, el["value_list"])
 
-  # TODO: add the encode then decode unit test
+  def test_encode_then_decode(self):
+    data_list = [
+      # {
+      #   "value_list": [21, 10, 11],
+      #   "base_list":  [30, 24, 60],
+      #   "encoded_value": 8241
+      # },
+      # {
+      #   "value_list": [3, 2,  1 ],
+      #   "base_list":  [5, 10, 10],
+      #   "encoded_value": 63,
+      # },
+      # {
+      #   "value_list": [1, 0, 2, 2, 128, 125, 0,   0  ],
+      #   "base_list":  [3, 3, 3, 3, 256, 256, 256, 256],
+      #   "encoded_value": 2602441
+      # },
+      # {
+      #   "value_list": [0, 1, 2, 0],
+      #   "base_list":  [3, 3, 3, 3],
+      #   "encoded_value": 21,
+      # },
+      # {
+      #   "value_list": [1, 0, 0,   0,   0,   0,   0  ],
+      #   "base_list":  [2, 2, 256, 256, 256, 256, 256],
+      #   "encoded_value": 1
+      # },
+      # {
+      #   "value_list": [0, 1, 0, 0, 1, 0, 1, 69,],
+      #   "base_list":  [2, 2, 2, 2, 2, 2, 2, 256],
+      #   "encoded_value": (0 + 2*(1 + 2*(0 + 2*(0 + 2*(1 + 2*(0+ 2*(1 + 2*(69))))))))
+      # },
+      {
+        "value_list": [0, 1, 0, 0, 1, 0, 1, 69,  0,   0,   195, 132, 32,  98,  99,  0  ],
+        "base_list":  [2, 2, 2, 2, 2, 2, 2, 256, 256, 256, 256, 256, 256, 256, 256, 256],
+        # Value calculated in python3 that uses by default big ints for
+        # integers. The formula is:
+        # (0 + 2*(1 + 2*(0 + 2*(0 + 2*(1 + 2*(0+ 2*(1 + 2*(69 + 256*(0 + 256*(0 + 256*(195 + 256*(132 + 256*(32 + 256*(98+ 256*99))))))))))))))
+        "encoded_value": 916649230342635397842
+      }
+    ]
+    for example in data_list:
+      encoded_value = encode(
+        value_list=example["value_list"],
+        base_list=example["base_list"]
+      )
+      decoded_value = decode(
+        base_list = example["base_list"],
+        encoded_value = encoded_value
+      )
+
+      self.assertEqual(encoded_value, example["encoded_value"])
+      self.assertEqual(decoded_value, example["value_list"])
