@@ -12,7 +12,7 @@ from test import file_helpers
 import test.desborda_test
 import test.desborda_test_data
 import six
-#from agora_tally.voting_systems.meek_stv import MeekSTV
+from agora_tally.ballot_codec.mixed_radix import TestMixedRadix
 
 def _pretty_print_base(data, mark_winners, show_percent, filter_name):
     '''
@@ -75,8 +75,6 @@ class TestSequenceFunctions(unittest.TestCase):
     BORDA2 = "borda2"
     BORDA_NAURU2 = "borda-nauru2"
     BORDA_CUSTOM = "borda-custom"
-    PAIRWISE_BETA = "pairwise-beta"
-    PAIRWISE_BRADLEYTERRY = "pairwise-bradleyterry"
     maxDiff = None
 
     def setUp(self):
@@ -152,7 +150,6 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_borda(self):
         self._test_method(self.BORDA)
 
-    # broken
     def test_borda2(self):
         self._test_method(self.BORDA2)
 
