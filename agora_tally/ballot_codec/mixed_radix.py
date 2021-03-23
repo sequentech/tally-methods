@@ -155,36 +155,36 @@ class TestMixedRadix(unittest.TestCase):
 
   def test_encode_then_decode(self):
     data_list = [
-      # {
-      #   "value_list": [21, 10, 11],
-      #   "base_list":  [30, 24, 60],
-      #   "encoded_value": 8241
-      # },
-      # {
-      #   "value_list": [3, 2,  1 ],
-      #   "base_list":  [5, 10, 10],
-      #   "encoded_value": 63,
-      # },
-      # {
-      #   "value_list": [1, 0, 2, 2, 128, 125, 0,   0  ],
-      #   "base_list":  [3, 3, 3, 3, 256, 256, 256, 256],
-      #   "encoded_value": 2602441
-      # },
-      # {
-      #   "value_list": [0, 1, 2, 0],
-      #   "base_list":  [3, 3, 3, 3],
-      #   "encoded_value": 21,
-      # },
-      # {
-      #   "value_list": [1, 0, 0,   0,   0,   0,   0  ],
-      #   "base_list":  [2, 2, 256, 256, 256, 256, 256],
-      #   "encoded_value": 1
-      # },
-      # {
-      #   "value_list": [0, 1, 0, 0, 1, 0, 1, 69,],
-      #   "base_list":  [2, 2, 2, 2, 2, 2, 2, 256],
-      #   "encoded_value": (0 + 2*(1 + 2*(0 + 2*(0 + 2*(1 + 2*(0+ 2*(1 + 2*(69))))))))
-      # },
+      {
+        "value_list": [21, 10, 11],
+        "base_list":  [30, 24, 60],
+        "encoded_value": 8241
+      },
+      {
+        "value_list": [3, 2,  1 ],
+        "base_list":  [5, 10, 10],
+        "encoded_value": 63,
+      },
+      {
+        "value_list": [1, 0, 2, 2, 128, 125, 0,   0  ],
+        "base_list":  [3, 3, 3, 3, 256, 256, 256, 256],
+        "encoded_value": 2602441
+      },
+      {
+        "value_list": [0, 1, 2, 0],
+        "base_list":  [3, 3, 3, 3],
+        "encoded_value": 21,
+      },
+      {
+        "value_list": [1, 0, 0,   0,   0,   0,   0  ],
+        "base_list":  [2, 2, 256, 256, 256, 256, 256],
+        "encoded_value": 1
+      },
+      {
+        "value_list": [0, 1, 0, 0, 1, 0, 1, 69,],
+        "base_list":  [2, 2, 2, 2, 2, 2, 2, 256],
+        "encoded_value": (0 + 2*(1 + 2*(0 + 2*(0 + 2*(1 + 2*(0+ 2*(1 + 2*(69))))))))
+      },
       {
         "value_list": [0, 1, 0, 0, 1, 0, 1, 69,  0,   0,   195, 132, 32,  98,  99,  0  ],
         "base_list":  [2, 2, 2, 2, 2, 2, 2, 256, 256, 256, 256, 256, 256, 256, 256, 256],
