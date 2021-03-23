@@ -13,6 +13,7 @@ import test.desborda_test
 import test.desborda_test_data
 import six
 from agora_tally.ballot_codec.mixed_radix import TestMixedRadix
+from agora_tally.ballot_codec.nvotes_codec import TestNVotesCodec
 
 def _pretty_print_base(data, mark_winners, show_percent, filter_name):
     '''
