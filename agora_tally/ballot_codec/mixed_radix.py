@@ -39,13 +39,12 @@ def encode(value_list, base_list):
   # Encode
   encoded_value = 0
   index = len(value_list) - 1
-
   while index >= 0:
     encoded_value = (encoded_value * base_list[index]) + value_list[index]
     index -= 1
   return encoded_value
 
-def decode(base_list, encoded_value, last_base):
+def decode(base_list, encoded_value, last_base=None):
   '''
   Mixed number decoding. It will decode using multiple different bases.
   
@@ -55,32 +54,66 @@ def decode(base_list, encoded_value, last_base):
   
   Returns the list of positive decoded integer values
   '''
-  decodedValues = []
+  decoded_values = []
   accumulator = encoded_value
   index = 0
 
   while accumulator > 0:
     base = base_list[index] if (index < len(base_list)) else last_base
+    if index >= len(base_list) and last_base is None:
+      raise Exception('Error decoding: last_base was needed but not provided')
 
-    decodedValues.append(accumulator % base)
-    accumulator = accumulator / base
+    modulus = accumulator % base
+    decoded_values.append(modulus)
+    accumulator = int((accumulator - modulus) / base)
     index += 1
 
   # If we didn't run all the bases, fill the rest with zeros
-  decodedValues.extend((len(base_list) - index)*[0])
+  decoded_values.extend((len(base_list) - index)*[0])
 
-  return decodedValues
+  return decoded_values
 
 
 class TestMixedRadix(unittest.TestCase):
   '''
   Unit tests related to the encode and decode functions
   '''
-
-  def test_encode_1(self):
-    encoded_val = encode(
+  data_list = [
+    dict(
       value_list=[29, 23, 59],
-      base_list=[30,24, 60]
+      base_list= [30, 24, 60],
+      encoded_value=(29 + 30*(23 + 24*59)), # 43199
+      last_base=None
+    ),
+    dict(
+      value_list=[10, 10, 10],
+      base_list= [30,24, 60],
+      encoded_value=7510, # = (10 + 30*(10 + 24*10))
+      last_base=None
+    ),
+    dict(
+      value_list=[21, 10, 11],
+      base_list= [30, 24, 60],
+      encoded_value=(21 + 30*(10 + 24*11)), # 8241
+      last_base=None
     )
-    self.assertEqual(encoded_val, (29 + 30*(23 + 24*59)))
-    self.assertEqual(encoded_val, 43199)
+  ]
+
+  def test_encode(self):
+    for el in self.data_list:
+      encoded_value = encode(
+        value_list=el["value_list"],
+        base_list=el["base_list"]
+      )
+      self.assertEqual(encoded_value, el["encoded_value"])
+
+  def test_decode(self):
+    for el in self.data_list:
+      decoded_value = decode(
+        base_list=el["base_list"],
+        encoded_value=el["encoded_value"],
+        last_base=el['last_base']
+      )
+      self.assertEqual(decoded_value, el["value_list"])
+
+  # TODO: add the encode then decode unit test
