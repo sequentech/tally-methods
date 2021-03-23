@@ -1,6 +1,6 @@
 # agora-tally [![tests_badge]][tests_link]
 
-agora-tally provides functions for tallying election data using OpenSTV as the underlying library when necessary
+`agora-tally` provides functions for tallying election questions.
 
 [tests_badge]: https://github.com/agoravoting/agora-tally/workflows/Test%20python/badge.svg
 [tests_link]: https://github.com/agoravoting/agora-tally/actions?query=workflow%3A%22Test+python%22

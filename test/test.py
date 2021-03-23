@@ -153,20 +153,11 @@ class TestSequenceFunctions(unittest.TestCase):
         self._test_method(self.BORDA)
 
     # broken
-    #def test_borda2(self):
-    #    self._test_method(self.BORDA2)
+    def test_borda2(self):
+        self._test_method(self.BORDA2)
 
-    def test_pairwise_beta(self):
-        self._test_method(self.PAIRWISE_BETA)
-
-    def test_pairwise_bradleyterry(self):
-        self._test_method(self.PAIRWISE_BRADLEYTERRY)
-
-    #def test_custom(self):
-    #    self._test_method(self.BORDA_CUSTOM)
-
-    #def test_meek_stv(self):
-        #self._test_method(self.MEEK_STV)
+    def test_custom(self):
+        self._test_method(self.BORDA_CUSTOM)
 
 class TestDesborda(unittest.TestCase):
 
