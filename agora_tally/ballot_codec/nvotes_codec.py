@@ -747,7 +747,7 @@ class TestNVotesCodec(unittest.TestCase):
           tally_type="plurality-at-large",
           answers=[
             dict(id=0),
-            dict(id=1,selected=0),
+            dict(id=1, selected=0),
             dict(id=2),
             dict(id=3),
             dict(id=4),
@@ -758,6 +758,55 @@ class TestNVotesCodec(unittest.TestCase):
         bases=  [2, 2, 2, 2, 2, 2, 2, 2],
         choices=[0, 0, 1, 0, 0, 0, 1, 0]
       ),
+      dict(
+        question=dict(
+          tally_type="plurality-at-large",
+          answers=[
+            dict(id=0,selected=0),
+            dict(id=1,selected=0),
+            dict(id=2),
+            dict(id=3),
+            dict(id=4),
+            dict(id=5, selected=0),
+            dict(id=6)
+          ]
+        ),
+        bases=  [2, 2, 2, 2, 2, 2, 2, 2],
+        choices=[0, 1, 1, 0, 0, 0, 1, 0]
+      ),
+      dict(
+        question=dict(
+          tally_type="borda",
+          max=3,
+          answers=[
+            dict(id=0,selected=0),
+            dict(id=1,selected=2),
+            dict(id=2),
+            dict(id=3),
+            dict(id=4),
+            dict(id=5, selected=1),
+            dict(id=6)
+          ]
+        ),
+        bases=  [2, 4, 4, 4, 4, 4, 4, 4],
+        choices=[0, 1, 3, 0, 0, 0, 2, 0]
+      ),
+      dict(
+        question=dict(
+          tally_type="plurality-at-large",
+          answers=[
+            dict(id=0,selected=1),
+            dict(id=1),
+            dict(
+              id=2,
+              selected=1,
+              urls=[dict(title='invalidVoteFlag', url='true')]
+            )
+          ]
+        ),
+        bases=  [2, 2, 2],
+        choices=[1, 1, 0]
+      ),
     ]
     for data in data_list:
       codec = NVotesCodec(data["question"])
@@ -766,9 +815,9 @@ class TestNVotesCodec(unittest.TestCase):
       # check raw ballot getter
       raw_ballot = codec.encode_raw_ballot()
       self.assertEqual(
-        serialize(raw_ballot),
-        serialize(dict(
+        raw_ballot,
+        dict(
           bases=data['bases'],
           choices=data['choices']
-        ))
+        )
       )
