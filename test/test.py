@@ -74,7 +74,6 @@ class TestSequenceFunctions(unittest.TestCase):
     BORDA_NAURU = "borda-nauru"
     BORDA = "borda"
     BORDA2 = "borda2"
-    BORDA_NAURU2 = "borda-nauru2"
     BORDA_CUSTOM = "borda-custom"
     maxDiff = None
 
@@ -97,53 +96,6 @@ class TestSequenceFunctions(unittest.TestCase):
 
     def test_borda_nauru(self):
         self._test_method(self.BORDA_NAURU)
-
-    def test_borda_nauru2(self):
-        '''
-        Tests removing some candidates using a different input format
-        '''
-        WITHDRAWALS = ["25"]
-
-        # first, generate questions_json
-        base_path = os.path.join(self.FIXTURES_PATH, self.BORDA_NAURU2)
-        candidates = file_helpers.read_file(os.path.join(base_path, "raw_candidates.txt"))
-        questions = json.loads(file_helpers.read_file(os.path.join(base_path, "questions_base_json")))
-        options = [line.split("\t")[0].strip() for line in candidates.split("\n")]
-
-        for i, option in enumerate(options):
-            questions[0]['answers'].append({
-                "category": "",
-                "details": "",
-                "id": i,
-                "text": option,
-                "urls": []
-            })
-        questions[0]['max'] = len(options)
-        questions[0]['num_winners'] = len(options) - 1
-        file_helpers.write_file(os.path.join(base_path, "questions_json"),
-          file_helpers.serialize(questions))
-
-        # serialize plaintexts
-        raw_plaintexts_path = os.path.join(base_path, "0-question", "raw_plaintexts.txt")
-        dst_plaintexts_path = os.path.join(base_path, "0-question", "plaintexts_json")
-        fw = file_helpers.open(dst_plaintexts_path, "w")
-
-        with file_helpers.open(raw_plaintexts_path, "r") as fr:
-            for line in fr:
-                num = "".join([str(int(opt.strip())-1).zfill(2)
-                               for opt in line.split(",")
-                               if opt.strip() not in WITHDRAWALS])
-                if len(num) == 0:
-                    num = len(questions[0]['answers']) + 2
-                fw.write('"%d"\n' % (int(num) + 1))
-        fw.close()
-        results = self._test_method(self.BORDA_NAURU2)
-
-        # print result
-        _pretty_print_base(results, False, show_percent=True,
-          filter_name="borda-nauru")
-        os.unlink(dst_plaintexts_path)
-        os.unlink(os.path.join(base_path, "questions_json"))
 
     def test_plurality_at_large(self):
           self._test_method(self.PLURALITY_AT_LARGE)
