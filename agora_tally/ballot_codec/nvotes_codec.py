@@ -685,7 +685,7 @@ class NVotesCodec(object):
     # the difference between the number of bases used for encoding the
     # ballot and the number of bases used to encode the modulus is the
     # number of byte bases left
-    return max_len - len(encoded_raw_ballot.bases)
+    return max_len - len(encoded_raw_ballot["bases"])
 
 
 class TestNVotesCodec(unittest.TestCase):
@@ -875,7 +875,7 @@ class TestNVotesCodec(unittest.TestCase):
         ),
         bases=    [2, 2, 2, 2, 2, 2, 2, 256, 256, 256, 256, 256, 256, 256, 256, 256],
         choices=  [0, 1, 0, 0, 1, 0, 1, 69,  0,   0,   195, 132, 32,  98,  99,  0]
-      )
+      ),
     ]
     for data in data_list:
       codec = NVotesCodec(data["question"])
@@ -890,3 +890,531 @@ class TestNVotesCodec(unittest.TestCase):
           choices=data['choices']
         )
       )
+
+  def test_decode_raw_ballot(self):
+    # The question contains the minimum data required for the encoder to work
+    data_list = [
+      dict(
+        question=dict(
+          tally_type="plurality-at-large",
+          answers=[
+            dict(id=0),
+            dict(id=1),
+            dict(id=2),
+            dict(id=3),
+            dict(id=4),
+            dict(id=5),
+            dict(id=6)
+          ]
+        ),
+        decoded_ballot=dict(
+          tally_type="plurality-at-large",
+          answers=[
+              dict(id=0, selected=-1),
+              dict(id=1, selected=0 ),
+              dict(id=2, selected=-1),
+              dict(id=3, selected=-1),
+              dict(id=4, selected=-1),
+              dict(id=5, selected=0 ),
+              dict(id=6, selected=-1)
+          ]
+        ),
+        bases=  [2, 2, 2, 2, 2, 2, 2, 2],
+        choices=[0, 0, 1, 0, 0, 0, 1, 0]
+      ),
+      dict(
+        question=dict(
+          tally_type="plurality-at-large",
+          answers=[
+            dict(id=0),
+            dict(id=1),
+            dict(id=2),
+            dict(id=3),
+            dict(id=4),
+            dict(id=5),
+            dict(id=6)
+          ]
+        ),
+        decoded_ballot=dict(
+          tally_type="plurality-at-large",
+          answers=[
+              dict(id=0, selected=0 ),
+              dict(id=1, selected=0 ),
+              dict(id=2, selected=-1),
+              dict(id=3, selected=-1),
+              dict(id=4, selected=-1),
+              dict(id=5, selected=0 ),
+              dict(id=6, selected=-1)
+          ]
+        ),
+        bases=  [2, 2, 2, 2, 2, 2, 2, 2],
+        choices=[0, 1, 1, 0, 0, 0, 1, 0]
+      ),
+      dict(
+        question=dict(
+          tally_type="borda",
+          answers=[
+            dict(id=0),
+            dict(id=1),
+            dict(id=2),
+            dict(id=3),
+            dict(id=4),
+            dict(id=5),
+            dict(id=6)
+          ]
+        ),
+        decoded_ballot=dict(
+          tally_type="borda",
+          answers=[
+              dict(id=0, selected=0 ),
+              dict(id=1, selected=2 ),
+              dict(id=2, selected=-1),
+              dict(id=3, selected=-1),
+              dict(id=4, selected=-1),
+              dict(id=5, selected=1 ),
+              dict(id=6, selected=-1)
+          ]
+        ),
+        bases=  [2, 4, 4, 4, 4, 4, 4, 4],
+        choices=[0, 1, 3, 0, 0, 0, 2, 0]
+      ),
+      dict(
+        question=dict(
+          tally_type="plurality-at-large",
+          answers=[
+            dict(id=0),
+            dict(id=1),
+            dict(
+              id=2,
+              selected=1,
+              urls=[dict(title='invalidVoteFlag', url='true')]
+            )
+          ]
+        ),
+        decoded_ballot=dict(
+          tally_type="plurality-at-large",
+          answers=[
+            dict(id=0, selected=0 ),
+            dict(id=1, selected=-1),
+            dict(
+              id=2,
+              selected=0,
+              urls=[dict(title='invalidVoteFlag', url='true')]
+            )
+          ]
+        ),
+        bases=  [2, 2, 2],
+        choices=[1, 1, 0]
+      ),
+      dict(
+        question=dict(
+          tally_type="borda",
+          max=2,
+          extra_options=dict(allow_writeins=True),
+          answers=[
+            dict(id=0),
+            dict(id=1),
+            dict(id=2),
+            dict(
+              id=3,
+              urls=[dict(title='invalidVoteFlag', url='true')]
+            ),
+            dict(
+              id=4,
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=5,
+              urls=[dict(title='isWriteIn', url='true')]
+            )
+          ]
+        ),
+        decoded_ballot=dict(
+          tally_type="borda",
+          max=2,
+          extra_options=dict(allow_writeins=True),
+          answers=[
+            dict(id=0, selected=0 ),
+            dict(id=1, selected=-1),
+            dict(id=2, selected=-1),
+            dict(
+              id=3,
+              selected=0,
+              urls=[dict(title='invalidVoteFlag', url='true')]
+            ),
+            dict(
+              id=4,
+              text='D',
+              selected=1,
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=5,
+              text='',
+              selected=-1,
+              urls=[dict(title='isWriteIn', url='true')]
+            )
+          ]
+        ),
+        bases=  [2, 3, 3, 3, 3, 3, 256, 256, 256],
+        choices=[1, 1, 0, 0, 2, 0, 68,  0,   0]
+      ),
+      dict(
+        question=dict(
+          tally_type="plurality-at-large",
+          extra_options=dict(allow_writeins=True),
+          max=3,
+          answers=[
+            dict(id=0),
+            dict(id=1),
+            dict(id=2),
+            dict(
+              id=3,
+              urls=[dict(title='invalidVoteFlag', url='true')]
+            ),
+            dict(
+              id=4,
+              text='E',
+              selected=1,
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=5,
+              text='',
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=6,
+              text='Ä bc',
+              urls=[dict(title='isWriteIn', url='true')]
+            )
+          ]
+        ),
+        decoded_ballot=dict(
+          tally_type="plurality-at-large",
+          extra_options=dict(allow_writeins=True),
+          max=3,
+          answers=[
+            dict(id=0, selected=0 ),
+            dict(id=1, selected=-1),
+            dict(id=2, selected=-1),
+            dict(
+              id=3,
+              urls=[dict(title='invalidVoteFlag', url='true')]
+            ),
+            dict(
+              id=4,
+              text='E',
+              selected=0,
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=5,
+              text='',
+              selected=-1,
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=6,
+              selected=0,
+              text='Ä bc',
+              urls=[dict(title='isWriteIn', url='true')]
+            )
+          ]
+        ),
+        bases=  [2, 2, 2, 2, 2, 2, 2, 256, 256, 256, 256, 256, 256, 256, 256, 256],
+        choices=[0, 1, 0, 0, 1, 0, 1, 69,  0,   0,   195, 132, 32,  98,  99,  0]
+      ),
+    ]
+    for data in data_list:
+      codec = NVotesCodec(data["question"])
+      self.assertTrue(codec.sanity_check())
+
+      # check raw ballot getter
+      decoded_ballot = codec.decode_raw_ballot(dict(
+        bases=data['bases'],
+        choices=data['choices']
+      ))
+      self.assertEqual(
+        decoded_ballot,
+        data['decoded_ballot']
+      )
+
+  def test_decode_raw_ballot(self):
+    # The question contains the minimum data required for the encoder to work
+    data_list = [
+      dict(
+        question=dict(
+          tally_type="plurality-at-large",
+          extra_options=dict(allow_writeins=True),
+          max=3,
+          answers=[
+            dict(id=0),
+            dict(id=1),
+            dict(id=2),
+            dict(
+              id=3,
+              urls=[dict(title='invalidVoteFlag', url='true')]
+            ),
+            dict(
+              id=4,
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=5,
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=6,
+              urls=[dict(title='isWriteIn', url='true')]
+            )
+          ]
+        ),
+        ballot=dict(
+          tally_type="plurality-at-large",
+          extra_options=dict(allow_writeins=True),
+          max=3,
+          answers=[
+            dict(id=0, selected=0 ),
+            dict(id=1, selected=-1),
+            dict(id=2, selected=-1),
+            dict(
+              id=3,
+              selected=-1,
+              urls=[dict(title='invalidVoteFlag', url='true')]
+            ),
+            dict(
+              id=4,
+              text='E',
+              selected=0,
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=5,
+              text='',
+              selected=-1,
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=6,
+              selected=0,
+              text='Ä bc',
+              urls=[dict(title='isWriteIn', url='true')]
+            )
+          ]
+        ),
+        raw_ballot=dict(
+          bases=  [2, 2, 2, 2, 2, 2, 2, 256, 256, 256, 256, 256, 256, 256, 256, 256],
+          choices=[0, 1, 0, 0, 1, 0, 1, 69,  0,   0,   195, 132, 32,  98,  99,  0]
+        ),
+        int_ballot=916649230342635397842
+      ),
+    ]
+    for data in data_list:
+      # 1. encode from ballot to rawBallot and test it
+      encoder = NVotesCodec(data["ballot"])
+      self.assertTrue(encoder.sanity_check())
+      raw_ballot = encoder.encode_raw_ballot()
+      self.assertEqual(raw_ballot, data["raw_ballot"])
+
+      # 2. encode from raw_ballot to BigInt and test it
+      int_ballot = encoder.encode_to_int(raw_ballot)
+      self.assertEqual(int_ballot, data["int_ballot"])
+
+      # 3. create a pristine encoder using the question without any selection 
+      # set, and decode from BigInt to raw_ballot and test it
+      decoder = NVotesCodec(data["question"])
+      self.assertTrue(decoder.sanity_check())
+      decoded_raw_ballot = decoder.decode_from_int(data["int_ballot"])
+      self.assertEqual(decoded_raw_ballot, data["raw_ballot"])
+      
+      # 4. decode from raw ballot to ballot and test it
+      decoded_ballot = decoder.decode_raw_ballot(decoded_raw_ballot)
+      self.assertEqual(decoded_ballot, data["ballot"])
+
+  def test_biggest_encodable_ballot(self):
+    data_list = [
+      dict(
+        question=dict(
+          tally_type="plurality-at-large",
+          answers=[
+            dict(id=0),
+            dict(id=1)
+          ]
+        ),
+        expected_value=7
+      ),
+      dict(
+        question=dict(
+          tally_type="borda",
+          max=3,
+          answers=[
+            dict(id=0),
+            dict(id=1),
+            dict(id=2)
+          ]
+        ),
+        expected_value=(1 + 3*2 + 3*2*4 + 3*2*4*4) # 127
+      ),
+      dict(
+        question=dict(
+          tally_type="plurality-at-large",
+          max=3,
+          extra_options=dict(allow_writeins=True),
+          answers=[
+            dict(id=0),
+            dict(id=1),
+            dict(id=2),
+            dict(
+              id=3,
+              urls=[dict(title='invalidVoteFlag', url='true')]
+            ),
+            dict(
+              id=4,
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=5,
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=6,
+              urls=[dict(title='isWriteIn', url='true')]
+            )
+          ]
+        ),
+        # highest_value_list = [1, 1, 1, 1, 1, 1, 1, 255, 255, 255]
+        # bases =              [2, 2, 2, 2, 2, 2, 2, 256, 256, 256]
+        # expected_value =     (1 + 1*2 + 2**2 + 2**3 + 2**4 + 2**5 + 2**6 + 255*(2**7) + 255*(2**7)*256  + 255*(2**7)*(256**2)) = 2147483647
+        expected_value=2147483647
+      )
+    ]
+    for data in data_list:
+      codec = NVotesCodec(data["question"])
+      self.assertTrue(codec.sanity_check())
+      
+      # check the number of bytes left
+      self.assertEqual(
+        codec.biggest_encodable_normal_ballot(),
+        data['expected_value']
+      )
+
+  def test_num_write_in_bytes_left(self):
+    data_list = [
+      dict(
+        question=dict(
+          tally_type='plurality-at-large',
+          answers=[
+            dict(id=0),
+            dict(id=1)
+          ]
+        ),
+        modulus=111,
+        bytes_left='throws'
+      ),
+      dict(
+        question=dict(
+          tally_type='plurality-at-large',
+          max=1,
+          extra_options=dict(allow_writeins=True),
+          answers=[
+            dict(id=0),
+            dict(id=1),
+            dict(
+              id=2,
+              urls=[dict(title='isWriteIn', url='true')]
+            )
+          ]
+        ),
+        #                bases  = [2, 2, 2, 2, 256]
+        # biggest normal ballot = [1, 1, 1, 1, 255]
+        # minimum encoded modulus for one byte free:
+        #               modulus = dict(
+        #                  bases=[2, 2, 2, 2, 256, 256, 256]
+        #                  value=[0, 0, 0, 0, 0,   0,   1  ]
+        modulus=(1*2*2*2*2*256*256 - 1), # 1048575
+        bytes_left=0
+      ),
+      dict(
+        question=dict(
+          tally_type='plurality-at-large',
+          max=1,
+          extra_options=dict(allow_writeins=True),
+          answers=[
+            dict(id=0),
+            dict(id=1),
+            dict(
+              id=2,
+              urls=[dict(title='isWriteIn', url='true')]
+            )
+          ]
+        ),
+        #                bases  = [2, 2, 2, 2, 256]
+        # biggest normal ballot = [1, 1, 1, 1, 255]
+        # minimum encoded modulus for one byte free:
+        #               modulus = dict(
+        #                  bases=[2, 2, 2, 2, 256, 256, 256]
+        #                  value=[0, 0, 0, 0, 0,   0,   1  ]
+        modulus=(1*2*2*2*2*256*256), # 1048576
+        bytes_left=1
+      ),
+      dict(
+        question=dict(
+          tally_type='plurality-at-large',
+          max=1,
+          extra_options=dict(allow_writeins=True),
+          answers=[
+            dict(id=0),
+            dict(id=1),
+            dict(
+              id=2,
+              urls=[dict(title='isWriteIn', url='true')]
+            )
+          ]
+        ),
+        #                bases  = [2, 2, 2, 2, 256]
+        # biggest normal ballot = [1, 1, 1, 1, 255]
+        # minimum encoded modulus for 2 bytes free:
+        #               modulus = dict(
+        #                  bases=[2, 2, 2, 2, 256, 256, 256, 256]
+        #                  value=[0, 0, 0, 0, 0,   0,   0,   1  ]
+        modulus=(1*2*2*2*2*256*256*256 - 1), # 268435455
+        bytes_left=1
+      ),
+      dict(
+        question=dict(
+          tally_type='plurality-at-large',
+          max=1,
+          extra_options=dict(allow_writeins=True),
+          answers=[
+            dict(id=0),
+            dict(id=1),
+            dict(
+              id=2,
+              urls=[dict(title='isWriteIn', url='true')]
+            )
+          ]
+        ),
+        #                bases  = [2, 2, 2, 2, 256]
+        # biggest normal ballot = [1, 1, 1, 1, 255]
+        # minimum encoded modulus for 2 bytes free:
+        #               modulus = {
+        #                  bases=[2, 2, 2, 2, 256, 256, 256, 256]
+        #                  value=[0, 0, 0, 0, 0,   0,   0,   1  ]
+        modulus=(1*2*2*2*2*256*256*256), # 268435456
+        bytes_left=2
+      ),
+    ]
+    for data in data_list:
+      codec = NVotesCodec(data["question"])
+      self.assertTrue(codec.sanity_check())
+
+      # check the number of bytes left
+      if data["bytes_left"] == 'throws':
+        with self.assertRaises(Exception):
+          codec.num_write_in_bytes_left(data["modulus"])
+      else:
+        self.assertEqual(
+          codec.num_write_in_bytes_left(data["modulus"]),
+          data["bytes_left"]
+        )
