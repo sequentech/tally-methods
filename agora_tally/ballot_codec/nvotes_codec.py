@@ -329,7 +329,11 @@ class NVotesCodec(object):
     )
     invalid_vote_flag = (
       1 
-      if invalid_vote_answer and invalid_vote_answer["selected"] > -1
+      if (
+        invalid_vote_answer is not None and 
+        "selected" in invalid_vote_answer and 
+        invalid_vote_answer["selected"] > -1
+      )
       else 0
     )
 
@@ -807,6 +811,71 @@ class TestNVotesCodec(unittest.TestCase):
         bases=  [2, 2, 2],
         choices=[1, 1, 0]
       ),
+      dict(
+        question=dict(
+          tally_type="borda",
+          max=2,
+          extra_options=dict(allow_writeins=True),
+          answers=[
+            dict(id=0, selected=0),
+            dict(id=1),
+            dict(id=2),
+            dict(
+              id=3,
+              selected=0,
+              urls=[dict(title='invalidVoteFlag', url='true')]
+            ),
+            dict(
+              id=4,
+              text='D',
+              selected=1,
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=5,
+              text='',
+              urls=[dict(title='isWriteIn', url='true')]
+            )
+          ]
+        ),
+        bases=     [2, 3, 3, 3, 3, 3, 256, 256, 256],
+        choices=   [1, 1, 0, 0, 2, 0, 68,  0,   0]
+      ),
+      dict(
+        question=dict(
+          tally_type="plurality-at-large",
+          extra_options=dict(allow_writeins=True),
+          max=3,
+          answers=[
+            dict(id=0, selected=1),
+            dict(id=1),
+            dict(id=2),
+            dict(
+              id=3,
+              urls=[dict(title='invalidVoteFlag', url='true')]
+            ),
+            dict(
+              id=4,
+              text='E',
+              selected=1,
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=5,
+              text='',
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=6,
+              selected=1,
+              text='Ä bc',
+              urls=[dict(title='isWriteIn', url='true')]
+            )
+          ]
+        ),
+        bases=    [2, 2, 2, 2, 2, 2, 2, 256, 256, 256, 256, 256, 256, 256, 256, 256],
+        choices=  [0, 1, 0, 0, 1, 0, 1, 69,  0,   0,   195, 132, 32,  98,  99,  0]
+      )
     ]
     for data in data_list:
       codec = NVotesCodec(data["question"])
