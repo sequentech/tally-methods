@@ -16,7 +16,7 @@ import unittest
 import copy
 from operator import itemgetter
 
-import agora_tally.ballot_codec.mixed_radix
+from agora_tally.ballot_codec import mixed_radix
 from test.file_helpers import serialize
 
 '''
@@ -84,11 +84,11 @@ class NVotesCodec(object):
         for answer in sorted_answers
         if dict(title='isWriteIn', url='true') in answer.get('urls', [])
       ]
-      bases.append(len(write_in_nwsers)*[256])
+      bases = bases + len(write_in_anwsers)*[256]
 
     return bases
 
-  def encode_to_int(raw_ballot):
+  def encode_to_int(self, raw_ballot):
     '''
     Converts a raw ballot into an encoded number ready to be encrypted. 
     A raw ballot is a list of positive integer numbers representing
@@ -249,12 +249,12 @@ class NVotesCodec(object):
     encoded_choices = 1*2^4 + 1*2^5 + 68*2^6 + 69*2^8 = 22064
     ```
     '''
-    return mixedRadix.encode(
+    return mixed_radix.encode(
       value_list=raw_ballot["choices"],
       base_list=raw_ballot["bases"]
     )
 
-  def decode_from_int(int_ballot):
+  def decode_from_int(self, int_ballot):
     '''
     Does exactly the reverse of of encode_from_int. It should be
     such as the following statement is always true:
@@ -281,16 +281,20 @@ class NVotesCodec(object):
       self.question["extra_options"]["allow_writeins"] is True
     ):
       # add missing byte bases and last \0 in the choices
-      if bases.length < choices.length:
-        choices.push(0)
-      bases.append((choices.length - bases.length - 1) * [256]);
+      if len(bases) < len(choices):
+        choices.append(0)
+
+      index = len(bases) + 1
+      while index <= len(choices):
+        bases.append(256)
+        index += 1
     
     return dict(
       choices=choices,
       bases=bases
     )
 
-  def encode_raw_ballot():
+  def encode_raw_ballot(self):
     '''
     Returns the ballot choices and the bases to be used for encoding
     as an object, for example something like:
@@ -318,6 +322,11 @@ class NVotesCodec(object):
       for answer in sorted_answers
       if dict(title='invalidVoteFlag', url='true') in answer.get('urls', [])
     ]
+    invalid_vote_answer = (
+      None
+      if len(invalid_answers) == 0
+      else invalid_answers[0]
+    )
     invalid_vote_flag = (
       1 
       if invalid_vote_answer and invalid_vote_answer["selected"] > -1
@@ -355,7 +364,7 @@ class NVotesCodec(object):
           )
           else 1
         )
-        choices.push(answer_value)
+        choices.append(answer_value)
       else:
         # we add 1 because the counting starts with 1, as zero means this 
         # answer was not voted / ranked
@@ -367,7 +376,7 @@ class NVotesCodec(object):
           )
           else answer["selected"] + 1
         )
-        choices.push(answer_value)
+        choices.append(answer_value)
     
     # Populate the bases and the raw_ballot values with the write-ins 
     # if there's any. We will through each write-in (if any), and then 
@@ -381,26 +390,26 @@ class NVotesCodec(object):
     ):
       for answer in write_in_anwsers:
         if "text" not in answer or len(answer["text"]) == 0:
-          # we don't do a bases.push(256) as this is done in get_bases()
+          # we don't do a bases.append(256) as this is done in get_bases()
           # end it with a zero
-          choices.push(0)
+          choices.append(0)
           continue
 
-        encoded_text = answer.text.encode('utf-8')
+        encoded_text = answer["text"].encode('utf-8')
         for text_byte in encoded_text:
-          bases.push(256)
-          choices.push(text_byte)
+          bases.append(256)
+          choices.append(text_byte)
 
-        # End it with a zero. we don't do a bases.push(256) as this is done in 
+        # End it with a zero. we don't do a bases.append(256) as this is done in 
         # get_bases()
-        choices.push(0)
+        choices.append(0)
 
     return dict(
       bases=bases,
       choices=choices
     )
  
-  def decode_raw_ballot(raw_ballot):
+  def decode_raw_ballot(self, raw_ballot):
     '''
     Does the opposite of `encode_raw_ballot`.
     
@@ -413,11 +422,15 @@ class NVotesCodec(object):
 
     # 2. sort & segment answers
     # 2.1. sort answers by id
-    sorted_answers = copy.deepcopy(question["answers"])
+    sorted_answers = question["answers"][:]
     sorted_answers.sort(key=itemgetter('id'))
 
-
     # 3. Obtain the invalidVote flag and set it
+    valid_answers = [
+      answer 
+      for answer in sorted_answers
+      if dict(title='invalidVoteFlag', url='true') not in answer.get('urls', [])
+    ]
     invalid_answers = [
       answer 
       for answer in sorted_answers
@@ -487,7 +500,7 @@ class NVotesCodec(object):
             write_ins_raw_bytes_array.append([])
         else:
           last_index = len(write_ins_raw_bytes_array) - 1
-          write_ins_raw_bytes_array[last_index].push(byte_element);
+          write_ins_raw_bytes_array[last_index].append(byte_element)
       
       if len(write_ins_raw_bytes_array) != len(write_in_answers):
         raise Exception(
@@ -498,7 +511,7 @@ class NVotesCodec(object):
 
       # 6.3. Decode each write-in byte array
       write_in_decoded = [
-        bytes(write_in_encoded_utf8)
+        bytes(write_in_encoded_utf8).decode('utf-8')
         for write_in_encoded_utf8 in write_ins_raw_bytes_array
       ]
 
@@ -508,8 +521,7 @@ class NVotesCodec(object):
     
     return question
 
-
-  def sanityCheck():
+  def sanity_check(self):
     '''
     Sanity check with a specific manual example, to see that encoding
     and decoding works as expected.
@@ -599,21 +611,21 @@ class NVotesCodec(object):
       # set, and decode from BigInt to raw_ballot and test it
       decoder = NVotesCodec(data["question"])
       decoded_raw_ballot = decoder.decode_from_int(data["int_ballot"])
-      if stringify(decoded_raw_ballot) != stringify(data["raw_ballot"]):
+      if serialize(decoded_raw_ballot) != serialize(data["raw_ballot"]):
         raise Exception("Sanity Check fail")
       
       # 4. decode from raw ballot to ballot and test it
       decoded_ballot = decoder.decode_raw_ballot(decoded_raw_ballot)
-      if stringify(decoded_ballot) != stringify(data.ballot):
+      if serialize(decoded_ballot) != serialize(data["ballot"]):
         raise Exception("Sanity Check fail")
 
     except Exception as e:
-      return False
+      raise e
+      # return False
 
     return True
 
-
-  def biggest_encodable_normal_ballot():
+  def biggest_encodable_normal_ballot(self):
     '''
     Returns the biggest encodable ballot that doesn't include any
     write-in text (or they are empty strings) encoded as a big int 
@@ -633,7 +645,7 @@ class NVotesCodec(object):
     )
     return highest_encoded_ballot
 
-  def numWriteInBytesLeft(modulus):
+  def num_write_in_bytes_left(self, modulus):
     '''
     Returns the numbers of ASCII characters left to encode a number
     not bigger than the BigInt modulus given as input.
@@ -726,5 +738,37 @@ class TestNVotesCodec(unittest.TestCase):
     for data in data_list:
       codec = NVotesCodec(data["question"])
       self.assertEqual(codec.get_bases(), data["bases"])
-    
 
+  def test_encode_raw_ballot(self):
+    # The question contains the minimum data required for the encoder to work
+    data_list = [
+      dict(
+        question=dict(
+          tally_type="plurality-at-large",
+          answers=[
+            dict(id=0),
+            dict(id=1,selected=0),
+            dict(id=2),
+            dict(id=3),
+            dict(id=4),
+            dict(id=5, selected=1),
+            dict(id=6)
+          ]
+        ),
+        bases=  [2, 2, 2, 2, 2, 2, 2, 2],
+        choices=[0, 0, 1, 0, 0, 0, 1, 0]
+      ),
+    ]
+    for data in data_list:
+      codec = NVotesCodec(data["question"])
+      self.assertTrue(codec.sanity_check())
+
+      # check raw ballot getter
+      raw_ballot = codec.encode_raw_ballot()
+      self.assertEqual(
+        serialize(raw_ballot),
+        serialize(dict(
+          bases=data['bases'],
+          choices=data['choices']
+        ))
+      )
