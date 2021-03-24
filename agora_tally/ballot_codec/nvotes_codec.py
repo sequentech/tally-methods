@@ -339,7 +339,7 @@ class NVotesCodec(object):
     bases = self.get_bases()
     choices = [invalid_vote_flag]
 
-    # populate rawBallot and bases using the valid answers list
+    # populate raw_ballot and bases using the valid answers list
     tally_type = self.question["tally_type"]
     for answer in valid_answers:
       if tally_type == 'plurality-at-large':
@@ -368,7 +368,7 @@ class NVotesCodec(object):
         )
         choices.push(answer_value)
     
-    # Populate the bases and the rawBallot values with the write-ins 
+    # Populate the bases and the raw_ballot values with the write-ins 
     # if there's any. We will through each write-in (if any), and then 
     # encode the write-in answer.text string with UTF-8 and use for 
     # each byte a specific value with base 256 and end each write-in 
@@ -398,7 +398,114 @@ class NVotesCodec(object):
       bases=bases,
       choices=choices
     )
+ 
+  def decode_raw_ballot(raw_ballot):
+    '''
+    Does the opposite of `encode_raw_ballot`.
+    
+    Returns `self.questions` with the data from the raw ballot.
+    '''
+    # 1. clone the question and reset the selections
+    question = copy.deepcopy(self.question)
+    for answer in question['answers']:
+      answer['selected'] = -1
 
+    # 2. sort & segment answers
+    # 2.1. sort answers by id
+    sorted_answers = copy.deepcopy(question["answers"])
+    sorted_answers.sort(key=itemgetter('id'))
+
+
+    # 3. Obtain the invalidVote flag and set it
+    invalid_answers = [
+      answer 
+      for answer in sorted_answers
+      if dict(title='invalidVoteFlag', url='true') in answer.get('urls', [])
+    ]
+    invalid_vote_answer = (
+      None 
+      if len(invalid_answers) == 0
+      else invalid_answers[0]
+    )
+
+    if invalid_vote_answer is not None:
+      if raw_ballot["choices"][0] > 0:
+        invalid_vote_answer["selected"] = 0
+      else:
+        invalid_vote_answer["selected"] = -1
+
+    # 4. Do some verifications on the number of choices:
+    #    Checking that the raw_ballot has as many choices as required
+    min_num_choices = len(question["answers"])
+    if len(raw_ballot["choices"]) < min_num_choices:
+      raise Exception('Invalid Ballot: Not enough choices to decode')
+    
+    # 5. Obtain the vote for valid answers and populate the selections.
+    valid_anwsers = [
+      answer 
+      for answer in sorted_answers
+      if dict(title='invalidVoteFlag', url='true') not in answer.get('urls', [])
+    ]
+
+    # 5.1. Populate the valid answers. We asume they are in the same order as
+    # in raw_ballot["choices"]
+    for index, answer in enumerate(valid_answers):
+      # we add 1 to the index because raw_ballot.choice[0] is just the
+      # invalidVoteFlag
+      choice_index = index + 1
+      answer["selected"] = raw_ballot["choices"][choice_index] - 1
+
+    # 6. Filter for the write ins, decode the write-in texts into 
+    #    UTF-8 and split by the \0 character, finally the text for the
+    #    write-ins.
+    if (
+      "extra_options" in question and 
+      "allow_writeins" in question["extra_options"] and
+      question["extra_options"]["allow_writeins"] is True
+    ):
+      write_in_answers = [
+        answer 
+        for answer in sorted_answers
+        if dict(title='isWriteIn', url='true') in answer.get('urls', [])
+      ]
+      # if no write ins, return
+      if len(write_in_answers) == 0:
+        return question
+
+      # 6.1. Slice the choices to get only the bytes related to the write ins
+      write_in_raw_bytes = raw_ballot["choices"][len(question["answers"]):]
+
+      # 6.2. Split the write-in bytes arrays in multiple sub-arrays 
+      # using byte \0 as a separator.
+      write_ins_raw_bytes_array = [ [] ]
+      for index, byte_element in enumerate(write_in_raw_bytes):
+        if byte_element == 0:
+          # Start the next write-in byte array, but only if this is
+          # not the last one
+          if index != len(write_in_raw_bytes) - 1:
+            write_ins_raw_bytes_array.append([])
+        else:
+          last_index = len(write_ins_raw_bytes_array) - 1
+          write_ins_raw_bytes_array[last_index].push(byte_element);
+      
+      if len(write_ins_raw_bytes_array) != len(write_in_answers):
+        raise Exception(
+          "Invalid Ballot: invalid number of write-in bytes," +
+          " len(write_ins_raw_bytes_array) = " + len(write_ins_raw_bytes_array) +
+          ", len(write_in_answers) = " + len(write_in_answers)
+        )
+
+      # 6.3. Decode each write-in byte array
+      write_in_decoded = [
+        bytes(write_in_encoded_utf8)
+        for write_in_encoded_utf8 in write_ins_raw_bytes_array
+      ]
+
+      # 6.4. Assign the write-in name for each write in
+      for index, write_in_answer in enumerate(write_in_answers):
+          write_in_answer["text"] = write_in_decoded[index]
+    
+    return question
 
 class TestNVotesCodec(unittest.TestCase):
   def test_bases(self):
