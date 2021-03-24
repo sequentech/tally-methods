@@ -523,6 +523,20 @@ class NVotesCodec(object):
       for index, write_in_answer in enumerate(write_in_answers):
           write_in_answer["text"] = write_in_decoded[index]
     
+    else:
+      # if there are no write-ins, we will check that there are no more choices
+      # set after the choice for the last answer, as they would not mean 
+      # anything and thus it would be an invalid ballot, but one of a different
+      # type that just marking the ballot invalid or marking more/less options
+      # than required. It would be gibberish without any meaning, so we raise
+      # an exception on that use-case.
+      if len(valid_answers) +1 != len(raw_ballot["choices"]):
+        raise Exception(
+          "Invalid Ballot: invalid number of choices," +
+          " len(raw_ballot[\"choices\"]) = " + len(raw_ballot["choices"]) +
+          ", len(valid_answers) + 1 = " + (len(valid_answers) + 1)
+        )
+    
     return question
 
   def sanity_check(self):

@@ -14,9 +14,9 @@
 # along with agora-tally.  If not, see <http://www.gnu.org/licenses/>.
 
 from importlib import import_module
+from agora_tally.ballot_codec.nvotes_codec import NVotesCodec
 
 VOTING_METHODS = (
-    #'agora_tally.voting_systems.meek_stv.MeekSTV',
     'agora_tally.voting_systems.plurality_at_large.PluralityAtLarge',
     'agora_tally.voting_systems.borda_nauru.BordaNauru',
     'agora_tally.voting_systems.borda.Borda',
@@ -90,13 +90,16 @@ class BaseTally(object):
     '''
     Class oser to tally an election
     '''
-    election = None
+    question = None
     question_num = None
     question_id = None
+    decoder = None
+    custom_subparser = None
 
-    def __init__(self, election, question_num):
-        self.election = election
+    def __init__(self, question, question_num):
+        self.question = question
         self.question_num = question_num
+        self.decoder = NVotesCodec(question)
         self.init()
 
     def init(self):
@@ -114,12 +117,58 @@ class BaseTally(object):
         '''
         pass
 
-    def parse_vote(self, number, question, withdrawals=[]):
+    def parse_vote(
+        self, 
+        int_ballot, 
+        question, 
+        withdrawals=[]
+    ):
         '''
-        parse vote
+        Parse vote
         '''
-        pass
+        raw_ballot = self.decoder.decode_from_int(int_ballot)
+        decoded_ballot = self.decoder.decode_raw_ballot(raw_ballot)
 
+        # detect if the ballot was marked as invalid, even if there's no 
+        # explicit invalid answer
+        if raw_ballot['choices'][0] > 0:
+            raise Exception()
+    
+        non_blank_unwithdrawed_answers = None
+        if self.custom_subparser is None:
+            non_blank_unwithdrawed_answers = [
+                answer['id']
+                for answer in decoded_ballot['answers']
+                if answer['selected'] > -1 and answer['id'] not in withdrawals
+            ]
+        else:
+            non_blank_unwithdrawed_answers = self.custom_subparser(
+                decoded_ballot,
+                question,
+                withdrawals
+            )
+
+        if len(non_blank_unwithdrawed_answers) == 0:
+            raise BlankVoteException()
+
+        # detect and deal with different types of invalid votes
+        if (
+            len(non_blank_unwithdrawed_answers) < question['min'] or 
+            len(set(non_blank_unwithdrawed_answers)) != len(non_blank_unwithdrawed_answers)
+        ):
+            raise Exception()
+
+        if len(non_blank_unwithdrawed_answers) > question['max']:
+            if (
+                "truncate-max-overload" in question and
+                question["truncate-max-overload"]
+            ):
+                non_blank_unwithdrawed_answers = \
+                    non_blank_unwithdrawed_answers[:question['max']]
+            else:
+                raise Exception()
+
+        return non_blank_unwithdrawed_answers
     def post_tally(self, questions):
         '''
         Once all votes have been added, this function is called once

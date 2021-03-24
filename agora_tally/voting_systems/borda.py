@@ -48,11 +48,11 @@ class Borda(BaseVotingSystem):
         return _('Borda Count voting')
 
     @staticmethod
-    def create_tally(election, question_num):
+    def create_tally(question, question_num):
         '''
         Create object that helps to compute the tally
         '''
-        return BordaTally(election, question_num)
+        return BordaTally(question=question, question_num=question_num)
 
 class BordaTally(BaseTally):
     '''
@@ -82,50 +82,18 @@ class BordaTally(BaseTally):
 
     def init(self):
         self.ballots_path = tempfile.mktemp(".blt")
-
         self.ballots = []
 
-    def parse_vote(self, number, question, withdrawals=[]):
-        vote_str = str(number)
-        tab_size = len(str(len(question['answers']) + 2))
+        def custom_subparser(decoded_ballot, _question, withdrawals):
+            sorted_ballot_answers = copy.deepcopy(decoded_ballot['answers'])
+            sorted_ballot_answers.sort(key=itemgetter('selected'))
+            return [
+                answer['id']
+                for answer in sorted_ballot_answers
+                if answer['selected'] > -1 and answer['id'] not in withdrawals
+            ]
 
-        # fix add zeros
-        if len(vote_str) % tab_size != 0:
-            num_zeros = (tab_size - (len(vote_str) % tab_size)) % tab_size
-            vote_str = "0" * num_zeros + vote_str
-
-        ret = []
-        withdrawed_options = []
-        for i in range(int(len(vote_str) / tab_size)):
-            option = int(vote_str[i*tab_size: (i+1)*tab_size]) - 1
-
-            if option in withdrawals:
-                withdrawed_options.append(option)
-                continue
-            # blank vote
-            elif option == len(question['answers']) + 1:
-                raise BlankVoteException()
-            # invalid vote
-            elif option < 0 or option >= len(question['answers']):
-                raise Exception()
-            ret.append(option)
-
-        # after removing withdrawed options, the vote might be empty but it 
-        # would not have raised the BlankVoteException. Detect this case and
-        # raise the exception in that case.
-        if len(ret) == 0 and len(withdrawed_options) > 0:
-            raise Exception()
-
-        # detect invalid vote
-        if len(ret) < question['min'] or len(set(ret)) != len(ret):
-            raise Exception()
-        if len(ret) > question['max']:
-            if "truncate-max-overload" in question and question["truncate-max-overload"]:
-                ret = ret[:question['max']]
-            else:
-                raise Exception()
-
-        return ret
+        self.custom_subparser = custom_subparser
 
     def pre_tally(self, questions):
         '''

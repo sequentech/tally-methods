@@ -69,13 +69,16 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
     base_vote =[dict(choices=[]) for q in questions]
     total_count = encrypted_invalid_votes
 
-    # setup the initial data common to all voting system
-    i = 0
+    # setup the initial data common to all voting systems
+    question_index = 0
     for qindex, question in enumerate(questions):
 
         tally_type = question['tally_type']
         voting_system = get_voting_system_by_id(tally_type)
-        tally = voting_system.create_tally(None, i)
+        tally = voting_system.create_tally(
+            question=question,
+            question_num=question_index
+        )
         if monkey_patcher:
             monkey_patcher(tally)
         tallies.append(tally)
@@ -94,7 +97,7 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
                 answer['total_count'] = 0
 
         if question_indexes is not None and qindex not in question_indexes:
-            i += 1
+            question_index += 1
             continue
 
         question['winners'] = []
@@ -108,7 +111,7 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
             answer['total_count'] = 0
 
         tally.pre_tally(questions)
-        plaintexts_path = os.path.join(dir_path, "%d-*" % i, "plaintexts_json")
+        plaintexts_path = os.path.join(dir_path, "%d-*" % question_index, "plaintexts_json")
         try:
             plaintexts_path = glob.glob(plaintexts_path)[0]
             tally.question_id = plaintexts_path.split('/')[-2]
@@ -119,15 +122,17 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
                 pass
         else:
             q_withdrawals = [
-            answer['answer_id']
-            for answer in withdrawals
-            if answer['question_index'] == qindex]
+                answer['answer_id']
+                for answer in withdrawals
+                if answer['question_index'] == qindex
+            ]
 
             with codecs.open(plaintexts_path, encoding='utf-8', mode='r') as plaintexts_file:
                 total_count = encrypted_invalid_votes
                 for line in plaintexts_file.readlines():
                     total_count += 1
                     voter_answers = copy.deepcopy(base_vote)
+                    int_ballot = None
                     try:
                         # Note line starts with " (1 character) and ends with
                         # "\n (2 characters). It contains the index of the
@@ -135,23 +140,34 @@ def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
                         # because number 0 cannot be encrypted with elgammal
                         # so we trim beginning and end, parse the int and
                         # substract one
-                        number = int(line[1:-2]) - 1
-                        choices = tally.parse_vote(number, question, q_withdrawals)
+                        int_ballot = int(line[1:-2]) - 1
+                        choices = tally.parse_vote(
+                            int_ballot, 
+                            question, 
+                            q_withdrawals
+                        )
+                        #print("ballot with choices: %r" % int_ballot)
+                        #print(choices)
 
                         # craft the voter_answers in the format admitted by
                         # tally.add_vote
-                        voter_answers[i]['choices'] = choices
+                        voter_answers[question_index]['choices'] = choices
                     except BlankVoteException:
+                        #print("blank ballot %r" % int_ballot)
                         question['totals']['blank_votes'] += 1
                     except Exception as e:
+                        #print("invalid ballot %r" % int_ballot)
                         question['totals']['null_votes'] += 1
                         if not ignore_invalid_votes:
                             print("invalid vote: " + line)
 
-                    tally.add_vote(voter_answers=voter_answers,
-                        questions=questions, is_delegated=False)
+                    tally.add_vote(
+                        voter_answers=voter_answers,
+                        questions=questions, 
+                        is_delegated=False
+                    )
 
-            i += 1
+            question_index += 1
 
 
     extra_data = dict()
