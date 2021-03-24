@@ -17,6 +17,7 @@ import copy
 from operator import itemgetter
 
 import agora_tally.ballot_codec.mixed_radix
+from test.file_helpers import serialize
 
 '''
 Encodes/Decodes the answer to a question given the question type.
@@ -506,6 +507,170 @@ class NVotesCodec(object):
           write_in_answer["text"] = write_in_decoded[index]
     
     return question
+
+
+  def sanityCheck():
+    '''
+    Sanity check with a specific manual example, to see that encoding
+    and decoding works as expected.
+    
+    Returns True if the test checks out or False otherwise.
+    '''
+    try:
+      data = dict(
+        question=dict(
+          tally_type="plurality-at-large",
+          max=3,
+          extra_options=dict(allow_writeins=True),
+          answers=[
+            dict(id=0),
+            dict(id=1),
+            dict(id=2),
+            dict(
+              id=3,
+              urls=[dict(title='invalidVoteFlag', url='true')]
+            ),
+            dict(
+              id=4,
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=5,
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=6,
+              urls=[dict(title='isWriteIn', url='true')]
+            )
+          ]
+        ),
+        ballot=dict(
+          tally_type="plurality-at-large",
+          max=3,
+          extra_options=dict(allow_writeins=True),
+          answers=[
+            dict(id=0, selected=0 ),
+            dict(id=1, selected=-1),
+            dict(id=2, selected=-1),
+            dict(
+              id=3,
+              selected=-1,
+              urls=[dict(title='invalidVoteFlag', url='true')]
+            ),
+            dict(
+              id=4,
+              text='E',
+              selected=0,
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=5,
+              selected=-1,
+              text='',
+              urls=[dict(title='isWriteIn', url='true')]
+            ),
+            dict(
+              id=6,
+              selected=0,
+              text='Ä bc',
+              urls=[dict(title='isWriteIn', url='true')]
+            )
+          ]
+        ),
+        raw_ballot=dict(
+          bases=    [2, 2, 2, 2, 2, 2, 2, 256, 256, 256, 256, 256, 256, 256, 256, 256],
+          choices=  [0, 1, 0, 0, 1, 0, 1, 69,  0,   0,   195, 132, 32,  98,  99,  0]
+        ),
+        int_ballot=916649230342635397842
+      )
+
+      # 1. encode from ballot to raw_ballot and test it
+      encoder = NVotesCodec(data["ballot"])
+      raw_ballot = encoder.encode_raw_ballot()
+      if serialize(raw_ballot) != serialize(data["raw_ballot"]):
+        raise Exception("Sanity Check fail")
+
+      # 2. encode from raw_ballot to BigInt and test it
+      int_ballot = encoder.encode_to_int(raw_ballot)
+      if serialize(int_ballot) != serialize(data["int_ballot"]):
+        raise Exception("Sanity Check fail")
+
+      # 3. create a pristine encoder using the question without any selection 
+      # set, and decode from BigInt to raw_ballot and test it
+      decoder = NVotesCodec(data["question"])
+      decoded_raw_ballot = decoder.decode_from_int(data["int_ballot"])
+      if stringify(decoded_raw_ballot) != stringify(data["raw_ballot"]):
+        raise Exception("Sanity Check fail")
+      
+      # 4. decode from raw ballot to ballot and test it
+      decoded_ballot = decoder.decode_raw_ballot(decoded_raw_ballot)
+      if stringify(decoded_ballot) != stringify(data.ballot):
+        raise Exception("Sanity Check fail")
+
+    except Exception as e:
+      return False
+
+    return True
+
+
+  def biggest_encodable_normal_ballot():
+    '''
+    Returns the biggest encodable ballot that doesn't include any
+    write-in text (or they are empty strings) encoded as a big int 
+    voting to non-write-ins.
+    
+    Used to know if the ballot would overflow, for example during
+    election creation, because it contains too many options.
+    '''
+    bases = self.get_bases()
+
+    # calculate the biggest number that can be encoded with the 
+    # minumum number of bases, which should be bigger than modulus
+    highest_value_list = [base-1 for base in bases]
+    highest_encoded_ballot = mixed_radix.encode(
+      value_list=highest_value_list,
+      base_list=bases
+    )
+    return highest_encoded_ballot
+
+  def numWriteInBytesLeft(modulus):
+    '''
+    Returns the numbers of ASCII characters left to encode a number
+    not bigger than the BigInt modulus given as input.
+    '''
+    # The calculations here do not make sense when there are no write-ins
+    if (
+      "extra_options" not in self.question or
+      "allow_writeins" not in self.question["extra_options"] or
+      self.question["extra_options"]["allow_writeins"] is False
+    ):
+      raise Exception("Contest does not have write-ins")
+
+    # Sanity check: modulus needs to be bigger than the biggest 
+    # encodable normal ballot
+    bases = self.get_bases()
+    highest_int = self.biggest_encodable_normal_ballot()
+    if highest_int >= modulus:
+      raise Exception("modulus too small")
+
+    # If we decode the modulus bigint using the questions' mixed radix bases, 
+    # the value will be garbage but the number of ints will be just 1 too many 
+    # (as the last one will never be usable)
+    decoded_modulus = mixed_radix.decode(
+      base_list=bases,
+      encoded_value=modulus,
+      last_base=256
+    )
+    encoded_raw_ballot = self.encode_raw_ballot()
+    max_len = len(decoded_modulus) - 1
+
+    # As we know that the modulus is big enough for a ballot with no
+    # write-ins and because we know all extra bases will be bytes,
+    # the difference between the number of bases used for encoding the
+    # ballot and the number of bases used to encode the modulus is the
+    # number of byte bases left
+    return max_len - len(encoded_raw_ballot.bases)
+
 
 class TestNVotesCodec(unittest.TestCase):
   def test_bases(self):
