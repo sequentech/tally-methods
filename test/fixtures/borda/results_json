@@ -52,12 +52,12 @@
             "tally_type": "borda",
             "title": "Test question",
             "totals": {
-                "blank_votes": 0,
+                "blank_votes": 1,
                 "null_votes": 3,
                 "valid_votes": 6
             },
             "winners": []
         }
     ],
-    "total_votes": 9
+    "total_votes": 10
 }

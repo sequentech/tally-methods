@@ -47,11 +47,14 @@ class PluralityAtLarge(BaseVotingSystem):
         return _('Plurality at large voting')
 
     @staticmethod
-    def create_tally(election, question_num):
+    def create_tally(question, question_num):
         '''
         Create object that helps to compute the tally
         '''
-        return PluralityAtLargeTally(election, question_num)
+        return PluralityAtLargeTally(
+            question=question,
+            question_num=question_num
+        )
 
 class PluralityAtLargeTally(BaseTally):
     '''
@@ -88,51 +91,7 @@ class PluralityAtLargeTally(BaseTally):
 
     def init(self):
         self.ballots_path = tempfile.mktemp(".blt")
-
         self.ballots = []
-
-    def parse_vote(self, number, question, withdrawals=[]):
-        vote_str = str(number)
-        tab_size = len(str(len(question['answers']) + 2))
-
-        # fix add zeros
-        if len(vote_str) % tab_size != 0:
-            num_zeros = (tab_size - (len(vote_str) % tab_size)) % tab_size
-            vote_str = "0" * num_zeros + vote_str
-
-        ret = []
-        withdrawed_options = []
-        for i in range(int(len(vote_str) / tab_size)):
-            option = int(vote_str[i*tab_size: (i+1)*tab_size]) - 1
-
-            if option in withdrawals:
-                withdrawed_options.append(option)
-                continue
-
-            # blank vote
-            if option == len(question['answers']) + 1  and int(len(vote_str) / tab_size) == 1:
-                raise BlankVoteException()
-            # invalid vote
-            elif option < 0 or option >= len(question['answers']):
-                raise Exception()
-            ret.append(option)
-
-        # after removing withdrawed options, the vote might be empty but it 
-        # would not have raised the BlankVoteException. Detect this case and
-        # raise the exception in that case.
-        if len(ret) == 0 and len(withdrawed_options) > 0:
-            raise Exception()
-
-        # detect invalid vote
-        if len(ret) < question['min'] or len(set(ret)) != len(ret):
-            raise Exception()
-        if len(ret) > question['max']:
-            if "truncate-max-overload" in question and question["truncate-max-overload"]:
-                ret = ret[:question['max']]
-            else:
-                raise Exception()
-
-        return ret
 
     def pre_tally(self, questions):
         '''
@@ -221,7 +180,6 @@ class PluralityAtLargeTally(BaseTally):
             e.strongTieBreakMethod = self.strongTieBreakMethod
 
         # run election and generate the report
-        # from celery.contrib import rdb; rdb.set_trace()
         e.runElection()
 
         # generate report

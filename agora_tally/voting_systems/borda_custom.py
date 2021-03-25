@@ -48,11 +48,14 @@ class BordaCustom(BaseVotingSystem):
         return _('Custom Borda Count voting')
 
     @staticmethod
-    def create_tally(election, question_num):
+    def create_tally(question, question_num):
         '''
         Create object that helps to compute the tally
         '''
-        return BordaCustomTally(election, question_num)
+        return BordaCustomTally(
+            question=question,
+            question_num=question_num
+        )
 
 class BordaCustomTally(BordaTally):
     # openstv options

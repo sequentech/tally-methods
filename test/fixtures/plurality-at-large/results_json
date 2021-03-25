@@ -6,7 +6,7 @@
                 {
                     "category": "",
                     "details": "",
-                    "id": 1,
+                    "id": 0,
                     "text": "Alice",
                     "total_count": 3,
                     "urls": [],
@@ -15,7 +15,7 @@
                 {
                     "category": "",
                     "details": "",
-                    "id": 2,
+                    "id": 1,
                     "text": "Bob",
                     "total_count": 4,
                     "urls": [],
@@ -24,7 +24,7 @@
                 {
                     "category": "",
                     "details": "",
-                    "id": 3,
+                    "id": 2,
                     "text": "Carmen",
                     "total_count": 1,
                     "urls": [],

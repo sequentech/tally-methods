@@ -4,15 +4,17 @@ import codecs
 import os
 import copy
 import json
+import six
 from operator import itemgetter
 
 from agora_tally.tally import do_tartally, do_dirtally, do_tally
 from agora_tally.voting_systems.plurality_at_large import PluralityAtLarge
-from test import file_helpers
+from agora_tally import file_helpers
+from agora_tally.ballot_codec.mixed_radix import TestMixedRadix
+from agora_tally.ballot_codec.nvotes_codec import TestNVotesCodec
+
 import test.desborda_test
 import test.desborda_test_data
-import six
-#from agora_tally.voting_systems.meek_stv import MeekSTV
 
 def _pretty_print_base(data, mark_winners, show_percent, filter_name):
     '''
@@ -73,10 +75,7 @@ class TestSequenceFunctions(unittest.TestCase):
     BORDA_NAURU = "borda-nauru"
     BORDA = "borda"
     BORDA2 = "borda2"
-    BORDA_NAURU2 = "borda-nauru2"
     BORDA_CUSTOM = "borda-custom"
-    PAIRWISE_BETA = "pairwise-beta"
-    PAIRWISE_BRADLEYTERRY = "pairwise-bradleyterry"
     maxDiff = None
 
     def setUp(self):
@@ -99,74 +98,17 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_borda_nauru(self):
         self._test_method(self.BORDA_NAURU)
 
-    def test_borda_nauru2(self):
-        '''
-        Tests removing some candidates using a different input format
-        '''
-        WITHDRAWALS = ["25"]
-
-        # first, generate questions_json
-        base_path = os.path.join(self.FIXTURES_PATH, self.BORDA_NAURU2)
-        candidates = file_helpers.read_file(os.path.join(base_path, "raw_candidates.txt"))
-        questions = json.loads(file_helpers.read_file(os.path.join(base_path, "questions_base_json")))
-        options = [line.split("\t")[0].strip() for line in candidates.split("\n")]
-
-        for i, option in enumerate(options):
-            questions[0]['answers'].append({
-                "category": "",
-                "details": "",
-                "id": i,
-                "text": option,
-                "urls": []
-            })
-        questions[0]['max'] = len(options)
-        questions[0]['num_winners'] = len(options) - 1
-        file_helpers.write_file(os.path.join(base_path, "questions_json"),
-          file_helpers.serialize(questions))
-
-        # serialize plaintexts
-        raw_plaintexts_path = os.path.join(base_path, "0-question", "raw_plaintexts.txt")
-        dst_plaintexts_path = os.path.join(base_path, "0-question", "plaintexts_json")
-        fw = file_helpers.open(dst_plaintexts_path, "w")
-
-        with file_helpers.open(raw_plaintexts_path, "r") as fr:
-            for line in fr:
-                num = "".join([str(int(opt.strip())-1).zfill(2)
-                               for opt in line.split(",")
-                               if opt.strip() not in WITHDRAWALS])
-                if len(num) == 0:
-                    num = len(questions[0]['answers']) + 2
-                fw.write('"%d"\n' % (int(num) + 1))
-        fw.close()
-        results = self._test_method(self.BORDA_NAURU2)
-
-        # print result
-        _pretty_print_base(results, False, show_percent=True,
-          filter_name="borda-nauru")
-        os.unlink(dst_plaintexts_path)
-        os.unlink(os.path.join(base_path, "questions_json"))
-
     def test_plurality_at_large(self):
           self._test_method(self.PLURALITY_AT_LARGE)
 
     def test_borda(self):
         self._test_method(self.BORDA)
 
-    # broken
-    #def test_borda2(self):
-    #    self._test_method(self.BORDA2)
+    def test_borda2(self):
+        self._test_method(self.BORDA2)
 
-    def test_pairwise_beta(self):
-        self._test_method(self.PAIRWISE_BETA)
-
-    def test_pairwise_bradleyterry(self):
-        self._test_method(self.PAIRWISE_BRADLEYTERRY)
-
-    #def test_custom(self):
-    #    self._test_method(self.BORDA_CUSTOM)
-
-    #def test_meek_stv(self):
-        #self._test_method(self.MEEK_STV)
+    def test_custom(self):
+        self._test_method(self.BORDA_CUSTOM)
 
 class TestDesborda(unittest.TestCase):
 
@@ -178,24 +120,18 @@ class TestDesborda(unittest.TestCase):
     def test_borda(self):
         # from the variables passed as arguments, create a folder with the data
         # in a format usable for tests
-        tally_path = test.desborda_test.create_desborda_test(test.desborda_test_data.test_desborda_1)
+        tally_path = test.desborda_test.create_desborda_test(
+            test.desborda_test_data.test_desborda_1
+        )
         try:
-            results_path = os.path.join(tally_path, "results_json")
             results = do_dirtally(tally_path)
             serialized_results = file_helpers.serialize(results)
-            should_results = file_helpers.read_file(results_path)
-            # ====================================================== #
-            #file_helpers.write_file('/agora/test/napas/shouldresults_json', should_results)
-            #file_helpers.write_file('/agora/test/napas/results_json', serialized_results)
 
-            #copied_results = copy.deepcopy(results['questions'][0]['answers'])
-            #sorted_results = sorted(copied_results, key = lambda x: 62 if x['winner_position'] is None else x['winner_position'])
-            #test_out = ""
-            #for answer in sorted_results:
-                #test_out += "%s, %i\n" % (answer['text'], answer['total_count'])
-            #file_helpers.write_file('/agora/test/napas/test_out', test_out)
-            # ====================================================== #
+            results_path = os.path.join(tally_path, "results_json")
+            should_results = file_helpers.read_file(results_path)
+            
             self.assertEqual(serialized_results, should_results)
+            
             # remove the temp test folder also in a successful test
             file_helpers.remove_tree(tally_path)
         except:
@@ -207,13 +143,18 @@ class TestDesborda(unittest.TestCase):
     def test_desborda_blank_invalid(self):
         # from the variables passed as arguments, create a folder with the data
         # in a format usable for tests
-        tally_path = test.desborda_test.create_desborda_test(test.desborda_test_data.test_desborda_2)
+        tally_path = test.desborda_test.create_desborda_test(
+            test.desborda_test_data.test_desborda_2
+        )
         try:
-            results_path = os.path.join(tally_path, "results_json")
             results = do_dirtally(tally_path)
             serialized_results = file_helpers.serialize(results)
+
+            results_path = os.path.join(tally_path, "results_json")
             should_results = file_helpers.read_file(results_path)
+            
             self.assertEqual(serialized_results, should_results)
+            
             # remove the temp test folder also in a successful test
             file_helpers.remove_tree(tally_path)
         except:

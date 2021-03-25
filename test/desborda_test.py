@@ -22,8 +22,10 @@ import copy
 import json
 import os
 from os import urandom
-from test import file_helpers
 import tempfile
+
+from agora_tally.ballot_codec.nvotes_codec import NVotesCodec
+from agora_tally import file_helpers
 
 def remove_spaces(in_str):
     return re.sub(r"[ \t\r\f\v]*", "", in_str)
@@ -38,16 +40,26 @@ def has_output_format(out_str):
      m = re.fullmatch(r"(\s*[A-Z][0-9]+[fm]\s*,\s*[0-9]+\s*\n)*\s*[A-Z][0-9]+[fm]\s*,\s*[0-9]+\s*\n?", out_str)
      return m is not None
 
-def encode_ballot(ballot, indexed_candidates):
-    max_num = len(indexed_candidates) + 2
-    digit_num_per_candidate = len(str(max_num))
-    encoded = ""
-    for candidate in ballot:
-        enc_cand = str(indexed_candidates[candidate] + 1)
-        enc_cand = '0' * (digit_num_per_candidate - len(enc_cand)) + enc_cand
-        encoded = encoded + enc_cand
-    # note, only will work correctly on python 3
-    return str(int(encoded) + 1)
+def encode_valid_ballot(
+    text_ballot, 
+    indexed_results, 
+    question
+):
+    for preference_position, candidate in enumerate(text_ballot):
+        if candidate in indexed_results:
+            indexed_results[candidate]["voters_by_position"][preference_position] += 1
+   
+    ballot_question = copy.deepcopy(question)
+    for answer_index, answer in enumerate(ballot_question['answers']):
+        answer['selected'] = (
+            -1
+            if answer['text'] not in text_ballot
+            else text_ballot.index(answer['text'])
+        )
+    ballot_encoder = NVotesCodec(ballot_question)
+    raw_ballot = ballot_encoder.encode_raw_ballot()
+    int_ballot = ballot_encoder.encode_to_int(raw_ballot)
+    return str(int_ballot + 1)
 
 # generate password with length number of characters
 def gen_pass(length):
@@ -65,8 +77,14 @@ def create_desborda_test(test_data, tally_type = "desborda"):
     if not has_output_format(test_data["output"]):
         raise Exception("Error: test data output with format errors")
 
-    ballots = [re.split(r",", line) for line in remove_spaces(test_data["input"]).splitlines()]
-    results = [re.split(r",", line) for line in remove_spaces(test_data["output"]).splitlines()]
+    ballots = [
+        re.split(r",", line) 
+        for line in remove_spaces(test_data["input"]).splitlines()
+    ]
+    results = [
+        re.split(r",", line) 
+        for line in remove_spaces(test_data["output"]).splitlines()
+    ]
     num_winners = 62
     if "num_winners" in test_data:
         num_winners = test_data["num_winners"]
@@ -76,6 +94,9 @@ def create_desborda_test(test_data, tally_type = "desborda"):
     num_blank_votes = 0
     num_invalid_votes = 0
     max_num = 0
+
+    # first round of ballot processing. We count blank and invalid and collect 
+    # candidate names and teams
     for ballot in ballots:
         len_ballot = len(ballot)
         if len_ballot > max_num:
@@ -88,13 +109,18 @@ def create_desborda_test(test_data, tally_type = "desborda"):
            continue
         for candidate in ballot:
             team = candidate[:1]
-            female = "f" is candidate[-1]
+            female = ("f" == candidate[-1])
             if team not in teams:
                 teams[team] = []
             else:
                 other_sex = candidate[:-1] + ("m" if female else "f")
                 if other_sex in teams[team]:
-                    raise Exception("Error: candidate %s repeated: %s" % (candidate, other_sex))
+                    raise Exception(
+                        "Error: candidate %s repeated: %s" % (
+                            candidate, 
+                            other_sex
+                        )
+                    )
 
             if candidate not in teams[team]:
                 if female:
@@ -108,7 +134,10 @@ def create_desborda_test(test_data, tally_type = "desborda"):
     set_all = set(all_candidates)
     set_results = set([x[0] for x in results])
     if len(set_results) is not len(set_all & set_results):
-        raise Exception("Error: there are some answers in the results that are not candidates: %s " % str(set_results - set_all))
+        raise Exception(
+            "Error: there are some answers in the results that are not "\
+            "candidates: %s " % str(set_results - set_all)
+        )
 
     question = {
         "answer_total_votes_percentage": "over-total-valid-votes",
@@ -158,16 +187,27 @@ def create_desborda_test(test_data, tally_type = "desborda"):
 
     # encode ballots in plaintexts_json format, and recreate voters_by_position
     plaintexts_json = ""
+    
+    # we use an encoder to create default ballots for a blank vote and null vote
+    encoder = NVotesCodec(question)
+    blank_vote_raw = encoder.encode_raw_ballot()
+    blank_vote_int = encoder.encode_to_int(blank_vote_raw)
+
+    null_vote_raw = copy.deepcopy(blank_vote_raw)
+    null_vote_raw['choices'][0] = 1 # set the invalid vote flag
+    null_vote_int = encoder.encode_to_int(null_vote_raw)
+
     for ballot in ballots:
         if ['i'] == ballot:
-           encoded_ballot = str(len(question["answers"])+3)
+            encoded_ballot = str(null_vote_int + 1)
         elif ['b'] == ballot:
-           encoded_ballot = str(len(question["answers"])+2)
+            encoded_ballot = str(blank_vote_int + 1)
         else:
-            for preference_position, candidate in enumerate(ballot):
-                if candidate in indexed_results:
-                   indexed_results[candidate]["voters_by_position"][preference_position] += 1
-            encoded_ballot = encode_ballot(ballot, indexed_candidates)
+            encoded_ballot = encode_valid_ballot(
+                text_ballot=ballot, 
+                indexed_results=indexed_results, 
+                question=question
+            )
         plaintexts_json = plaintexts_json + '"' + encoded_ballot + '"\n'
 
     for answer in results_json["questions"][0]["answers"]:
@@ -188,14 +228,26 @@ def create_desborda_test(test_data, tally_type = "desborda"):
     }
     results_json["questions"][0]["winners"] = []
 
-    # create folder
+    # create folder and files
     desborda_test_path = create_temp_folder()
     try:
         plaintexts_folder = os.path.join(desborda_test_path, "0-question")
         os.mkdir(plaintexts_folder)
-        file_helpers.write_file(os.path.join(plaintexts_folder, "plaintexts_json"), plaintexts_json)
-        file_helpers.write_file(os.path.join(desborda_test_path, "questions_json"), file_helpers.serialize(questions_json))
-        file_helpers.write_file(os.path.join(desborda_test_path, "results_json"), file_helpers.serialize(results_json))
+        
+        file_helpers.write_file(
+            os.path.join(plaintexts_folder, "plaintexts_json"), 
+            plaintexts_json
+        )
+        
+        file_helpers.write_file(
+            os.path.join(desborda_test_path, "questions_json"),
+            file_helpers.serialize(questions_json)
+        )
+
+        file_helpers.write_file(
+            os.path.join(desborda_test_path, "results_json"),
+            file_helpers.serialize(results_json)
+        )
     except:
         file_helpers.remove_tree(desborda_test_path)
         raise

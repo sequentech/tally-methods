@@ -49,11 +49,11 @@ class BordaNauru(BaseVotingSystem):
         return _('Nauru Borda Count voting')
 
     @staticmethod
-    def create_tally(election, question_num):
+    def create_tally(question, question_num):
         '''
         Create object that helps to compute the tally
         '''
-        return BordaNauruTally(election, question_num)
+        return BordaNauruTally(question=question, question_num=question_num)
 
 class BordaNauruTally(BordaTally):
     # openstv options
