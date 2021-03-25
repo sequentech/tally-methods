@@ -22,9 +22,10 @@ import copy
 import json
 import os
 from os import urandom
-from test import file_helpers
 import tempfile
+
 from agora_tally.ballot_codec.nvotes_codec import NVotesCodec
+from agora_tally import file_helpers
 
 def remove_spaces(in_str):
     return re.sub(r"[ \t\r\f\v]*", "", in_str)

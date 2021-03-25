@@ -17,7 +17,7 @@ import copy
 from operator import itemgetter
 
 from agora_tally.ballot_codec import mixed_radix
-from test.file_helpers import serialize
+from ..file_helpers import serialize
 
 '''
 Encodes/Decodes the answer to a question given the question type.

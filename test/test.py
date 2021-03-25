@@ -4,16 +4,17 @@ import codecs
 import os
 import copy
 import json
+import six
 from operator import itemgetter
 
 from agora_tally.tally import do_tartally, do_dirtally, do_tally
 from agora_tally.voting_systems.plurality_at_large import PluralityAtLarge
-from test import file_helpers
-import test.desborda_test
-import test.desborda_test_data
-import six
+from agora_tally import file_helpers
 from agora_tally.ballot_codec.mixed_radix import TestMixedRadix
 from agora_tally.ballot_codec.nvotes_codec import TestNVotesCodec
+
+import test.desborda_test
+import test.desborda_test_data
 
 def _pretty_print_base(data, mark_winners, show_percent, filter_name):
     '''
