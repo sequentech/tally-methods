@@ -119,24 +119,18 @@ class TestDesborda(unittest.TestCase):
     def test_borda(self):
         # from the variables passed as arguments, create a folder with the data
         # in a format usable for tests
-        tally_path = test.desborda_test.create_desborda_test(test.desborda_test_data.test_desborda_1)
+        tally_path = test.desborda_test.create_desborda_test(
+            test.desborda_test_data.test_desborda_1
+        )
         try:
-            results_path = os.path.join(tally_path, "results_json")
             results = do_dirtally(tally_path)
             serialized_results = file_helpers.serialize(results)
-            should_results = file_helpers.read_file(results_path)
-            # ====================================================== #
-            #file_helpers.write_file('/agora/test/napas/shouldresults_json', should_results)
-            #file_helpers.write_file('/agora/test/napas/results_json', serialized_results)
 
-            #copied_results = copy.deepcopy(results['questions'][0]['answers'])
-            #sorted_results = sorted(copied_results, key = lambda x: 62 if x['winner_position'] is None else x['winner_position'])
-            #test_out = ""
-            #for answer in sorted_results:
-                #test_out += "%s, %i\n" % (answer['text'], answer['total_count'])
-            #file_helpers.write_file('/agora/test/napas/test_out', test_out)
-            # ====================================================== #
+            results_path = os.path.join(tally_path, "results_json")
+            should_results = file_helpers.read_file(results_path)
+            
             self.assertEqual(serialized_results, should_results)
+            
             # remove the temp test folder also in a successful test
             file_helpers.remove_tree(tally_path)
         except:
@@ -148,13 +142,18 @@ class TestDesborda(unittest.TestCase):
     def test_desborda_blank_invalid(self):
         # from the variables passed as arguments, create a folder with the data
         # in a format usable for tests
-        tally_path = test.desborda_test.create_desborda_test(test.desborda_test_data.test_desborda_2)
+        tally_path = test.desborda_test.create_desborda_test(
+            test.desborda_test_data.test_desborda_2
+        )
         try:
-            results_path = os.path.join(tally_path, "results_json")
             results = do_dirtally(tally_path)
             serialized_results = file_helpers.serialize(results)
+
+            results_path = os.path.join(tally_path, "results_json")
             should_results = file_helpers.read_file(results_path)
+            
             self.assertEqual(serialized_results, should_results)
+            
             # remove the temp test folder also in a successful test
             file_helpers.remove_tree(tally_path)
         except:

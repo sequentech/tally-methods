@@ -52,18 +52,33 @@ def do_tartally(tally_path):
 
     return do_tally(dir_path, questions)
 
-def do_dirtally(dir_path, ignore_invalid_votes=False, encrypted_invalid_votes=0):
+def do_dirtally(
+    dir_path, 
+    ignore_invalid_votes=False, 
+    encrypted_invalid_votes=0
+):
     res_path = os.path.join(dir_path, 'questions_json')
     with codecs.open(res_path, encoding='utf-8', mode='r') as res_f:
         questions = json.loads(res_f.read())
 
-    return do_tally(dir_path, questions,
-                    ignore_invalid_votes=ignore_invalid_votes,
-                    encrypted_invalid_votes=encrypted_invalid_votes)
+    return do_tally(
+        dir_path=dir_path, 
+        questions=questions,
+        ignore_invalid_votes=ignore_invalid_votes,
+        encrypted_invalid_votes=encrypted_invalid_votes
+    )
 
-def do_tally(dir_path, questions, tallies=[], ignore_invalid_votes=False,
-             encrypted_invalid_votes=0, monkey_patcher=None,
-             question_indexes=None, withdrawals=[], allow_empty_tally=False):
+def do_tally(
+    dir_path, 
+    questions, 
+    tallies=[], 
+    ignore_invalid_votes=False,
+    encrypted_invalid_votes=0,
+    monkey_patcher=None,
+    question_indexes=None, 
+    withdrawals=[], 
+    allow_empty_tally=False
+):
     # questions is in the same format as get_questions_pretty(). Initialized here
     questions = copy.deepcopy(questions)
     base_vote =[dict(choices=[]) for q in questions]

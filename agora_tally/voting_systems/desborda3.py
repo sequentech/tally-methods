@@ -52,11 +52,11 @@ class Desborda3(BaseVotingSystem):
         return _('Desborda 3 Count voting')
 
     @staticmethod
-    def create_tally(election, question_num):
+    def create_tally(question, question_num):
         '''
         Create object that helps to compute the tally
         '''
-        return Desborda3Tally(election, question_num)
+        return Desborda3Tally(question=question, question_num=question_num)
 
 class Desborda3Tally(Desborda2Tally):
     # dict containing the current list of ballots.
