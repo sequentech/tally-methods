@@ -680,15 +680,19 @@ class NVotesCodec(object):
     # encodable normal ballot
     bases = self.get_bases()
     highest_int = self.biggest_encodable_normal_ballot()
-    if highest_int >= modulus:
+    if modulus - highest_int < 1:
       raise Exception("modulus too small")
 
-    # If we decode the modulus bigint using the questions' mixed radix bases, 
-    # the value will be garbage but the number of ints will be just 1 too many 
-    # (as the last one will never be usable)
+    # If we decode the modulus minus one, the value will be the highest
+    # encodable number plus one, given the set of bases for this 
+    # question and using 256 as the lastBase.
+    # However, as it overflows the maximum the maximum encodable 
+    # number, the last byte (last base) is unusable and it should be
+    # discarded. That is why maxBaseLength is obtained by using
+    # decodedModulus.length - 1
     decoded_modulus = mixed_radix.decode(
       base_list=bases,
-      encoded_value=modulus,
+      encoded_value=(modulus - 1),
       last_base=256
     )
     encoded_raw_ballot = self.encode_raw_ballot()
@@ -1346,7 +1350,7 @@ class TestNVotesCodec(unittest.TestCase):
         #               modulus = dict(
         #                  bases=[2, 2, 2, 2, 256, 256, 256]
         #                  value=[0, 0, 0, 0, 0,   0,   1  ]
-        modulus=(1*2*2*2*2*256*256 - 1), # 1048575
+        modulus=(1*2*2*2*2*256*256), # 1048576
         bytes_left=0
       ),
       dict(
@@ -1369,7 +1373,7 @@ class TestNVotesCodec(unittest.TestCase):
         #               modulus = dict(
         #                  bases=[2, 2, 2, 2, 256, 256, 256]
         #                  value=[0, 0, 0, 0, 0,   0,   1  ]
-        modulus=(1*2*2*2*2*256*256), # 1048576
+        modulus=(1*2*2*2*2*256*256+1), # 1048577
         bytes_left=1
       ),
       dict(
@@ -1392,7 +1396,7 @@ class TestNVotesCodec(unittest.TestCase):
         #               modulus = dict(
         #                  bases=[2, 2, 2, 2, 256, 256, 256, 256]
         #                  value=[0, 0, 0, 0, 0,   0,   0,   1  ]
-        modulus=(1*2*2*2*2*256*256*256 - 1), # 268435455
+        modulus=(1*2*2*2*2*256*256*256), # 268435456
         bytes_left=1
       ),
       dict(
@@ -1415,7 +1419,7 @@ class TestNVotesCodec(unittest.TestCase):
         #               modulus = {
         #                  bases=[2, 2, 2, 2, 256, 256, 256, 256]
         #                  value=[0, 0, 0, 0, 0,   0,   0,   1  ]
-        modulus=(1*2*2*2*2*256*256*256), # 268435456
+        modulus=(1*2*2*2*2*256*256*256+1), # 268435457
         bytes_left=2
       ),
     ]
