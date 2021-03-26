@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # This file is part of agora-tally.
-# Copyright (C) 2017  Agora Voting SL <agora@agoravoting.com>
+# Copyright (C) 2017-2021  Agora Voting SL <agora@agoravoting.com>
 
 # agora-tally is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
