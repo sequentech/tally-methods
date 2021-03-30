@@ -58,16 +58,22 @@ class NVotesCodec(object):
       if dict(title='invalidVoteFlag', url='true') not in answer.get('urls', [])
     ]
 
+    tally_type = self.question["tally_type"]
     # Calculate the base for answers. It depends on the 
     # `question.tally_type`:
     # - plurality-at-large: base 2 (value can be either 0 o 1)
     # - preferential (*bordas*): question.max + 1
-    # - cummulative: question.max + 1
-    answer_base = (
-      2 
-      if self.question["tally_type"] == "plurality-at-large" 
-      else self.question["max"] + 1
-    )
+    # - cummulative: question.extra_options.cumulative_number_of_checkboxes + 1
+    answer_base = 2
+    if tally_type == "plurality-at-large":
+        answer_base = 2
+    elif tally_type == "cumulative":
+        checkboxes = self.question\
+                .get("extra_options", {})\
+                .get("cumulative_number_of_checkboxes", 1)
+        answer_base = checkboxes + 1;
+    else:
+        answer_base = self.question["max"] + 1;
 
     # Set the initial bases and raw ballot, populate bases using the valid 
     # answers list

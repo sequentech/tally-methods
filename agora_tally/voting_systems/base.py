@@ -24,6 +24,7 @@ VOTING_METHODS = (
     'agora_tally.voting_systems.desborda.Desborda',
     'agora_tally.voting_systems.desborda2.Desborda2',
     'agora_tally.voting_systems.desborda3.Desborda3',
+    'agora_tally.voting_systems.cumulative.Cumulative',
 )
 
 def get_voting_system_classes():
