@@ -1,0 +1,54 @@
+{
+    "questions": [
+        {
+            "answer_total_votes_percentage": "over-total-valid-votes",
+            "answers": [
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 0,
+                    "text": "Alice",
+                    "total_count": 5,
+                    "urls": [],
+                    "winner_position": 0
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 1,
+                    "text": "Bob",
+                    "total_count": 4,
+                    "urls": [],
+                    "winner_position": null
+                },
+                {
+                    "category": "",
+                    "details": "",
+                    "id": 2,
+                    "text": "Carmen",
+                    "total_count": 1,
+                    "urls": [],
+                    "winner_position": null
+                }
+            ],
+            "description": "Test question",
+            "extra_options": {
+                "cumulative_number_of_checkboxes": 3
+            },
+            "layout": "simple",
+            "max": 2,
+            "min": 0,
+            "num_winners": 1,
+            "randomize_answer_order": true,
+            "tally_type": "cumulative",
+            "title": "Test question",
+            "totals": {
+                "blank_votes": 0,
+                "null_votes": 1,
+                "valid_votes": 5
+            },
+            "winners": []
+        }
+    ],
+    "total_votes": 6
+}

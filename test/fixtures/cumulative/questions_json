@@ -1,0 +1,39 @@
+[
+    {
+        "answer_total_votes_percentage": "over-total-valid-votes",
+        "answers": [
+            {
+                "category": "",
+                "details": "",
+                "id": 0,
+                "text": "Alice",
+                "urls": []
+            },
+            {
+                "category": "",
+                "details": "",
+                "id": 1,
+                "text": "Bob",
+                "urls": []
+            },
+            {
+                "category": "",
+                "details": "",
+                "id": 2,
+                "text": "Carmen",
+                "urls": []
+            }
+        ],
+        "description": "Test question",
+        "layout": "simple",
+        "max": 2,
+        "min": 0,
+        "num_winners": 1,
+        "randomize_answer_order": true,
+        "tally_type": "cumulative",
+        "title": "Test question",
+        "extra_options": {
+            "cumulative_number_of_checkboxes": 3
+        }
+    }
+]
