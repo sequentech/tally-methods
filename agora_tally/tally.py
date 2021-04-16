@@ -147,6 +147,8 @@ def do_tally(
                 for line in plaintexts_file.readlines():
                     total_count += 1
                     voter_answers = copy.deepcopy(base_vote)
+                    voter_answers[question_index]['is_blank'] = False
+                    voter_answers[question_index]['is_null'] = False
                     int_ballot = None
                     try:
                         # Note line starts with " (1 character) and ends with
@@ -161,17 +163,19 @@ def do_tally(
                             question, 
                             q_withdrawals
                         )
-                        #print("ballot with choices: %r" % int_ballot)
+                        #print("valid ballot with choices: %r" % int_ballot)
                         #print(choices)
 
                         # craft the voter_answers in the format admitted by
                         # tally.add_vote
                         voter_answers[question_index]['choices'] = choices
                     except BlankVoteException:
-                        #print("blank ballot %r" % int_ballot)
+                        #print("blank ballot %r" % line)
+                        voter_answers[question_index]['is_blank'] = True
                         question['totals']['blank_votes'] += 1
                     except Exception as e:
-                        #print("invalid ballot %r" % int_ballot)
+                        #print("invalid ballot %r" % line)
+                        voter_answers[question_index]['is_null'] = True
                         question['totals']['null_votes'] += 1
                         if not ignore_invalid_votes:
                             print("invalid vote: " + line)
