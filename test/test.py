@@ -73,6 +73,7 @@ class TestSequenceFunctions(unittest.TestCase):
     PLURALITY_AT_LARGE = "plurality-at-large"
     CUMULATIVE = "cumulative"
     CUMULATIVE2 = "cumulative2"
+    CUMULATIVE3 = "cumulative3"
     #MEEK_STV = "meek-stv"
     BORDA_NAURU = "borda-nauru"
     BORDA = "borda"
@@ -108,6 +109,9 @@ class TestSequenceFunctions(unittest.TestCase):
 
     def test_cumulative2(self):
           self._test_method(self.CUMULATIVE2)
+
+    def test_cumulative3(self):
+          self._test_method(self.CUMULATIVE3)
 
     def test_borda(self):
         self._test_method(self.BORDA)

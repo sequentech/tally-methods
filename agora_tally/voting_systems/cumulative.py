@@ -98,7 +98,6 @@ class CumulativeTally(BaseTally):
 
         def custom_subparser(decoded_ballot, question, withdrawals):
             answers = []
-            self.valid_votes += 1
 
             for answer in decoded_ballot["answers"]:
                 if answer['selected'] < 0 or answer['id'] in withdrawals:
@@ -136,6 +135,11 @@ class CumulativeTally(BaseTally):
         Add to the count a vote from a voter
         '''
         answers = voter_answers[self.question_num]['choices']
+        if (
+            not voter_answers[self.question_num]['is_blank'] and 
+            not voter_answers[self.question_num]['is_null']
+        ):
+            self.valid_votes += 1
 
         for answer in answers:
             ballot = self.find_ballot([answer.id + 1])

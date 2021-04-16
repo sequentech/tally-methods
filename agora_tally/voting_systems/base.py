@@ -159,6 +159,7 @@ class BaseTally(object):
         ):
             raise Exception()
 
+        truncate = False
         if len(non_blank_unwithdrawed_answers) > question['max']:
             if (
                 "truncate-max-overload" in question and
@@ -166,7 +167,24 @@ class BaseTally(object):
             ):
                 non_blank_unwithdrawed_answers = \
                     non_blank_unwithdrawed_answers[:question['max']]
+                truncate = True
             else:
+                raise Exception()
+        
+        # if panachage is disabled and vote is for answer of multiple categories
+        # then it's an invalid vote
+        enable_panachage = question\
+            .get('extra_options', {})\
+            .get('enable_panachage', True)
+        if not enable_panachage:
+            filtered_answer_categories = [
+                answer["category"] 
+                for answer in decoded_ballot['answers']
+                if answer['selected'] > -1 and answer['id'] not in withdrawals
+            ]
+            if truncate:
+                filtered_answer_categories = filtered_answer_categories[:question['max']]
+            if len(set(filtered_answer_categories)) > 1:
                 raise Exception()
 
         return non_blank_unwithdrawed_answers
