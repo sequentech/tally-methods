@@ -274,6 +274,7 @@ class NVotesCodec(object):
     This function is very useful for sanity checks.
     '''
     bases = self.get_bases()
+    len_bases = len(bases)
     choices = mixed_radix.decode(
       base_list=bases,
       encoded_value=int_ballot,
@@ -286,14 +287,34 @@ class NVotesCodec(object):
       "allow_writeins" in self.question["extra_options"] and
       self.question["extra_options"]["allow_writeins"] is True
     ):
-      # add missing byte bases and last \0 in the choices
-      if len(bases) < len(choices):
-        choices.append(0)
-
+      # make the number of bases equal to the number of choices
       index = len(bases) + 1
       while index <= len(choices):
         bases.append(256)
         index += 1
+      
+      # ensure that for each write-in answer there is a \0 char at the
+      # end
+      num_write_in_answers = len([
+        answer 
+        for answer in self.question["answers"]
+        if dict(title='isWriteIn', url='true') in answer.get('urls', [])
+      ])
+
+      num_write_in_strings = 0
+      write_ins_text_start_index = len_bases - num_write_in_answers
+      index2 = write_ins_text_start_index
+      while index2 < len(choices):
+        if choices[index2] == 0:
+          num_write_in_strings += 1
+        index2 += 1
+
+      # add the missing zeros
+      index3 = 0
+      while index3 < num_write_in_answers - num_write_in_strings:
+        bases.append(256)
+        choices.append(0)
+        index3 += 1
     
     return dict(
       choices=choices,
