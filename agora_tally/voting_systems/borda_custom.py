@@ -69,35 +69,3 @@ class BordaCustomTally(BordaTally):
             return frozenset(answers)
 
         self.custom_subparser = custom_subparser
-
-    
-    def perform_tally(self, questions):
-        '''
-        Actually calls to openstv to perform the tally
-        '''
-        from ..ballot_counter.ballots import Ballots
-        from ..ballot_counter.plugins import getMethodPlugins
-
-        # get voting and report methods
-        methods = getMethodPlugins("byName", exclude0=False)
-
-        # generate ballots
-        dirtyBallots = Ballots()
-        dirtyBallots.loadKnown(self.ballots_path, exclude0=False)
-        dirtyBallots.numSeats = self.num_winners
-        cleanBallots = dirtyBallots.getCleanBallots()
-
-        # create and configure election
-        e = methods[self.method_name](cleanBallots)
-        question = questions[self.question_num]
-        e.maxChosableOptions = question['max']
-        self.weightByPosition = question['borda_custom_weights']
-        e.weightByPosition = self.weightByPosition
-
-        # run election and generate the report
-        e.runElection()
-
-        # generate report
-        from .json_report import JsonReport
-        self.report = JsonReport(e)
-        self.report.generateReport()
