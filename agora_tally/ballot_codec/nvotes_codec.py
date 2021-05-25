@@ -31,7 +31,7 @@ VALID_CODECS = [
   "desborda3", 
   "desborda2", 
   "desborda", 
-  "borda-mas-madrid",
+  "borda-custom",
   "cumulative"
 ]
 
