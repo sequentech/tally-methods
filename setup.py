@@ -22,7 +22,7 @@ except ImportError: # for pip <= 9.0.3
 
 setup(
     name='Agora Tally',
-    version='103111.8',
+    version='20.2.0',
     author='Eduardo Robles Elvira',
     author_email='edulix@nvotes.com',
     packages=['agora_tally', 'agora_tally.voting_systems'],
