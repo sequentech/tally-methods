@@ -95,7 +95,10 @@ class TestSequenceFunctions(unittest.TestCase):
         results_path = os.path.join(tally_path, "results_json")
         results = do_dirtally(tally_path)
         should_results = file_helpers.read_file(results_path)
-        self.assertEqual(file_helpers.serialize(results).strip(), should_results.strip())
+        self.assertEqual(
+            file_helpers.serialize(results).strip(), 
+            should_results.strip()
+        )
         return results
 
     def test_borda_nauru(self):

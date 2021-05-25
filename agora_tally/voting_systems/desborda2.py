@@ -13,21 +13,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with agora-tally.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
-import random
 import copy
-import uuid
-import sys
-import codecs
-import os
 import math
 from operator import itemgetter
-from collections import defaultdict
 
-from ..ballot_counter.ballots import Ballots
-from ..ballot_counter.plugins import getMethodPlugins
-
-from .base import BaseVotingSystem, BaseTally, BlankVoteException
+from .base import BaseVotingSystem, BaseTally
 
 # Desborda 2 is a modification/generalization of desborda. 
 # Desborda is defined here:

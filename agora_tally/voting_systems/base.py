@@ -14,6 +14,8 @@
 # along with agora-tally.  If not, see <http://www.gnu.org/licenses/>.
 
 from importlib import import_module
+from collections import defaultdict
+import copy
 from agora_tally.ballot_codec.nvotes_codec import NVotesCodec
 
 VOTING_METHODS = (
@@ -59,6 +61,21 @@ def get_voting_system_by_id(name):
             return klass
     return None
 
+class WeightedChoice:
+    '''
+    Represents a selection within a ballot, which is a pair of of an answer 
+    and the number of checks selected.
+
+    If the answer is a write-in, the answer will be a string, else it will be
+    the answer id.
+    '''
+    def __init__(self, id_, points):
+        self.id = id_
+        self.points = points
+
+    def __hash__(self):
+        return hash((self.id, self.points))
+
 class BaseVotingSystem(object):
     '''
     Defines the helper functions that allows agora to manage a voting system.
@@ -87,6 +104,17 @@ class BaseVotingSystem(object):
         return BaseTally(election, question_num)
 
 
+def get_id_or_write_in(answer):
+    '''
+    If it's a write-in, returns the text of the write-in. Else,
+    it returns the id.
+    '''
+    if dict(title='isWriteIn', url='true') in answer.get('urls', []):
+        return answer['text']
+    else:
+        return answer['id']
+
+
 class BaseTally(object):
     '''
     Class oser to tally an election
@@ -110,13 +138,26 @@ class BaseTally(object):
         '''
         Function called once before the tally begins
         '''
-        pass
+        question = questions[self.question_num]
+        # initialize the counts
+        for answer in question['answers']:
+            answer['total_count'] = 0
+            answer['winner_position'] = None
 
-    def add_vote(self, voter_answers, questions, is_delegated):
-        '''
-        Add to the count a vote from a voter
-        '''
-        pass
+        # these are the answers that are not write-ins, so we can directly count
+        # them
+        self.normal_answers = dict([
+            (answer['id'], copy.deepcopy(answer))
+            for answer in question['answers']
+            if dict(title='isWriteIn', url='true') not in answer.get('urls', [])
+        ])
+
+        # write_in_answers id's will start at this id + 1
+        self.max_answer_id = max([answer['id'] for answer in question['answers']])
+        
+        # these are the write-in answers, and everytime a new write appears in
+        # a ballot, we will have to add it here
+        self.write_in_answers = dict()
 
     def parse_vote(
         self, 
@@ -137,11 +178,18 @@ class BaseTally(object):
     
         non_blank_unwithdrawed_answers = None
         if self.custom_subparser is None:
-            non_blank_unwithdrawed_answers = [
-                answer['id']
-                for answer in decoded_ballot['answers']
-                if answer['selected'] > -1 and answer['id'] not in withdrawals
-            ]
+            if not question.get("extra_options", dict()).get("allow_writeins", False):
+                non_blank_unwithdrawed_answers = [
+                    answer['id']
+                    for answer in decoded_ballot['answers']
+                    if answer['selected'] > -1 and answer['id'] not in withdrawals
+                ]
+            else:
+                non_blank_unwithdrawed_answers = [
+                    get_id_or_write_in(answer)
+                    for answer in decoded_ballot['answers']
+                    if answer['selected'] > -1 and answer['id'] not in withdrawals
+                ]
         else:
             non_blank_unwithdrawed_answers = self.custom_subparser(
                 decoded_ballot,
@@ -188,17 +236,98 @@ class BaseTally(object):
                 raise Exception()
 
         return non_blank_unwithdrawed_answers
+
+    def add_vote(self, voter_answers, questions, is_delegated):
+        '''
+        Add to the count a vote from a voter
+        '''
+        question = questions[self.question_num]
+        choices = voter_answers[self.question_num]['choices']
+        if (
+            not voter_answers[self.question_num]['is_blank'] and 
+            not voter_answers[self.question_num]['is_null']
+        ):
+            question['totals']['valid_votes'] += 1
+            for choice in choices:
+                if isinstance(choice.id, str):
+                    if choice.id in self.write_in_answers:
+                        self.write_in_answers[choice.id]['total_count'] += choice.points
+                    else:
+                        self.write_in_answers[choice.id] = dict(
+                            id=None, # this will be set later
+                            text=choice.id,
+                            category="",
+                            details="",
+                            total_count=choice.points,
+                            winner_position=None,
+                            urls=[
+                                dict(title='isWriteInResult', url='true')
+                            ]
+                        )
+                else:
+                    # we can safely assume that the id is valid, as otherwise
+                    # this would be counted as an invalid vote
+                    self.normal_answers[choice.id]['total_count'] += choice.points
+
     def post_tally(self, questions):
         '''
-        Once all votes have been added, this function is called once
+        Once all votes have been added, this function actually save them to
+        disk and then calls openstv to perform the tally
         '''
-        pass
+        question = questions[self.question_num]
+
+        # The counting is done, now we need to merge write-in answers and normal
+        # answers in a reproducible way, and then assign winners. First, we need
+        # to assign ids to the write ins.. and to do that sort them to make it
+        # reproducible
+        #
+        # first sort by the name of the eligible answers
+        write_ins_sorted_by_text = sorted(
+            self.write_in_answers,
+            key = lambda x: x['text']
+        )
+        # then sort in reverse by the total count
+        write_ins_sorted_by_text_and_total_count = sorted(
+            write_ins_sorted_by_text,
+            key = lambda x: x['total_count'],
+            reverse = True
+        )
+        # finally assign write-in answers their new answer ids
+        for index, answer in enumerate(write_ins_sorted_by_text_and_total_count):
+            answer['id'] = self.max_answer_id + 1 + index
+
+        # merge normal answers and write-ins
+        final_answers = [
+            self.normal_answers[answer_id]
+            for answer_id in sorted(self.normal_answers.keys())
+        ] + write_ins_sorted_by_text_and_total_count
+
+        # change the question answers to these. NOTE that we will be removing
+        # the write-in unfilled candidate options and adding the voted write-ins
+        question['answers'] = final_answers
+
+        final_answers_sorted_by_text = sorted(
+            final_answers,
+            key = lambda x: x['text']
+        )
+        # then sort in reverse by the total count and the first X are the 
+        # winners!
+        sorted_winners = sorted(
+            final_answers_sorted_by_text,
+            key = lambda x: x['total_count'],
+            reverse = True
+        )[:question['num_winners']]
+
+        # .. so we assign winner positions
+        for winner_pos, winner in enumerate(sorted_winners):
+            winner['winner_position'] = winner_pos
 
     def get_log(self):
         '''
         Returns the tally log. Called after post_tally()
         '''
-        return None
+        return {}
+
 
 class BlankVoteException(Exception):
     pass
