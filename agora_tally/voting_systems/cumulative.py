@@ -20,7 +20,7 @@ from .base import (
     BaseVotingSystem, 
     BaseTally, 
     BlankVoteException,
-    get_id_or_write_in,
+    get_key,
     WeightedChoice
 )
 
@@ -66,8 +66,9 @@ class CumulativeTally(BaseTally):
 
                 answers.add(
                     WeightedChoice(
-                        id_=get_id_or_write_in(answer),
-                        points=(answer['selected'] + 1)
+                        key=get_key(answer),
+                        points=(answer['selected'] + 1),
+                        answer_id=answer['id']
                     )
                 )
             return frozenset(answers)

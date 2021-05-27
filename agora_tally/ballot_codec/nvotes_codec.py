@@ -518,7 +518,11 @@ class NVotesCodec(object):
         return question
 
       # 6.1. Slice the choices to get only the bytes related to the write ins
-      write_in_raw_bytes = raw_ballot["choices"][len(question["answers"]):]
+      if invalid_vote_answer is None:
+        write_ins_start_index = len(question["answers"]) + 1
+      else:
+        write_ins_start_index = len(question["answers"])
+      write_in_raw_bytes = raw_ballot["choices"][write_ins_start_index:]
 
       # 6.2. Split the write-in bytes arrays in multiple sub-arrays 
       # using byte \0 as a separator.
@@ -662,6 +666,7 @@ class NVotesCodec(object):
       # 4. decode from raw ballot to ballot and test it
       decoded_ballot = decoder.decode_raw_ballot(decoded_raw_ballot)
       if serialize(decoded_ballot) != serialize(data["ballot"]):
+        import pdb; pdb.set_trace()
         raise Exception("Sanity Check fail")
 
     except Exception as e:

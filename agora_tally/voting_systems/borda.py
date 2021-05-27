@@ -17,7 +17,7 @@ from .base import (
     BaseVotingSystem, 
     BaseTally, 
     WeightedChoice, 
-    get_id_or_write_in
+    get_key
 )
 
 class Borda(BaseVotingSystem):
@@ -64,7 +64,8 @@ class BordaTally(BaseTally):
 
                 answers.add(
                     WeightedChoice(
-                        id_=get_id_or_write_in(answer),
+                        key=get_key(answer),
+                        answer_id=answer['id'],
                         points=(max_points - answer['selected'])
                     )
                 )
@@ -112,11 +113,11 @@ class BordaTally(BaseTally):
         for choice_index, choice in enumerate(choices):
             answer = None
             
-            if isinstance(choice.id, str):
-                answer = self.write_in_answers[choice.id]
+            if isinstance(choice.key, str):
+                answer = self.write_in_answers[choice.key]
                 # initialize voters_by_position if needed
                 if 'voters_by_position' not in answer:
                     answer['voters_by_position'] = [0] * question['max']
             else:
-                answer = self.normal_answers[choice.id]
+                answer = self.normal_answers[choice.answer_id]
             answer['voters_by_position'][choice_index] += 1

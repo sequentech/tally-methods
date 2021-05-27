@@ -17,7 +17,7 @@ from .base import (
     BaseVotingSystem, 
     BaseTally, 
     WeightedChoice, 
-    get_id_or_write_in
+    get_key
 )
 
 class PluralityAtLarge(BaseVotingSystem):
@@ -62,7 +62,8 @@ class PluralityAtLargeTally(BaseTally):
 
                 answers.add(
                     WeightedChoice(
-                        id_=get_id_or_write_in(answer),
+                        key=get_key(answer),
+                        answer_id=answer['id'],
                         points=(answer['selected'] + 1)
                     )
                 )

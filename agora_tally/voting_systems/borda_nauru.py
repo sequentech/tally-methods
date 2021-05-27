@@ -17,7 +17,7 @@ from .base import (
     BaseVotingSystem, 
     BaseTally, 
     WeightedChoice, 
-    get_id_or_write_in
+    get_key
 )
 from .borda import BordaTally
 
@@ -57,8 +57,9 @@ class BordaNauruTally(BordaTally):
 
                 answers.add(
                     WeightedChoice(
-                        id_=get_id_or_write_in(answer),
-                        points=1.0/(answer['selected'] + 1)
+                        key=get_key(answer),
+                        points=1.0/(answer['selected'] + 1),
+                        answer_id=answer['id']
                     )
                 )
             return frozenset(answers)

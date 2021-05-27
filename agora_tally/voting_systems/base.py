@@ -69,12 +69,20 @@ class WeightedChoice:
     If the answer is a write-in, the answer will be a string, else it will be
     the answer id.
     '''
-    def __init__(self, id_, points):
-        self.id = id_
+    def __init__(self, key, points, answer_id=None):
+        self.key = key
         self.points = points
+        self.answer_id = answer_id
 
     def __hash__(self):
-        return hash((self.id, self.points))
+        return hash((self.key, self.points))
+    
+    def __str__(self):
+        return "WeightedChoice(key=%r, points=%r, answer_id=%r)" % dict(
+            self.key,
+            self.points,
+            self.answer_id
+        )
 
 class BaseVotingSystem(object):
     '''
@@ -104,7 +112,7 @@ class BaseVotingSystem(object):
         return BaseTally(election, question_num)
 
 
-def get_id_or_write_in(answer):
+def get_key(answer):
     '''
     If it's a write-in, returns the text of the write-in. Else,
     it returns the id.
@@ -186,7 +194,7 @@ class BaseTally(object):
                 ]
             else:
                 non_blank_unwithdrawed_answers = [
-                    get_id_or_write_in(answer)
+                    get_key(answer)
                     for answer in decoded_ballot['answers']
                     if answer['selected'] > -1 and answer['id'] not in withdrawals
                 ]
@@ -249,13 +257,13 @@ class BaseTally(object):
         ):
             question['totals']['valid_votes'] += 1
             for choice in choices:
-                if isinstance(choice.id, str):
-                    if choice.id in self.write_in_answers:
-                        self.write_in_answers[choice.id]['total_count'] += choice.points
+                if isinstance(choice.key, str):
+                    if choice.key in self.write_in_answers:
+                        self.write_in_answers[choice.key]['total_count'] += choice.points
                     else:
-                        self.write_in_answers[choice.id] = dict(
+                        self.write_in_answers[choice.key] = dict(
                             id=None, # this will be set later
-                            text=choice.id,
+                            text=choice.key,
                             category="",
                             details="",
                             total_count=choice.points,
@@ -267,7 +275,7 @@ class BaseTally(object):
                 else:
                     # we can safely assume that the id is valid, as otherwise
                     # this would be counted as an invalid vote
-                    self.normal_answers[choice.id]['total_count'] += choice.points
+                    self.normal_answers[choice.answer_id]['total_count'] += choice.points
 
     def post_tally(self, questions):
         '''
