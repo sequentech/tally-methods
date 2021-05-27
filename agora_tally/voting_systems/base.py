@@ -78,7 +78,7 @@ class WeightedChoice:
         return hash((self.key, self.points))
     
     def __str__(self):
-        return "WeightedChoice(key=%r, points=%r, answer_id=%r)" % dict(
+        return "WeightedChoice(key=%(key)r, points=%(points)r, answer_id=%(answer_id)r)" % dict(
             self.key,
             self.points,
             self.answer_id
