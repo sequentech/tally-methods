@@ -79,9 +79,9 @@ class WeightedChoice:
     
     def __str__(self):
         return "WeightedChoice(key=%(key)r, points=%(points)r, answer_id=%(answer_id)r)" % dict(
-            self.key,
-            self.points,
-            self.answer_id
+            key=self.key,
+            points=self.points,
+            answer_id=self.answer_id
         )
 
 class BaseVotingSystem(object):
