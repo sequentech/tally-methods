@@ -62,6 +62,26 @@ class BordaNauruTally(BordaTally):
                         answer_id=answer['id']
                     )
                 )
+            
+            # Check for invalid votes:
+            selection = [
+                answer['selected']
+                for answer in decoded_ballot["answers"]
+                if answer['selected'] >= 0
+            ]
+            # - no position is repeated
+            if len(selection) != len(set(selection)):
+                raise Exception()
+
+            selection_sorted = sorted(selection)
+            should_be_selection_sorted = [
+                index
+                for index, _ in enumerate(selection_sorted)
+            ]
+            # - no missing position in-between
+            if selection_sorted != should_be_selection_sorted:
+                raise Exception()
+
             return frozenset(answers)
 
         self.custom_subparser = custom_subparser
