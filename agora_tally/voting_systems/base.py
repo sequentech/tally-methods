@@ -83,6 +83,9 @@ class WeightedChoice:
             points=self.points,
             answer_id=self.answer_id
         )
+    
+    def __repr__(self):
+        return self.__str__()
 
 class BaseVotingSystem(object):
     '''
@@ -207,6 +210,15 @@ class BaseTally(object):
 
         if len(non_blank_unwithdrawed_answers) == 0:
             raise BlankVoteException()
+        
+        # check that no write-in is repeated or else it's an invalid vote
+        write_in_answers = [
+            answer['text']
+            for answer in decoded_ballot['answers']
+            if dict(title='isWriteIn', url='true') in answer.get('urls', [])
+        ]
+        if len(write_in_answers) != len(set(write_in_answers)):
+            raise Exception()
 
         # detect and deal with different types of invalid votes
         if (

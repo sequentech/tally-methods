@@ -81,7 +81,7 @@ class BordaTally(BaseTally):
         
         # initialize voters_by_position
         question = questions[self.question_num]
-        for _, answer in self.normal_answers.items():
+        for answer in self.normal_answers.values():
             answer['voters_by_position'] = [0] * question['max']
 
     def add_vote(self, voter_answers, questions, is_delegated):
@@ -104,20 +104,15 @@ class BordaTally(BaseTally):
             key=lambda choice: choice.points,
             reverse=True
         )
-
-        if 'bordas-max-points' not in question:
-            max_points = question['max']
-        else:
-            max_points = question['bordas-max-points']
         
         for choice_index, choice in enumerate(choices):
             answer = None
             
             if isinstance(choice.key, str):
                 answer = self.write_in_answers[choice.key]
-                # initialize voters_by_position if needed
+                # initialize voters_by_position if needed in write-ins
                 if 'voters_by_position' not in answer:
                     answer['voters_by_position'] = [0] * question['max']
             else:
-                answer = self.normal_answers[choice.answer_id]
+                answer = self.normal_answers[choice.key]
             answer['voters_by_position'][choice_index] += 1
