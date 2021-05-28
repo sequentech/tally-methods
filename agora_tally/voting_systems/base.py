@@ -291,7 +291,7 @@ class BaseTally(object):
         #
         # first sort by the name of the eligible answers
         write_ins_sorted_by_text = sorted(
-            self.write_in_answers,
+            self.write_in_answers.values(),
             key = lambda x: x['text']
         )
         # then sort in reverse by the total count
