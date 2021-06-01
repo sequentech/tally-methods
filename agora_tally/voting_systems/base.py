@@ -215,7 +215,10 @@ class BaseTally(object):
         write_in_answers = [
             answer['text']
             for answer in decoded_ballot['answers']
-            if dict(title='isWriteIn', url='true') in answer.get('urls', [])
+            if (
+                dict(title='isWriteIn', url='true') in answer.get('urls', []) and
+                len(answer['text']) > 0
+            )
         ]
         if len(write_in_answers) != len(set(write_in_answers)):
             raise Exception()
