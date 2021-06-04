@@ -126,7 +126,11 @@ def do_tally(
             answer['total_count'] = 0
 
         tally.pre_tally(questions)
-        plaintexts_path = os.path.join(dir_path, "%d-*" % question_index, "plaintexts_json")
+        plaintexts_path = os.path.join(
+            dir_path, 
+            "%d-*" % question_index, 
+            "plaintexts_json"
+        )
         try:
             plaintexts_path = glob.glob(plaintexts_path)[0]
             tally.question_id = plaintexts_path.split('/')[-2]
@@ -142,11 +146,16 @@ def do_tally(
                 if answer['question_index'] == qindex
             ]
 
-            with codecs.open(plaintexts_path, encoding='utf-8', mode='r') as plaintexts_file:
+            with codecs.open(
+                plaintexts_path, 
+                encoding='utf-8', 
+                mode='r'
+            ) as plaintexts_file:
                 total_count = encrypted_invalid_votes
                 for line in plaintexts_file.readlines():
                     total_count += 1
                     voter_answers = copy.deepcopy(base_vote)
+                    voter_answers[question_index]['choices'] = None
                     voter_answers[question_index]['is_blank'] = False
                     voter_answers[question_index]['is_null'] = False
                     int_ballot = None

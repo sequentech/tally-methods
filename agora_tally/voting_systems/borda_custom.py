@@ -1,5 +1,5 @@
 # This file is part of agora-tally.
-# Copyright (C) 2013-2016  Agora Voting SL <agora@agoravoting.com>
+# Copyright (C) 2013-2021  Agora Voting SL <agora@agoravoting.com>
 
 # agora-tally is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -13,20 +13,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with agora-tally.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
-import random
-import copy
-import uuid
-import sys
-import codecs
-import os
-import tempfile
-from operator import itemgetter
-
-from ..ballot_counter.ballots import Ballots
-from ..ballot_counter.plugins import getMethodPlugins
-
-from .base import BaseVotingSystem, BaseTally, BlankVoteException
+from .base import (
+    BaseVotingSystem, 
+    BaseTally, 
+    WeightedChoice, 
+    get_key
+)
 from .borda import BordaTally
 
 class BordaCustom(BaseVotingSystem):
@@ -58,37 +50,43 @@ class BordaCustom(BaseVotingSystem):
         )
 
 class BordaCustomTally(BordaTally):
-    # openstv options
-    method_name = "BordaCustom"
-    weightByPosition = None
-    
-    def perform_tally(self, questions):
-        '''
-        Actually calls to openstv to perform the tally
-        '''
-        from ..ballot_counter.ballots import Ballots
-        from ..ballot_counter.plugins import getMethodPlugins
+    def init(self):
+        def custom_subparser(decoded_ballot, question, withdrawals):
+            answers = set()
 
-        # get voting and report methods
-        methods = getMethodPlugins("byName", exclude0=False)
+            weights = question['borda_custom_weights']
 
-        # generate ballots
-        dirtyBallots = Ballots()
-        dirtyBallots.loadKnown(self.ballots_path, exclude0=False)
-        dirtyBallots.numSeats = self.num_winners
-        cleanBallots = dirtyBallots.getCleanBallots()
+            for answer in decoded_ballot["answers"]:
+                if answer['selected'] < 0 or answer['id'] in withdrawals:
+                    continue
 
-        # create and configure election
-        e = methods[self.method_name](cleanBallots)
-        question = questions[self.question_num]
-        e.maxChosableOptions = question['max']
-        self.weightByPosition = question['borda_custom_weights']
-        e.weightByPosition = self.weightByPosition
+                answers.add(
+                    WeightedChoice(
+                        key=get_key(answer),
+                        points=weights[answer['selected']],
+                        answer_id=answer['id']
+                    )
+                )
+            
+            # Check for invalid votes:
+            selection = [
+                answer['selected']
+                for answer in decoded_ballot["answers"]
+                if answer['selected'] >= 0
+            ]
+            # - no position is repeated
+            if len(selection) != len(set(selection)):
+                raise Exception()
 
-        # run election and generate the report
-        e.runElection()
+            selection_sorted = sorted(selection)
+            should_be_selection_sorted = [
+                index
+                for index, _ in enumerate(selection_sorted)
+            ]
+            # - no missing position in-between
+            if selection_sorted != should_be_selection_sorted:
+                raise Exception()
 
-        # generate report
-        from .json_report import JsonReport
-        self.report = JsonReport(e)
-        self.report.generateReport()
+            return frozenset(answers)
+
+        self.custom_subparser = custom_subparser

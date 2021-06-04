@@ -53,11 +53,11 @@
             "title": "Test question",
             "totals": {
                 "blank_votes": 1,
-                "null_votes": 3,
+                "null_votes": 5,
                 "valid_votes": 6
             },
             "winners": []
         }
     ],
-    "total_votes": 10
+    "total_votes": 12
 }
