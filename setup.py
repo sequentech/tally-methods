@@ -14,21 +14,16 @@
 # along with agora-tally.  If not, see <http://www.gnu.org/licenses/>.
 
 from setuptools import setup
-try: # for pip >= 10
-    from pip._internal.req import parse_requirements
-except ImportError: # for pip <= 9.0.3
-    from pip.req import parse_requirements
-
 
 setup(
-    name='Agora Tally',
+    name='agora-tally',
     version='20.2.0',
-    author='Eduardo Robles Elvira',
-    author_email='edulix@nvotes.com',
+    author='Agora Voting SL',
+    author_email='contact@nvotes.com',
     packages=['agora_tally', 'agora_tally.voting_systems'],
     scripts=[],
     url='http://pypi.python.org/pypi/agora_tally/',
-    license='LICENSE.txt',
+    license='AGPL-3.0',
     description='agora voting tally system',
     long_description=open('README.md').read(),
     install_requires=[]
