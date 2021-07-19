@@ -7,4 +7,4 @@ then
     mkvirtualenv agora-tally
 fi
 workon agora-tally
-pip install -r testing_requirements.txt
+#pip install -r testing_requirements.txt
