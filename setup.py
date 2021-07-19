@@ -22,7 +22,7 @@ setup(
     author_email='contact@nvotes.com',
     packages=['agora_tally', 'agora_tally.voting_systems'],
     scripts=[],
-    url='http://pypi.python.org/pypi/agora_tally/',
+    url='https://github.com/agoravoting/agora-tally',
     license='AGPL-3.0',
     description='agora voting tally system',
     long_description=open('README.md').read(),
