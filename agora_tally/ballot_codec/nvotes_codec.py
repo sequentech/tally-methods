@@ -266,7 +266,7 @@ class NVotesCodec(object):
     such as the following statement is always true:
     
     ```
-    data = codec.decode_from_int(
+    raw_ballot == codec.decode_from_int(
       codec.encode_from_int(raw_ballot)
     )
     ```
@@ -484,15 +484,8 @@ class NVotesCodec(object):
     min_num_choices = len(question["answers"])
     if len(raw_ballot["choices"]) < min_num_choices:
       raise Exception('Invalid Ballot: Not enough choices to decode')
-    
-    # 5. Obtain the vote for valid answers and populate the selections.
-    valid_anwsers = [
-      answer 
-      for answer in sorted_answers
-      if dict(title='invalidVoteFlag', url='true') not in answer.get('urls', [])
-    ]
 
-    # 5.1. Populate the valid answers. We asume they are in the same order as
+    # 5. Populate the valid answers. We asume they are in the same order as
     # in raw_ballot["choices"]
     for index, answer in enumerate(valid_answers):
       # we add 1 to the index because raw_ballot.choice[0] is just the
@@ -1124,18 +1117,15 @@ class TestNVotesCodec(unittest.TestCase):
             ),
             dict(
               id=4,
-              text='E',
               selected=1,
               urls=[dict(title='isWriteIn', url='true')]
             ),
             dict(
               id=5,
-              text='',
               urls=[dict(title='isWriteIn', url='true')]
             ),
             dict(
               id=6,
-              text='Ä bc',
               urls=[dict(title='isWriteIn', url='true')]
             )
           ]
@@ -1150,6 +1140,7 @@ class TestNVotesCodec(unittest.TestCase):
             dict(id=2, selected=-1),
             dict(
               id=3,
+              selected=-1,
               urls=[dict(title='invalidVoteFlag', url='true')]
             ),
             dict(
@@ -1190,7 +1181,7 @@ class TestNVotesCodec(unittest.TestCase):
         data['decoded_ballot']
       )
 
-  def test_decode_raw_ballot(self):
+  def test_decode_raw_ballot2(self):
     # The question contains the minimum data required for the encoder to work
     data_list = [
       dict(
