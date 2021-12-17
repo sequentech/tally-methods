@@ -97,18 +97,19 @@ class DesbordaTally(BaseTally):
         Add to the count a vote from a voter
         '''
         answers = copy.deepcopy(voter_answers[self.question_num]['choices'])
-        # we got ourselves an invalid vote, don't count it
-        if answers is None or -1 in answers:
+        # do not count blank or invalid votes
+        if (
+            voter_answers[self.question_num]['is_blank'] or
+            voter_answers[self.question_num]['is_null']
+        ):
             return
         key_answers = str(answers)
 
-        # don't count blank/invalid votes
-        if len(answers) > 0:
-            # if ballot found, increment the count. Else, create a ballot and add it
-            if key_answers in self.ballots:
-                self.ballots[key_answers]['votes'] += 1
-            else:
-                self.ballots[key_answers] = dict(votes=1, answers=answers)
+        # if ballot found, increment the count. Else, create a ballot and add it
+        if key_answers in self.ballots:
+            self.ballots[key_answers]['votes'] += 1
+        else:
+            self.ballots[key_answers] = dict(votes=1, answers=answers)
 
     def desborda_tally(self, question, ballots):
         voters_by_position = [0] * question['max']
