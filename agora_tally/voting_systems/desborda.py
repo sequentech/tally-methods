@@ -16,7 +16,12 @@
 import copy
 from operator import itemgetter
 
-from .base import BaseVotingSystem, BaseTally
+from .base import (
+    BaseVotingSystem, 
+    BaseTally, 
+    WeightedChoice, 
+    get_key
+)
 
 # Definition of this system: 
 # http://pabloechenique.info/wp-content/uploads/2016/12/DesBorda-sistema-Echenique.pdf
@@ -70,98 +75,78 @@ class DesbordaTally(BaseTally):
 
     method_name = "Desborda"
 
-    # report object
-    report = None
 
     def init(self):
         self.ballots = dict()
 
-        def custom_subparser(decoded_ballot, _question, withdrawals):
+        def custom_subparser(decoded_ballot, question, withdrawals):
+            answers = set()
+
             sorted_ballot_answers = copy.deepcopy(decoded_ballot['answers'])
             sorted_ballot_answers.sort(key=itemgetter('selected'))
-            return [
-                answer['id']
+            filtered_ballot_answers = [
+                answer
                 for answer in sorted_ballot_answers
                 if answer['selected'] > -1 and answer['id'] not in withdrawals
             ]
+
+            max_points = 80
+
+            for index, answer in enumerate(filtered_ballot_answers):
+                if answer['selected'] < 0 or answer['id'] in withdrawals:
+                    continue
+
+                answers.add(
+                    WeightedChoice(
+                        key=get_key(answer),
+                        answer_id=answer['id'],
+                        points=max(1, max_points - index)
+                    )
+                )
+            return frozenset(answers)
+
         self.custom_subparser = custom_subparser
 
     def pre_tally(self, questions):
         '''
         Function called once before the tally begins
         '''
-        pass
+        super().pre_tally(questions)
+        
+        # initialize voters_by_position
+        question = questions[self.question_num]
+        for answer in self.normal_answers.values():
+            answer['voters_by_position'] = [0] * question['max']
 
     def add_vote(self, voter_answers, questions, is_delegated):
         '''
         Add to the count a vote from a voter
         '''
-        answers = copy.deepcopy(voter_answers[self.question_num]['choices'])
-        # do not count blank or invalid votes
+        super().add_vote(voter_answers, questions, is_delegated)
+
         if (
             voter_answers[self.question_num]['is_blank'] or
             voter_answers[self.question_num]['is_null']
         ):
             return
-        key_answers = str(answers)
 
-        # if ballot found, increment the count. Else, create a ballot and add it
-        if key_answers in self.ballots:
-            self.ballots[key_answers]['votes'] += 1
-        else:
-            self.ballots[key_answers] = dict(votes=1, answers=answers)
-
-    def desborda_tally(self, question, ballots):
-        voters_by_position = [0] * question['max']
-        for answer in question['answers']:
-            answer['voters_by_position'] = copy.deepcopy(voters_by_position)
-            answer['total_count'] = 0
-            answer['winner_position'] = None
-
-        # fill the 'voters_by_position' field on each answer
-        for ballot_name, ballot in ballots.items():
-            # "[50, 1, 4, 8]" : 
-            # {
-            #   'votes': 4
-            #   'answers': [50, 1, 4, 8]
-            # }
-            question['totals']['valid_votes'] += ballot['votes']
-            for index, option in enumerate(ballot['answers']):
-                question['answers'][option]['voters_by_position'][index] += ballot['votes']
-
-        # do the total count, assigning 80, 79, 78... points for each vote
-        # on each answer depending on the position of the vote
-        for answer in question['answers']:
-            for index, num_voters in enumerate(answer['voters_by_position']):
-                answer['total_count'] += (80-index) * num_voters
-
-        # first order by the name of the eligible answers
-        sorted_by_text = sorted(
-            question['answers'],
-            key = lambda x: x['text'])
-
-        # then order in reverse by the total count
-        sorted_winners = sorted(
-            sorted_by_text,
-            key = lambda x: x['total_count'],
-            reverse = True)# [:question['num_winners']]
-
-        for winner_pos, winner in enumerate(sorted_winners):
-            winner['winner_position'] = winner_pos
-
-    def perform_tally(self, questions):
-        self.report = {}
-        report = self.report
+        # count voters by position
         question = questions[self.question_num]
-        self.desborda_tally(question, self.ballots)
+        choices = voter_answers[self.question_num]['choices']
+        choices = sorted(
+            list(choices),
+            key=lambda choice: choice.points,
+            reverse=True
+        )
 
-    def post_tally(self, questions):
-        '''
-        '''
-        self.perform_tally(questions)
+        for choice_index, choice in enumerate(choices):
+            answer = None
 
-    def get_log(self):
-        '''
-        Returns the tally log. Called after post_tally()
-        '''
-        return self.report
+            if isinstance(choice.key, str):
+                answer = self.write_in_answers[choice.key]
+                # initialize voters_by_position if needed in write-ins
+                if 'voters_by_position' not in answer:
+                    answer['voters_by_position'] = [0] * question['max']
+            else:
+                answer = self.normal_answers[choice.key]
+            answer['voters_by_position'][choice_index] += 1
