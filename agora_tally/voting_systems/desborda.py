@@ -150,3 +150,14 @@ class DesbordaTally(BaseTally):
             else:
                 answer = self.normal_answers[choice.key]
             answer['voters_by_position'][choice_index] += 1
+
+    def post_tally(self, questions):
+        super().post_tally(questions)
+        question = questions[self.question_num]
+        sorted_answers = sorted(
+            question['answers'],
+            key = lambda x: x['total_count'],
+            reverse = True
+        )
+        for index, answer in enumerate(sorted_answers):
+            answer['winner_position'] = index
