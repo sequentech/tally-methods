@@ -17,7 +17,7 @@ from setuptools import setup
 
 setup(
     name='agora-tally',
-    version='5.0.6',
+    version='5.0.7',
     author='Agora Voting SL',
     author_email='contact@nvotes.com',
     packages=['agora_tally', 'agora_tally.voting_systems'],
