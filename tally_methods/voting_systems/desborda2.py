@@ -1,17 +1,17 @@
-# This file is part of agora-tally.
-# Copyright (C) 2017  Agora Voting SL <agora@agoravoting.com>
+# This file is part of tally-methods.
+# Copyright (C) 2017  Sequent Tech Inc <legal@sequentech.io>
 
-# agora-tally is free software: you can redistribute it and/or modify
+# tally-methods is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
 # the Free Software Foundation, either version 3 of the License.
 
-# agora-tally  is distributed in the hope that it will be useful,
+# tally-methods  is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
 
 # You should have received a copy of the GNU Affero General Public License
-# along with agora-tally.  If not, see <http://www.gnu.org/licenses/>.
+# along with tally-methods.  If not, see <http://www.gnu.org/licenses/>.
 
 import copy
 import math
@@ -62,7 +62,7 @@ from .base import (
 
 class Desborda2(BaseVotingSystem):
     '''
-    Defines the helper functions that allows agora to manage an OpenSTV-based
+    Defines the helper functions that allows sequent to manage an OpenSTV-based
      Borda voting system.
     '''
 
@@ -127,7 +127,7 @@ class Desborda2Tally(BaseTally):
             # max_points = floor(N + 3N/10)
             #
             # NOTE: Using here 'max' instead of 'num_winners' as requested in
-            # https://gitlab.nvotes.com/nvotes/pode-22/issues/15
+            # https://gitlab.sequentech.io/sequent/pode-22/issues/15
             if 'bordas-max-points' not in question:
                 base_max_points = question['max']
             else:
