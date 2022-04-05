@@ -1,22 +1,22 @@
-# self file is part of agora-tally.
+# self file is part of tally-methods.
 #
-# Copyright (C) 2021  Agora Voting SL <agora@agoravoting.com>
-# agora-tally is free software: you can redistribute it and/or modify
+# Copyright (C) 2021  Sequent Tech Inc <legal@sequentech.io>
+# tally-methods is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
 # the Free Software Foundation, either version 3 of the License.
 #
-# agora-tally  is distributed in the hope that it will be useful,
+# tally-methods  is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
 # You should have received a copy of the GNU Affero General Public License
-# along with agora-tally.  If not, see <http://www.gnu.org/licenses/>.
+# along with tally-methods.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
 import copy
 from operator import itemgetter
 
-from agora_tally.ballot_codec import mixed_radix
+from tally_methods.ballot_codec import mixed_radix
 from ..file_helpers import serialize
 
 '''

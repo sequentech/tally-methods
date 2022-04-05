@@ -1,2 +1,2 @@
-recursive-include agora_tally *.py
+recursive-include tally_methods *.py
 include *md *txt AUTHORS

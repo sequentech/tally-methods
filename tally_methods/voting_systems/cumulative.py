@@ -1,29 +1,33 @@
-# This file is part of agora-tally.
-# Copyright (C) 2013-2021  Agora Voting SL <agora@agoravoting.com>
+# This file is part of tally-methods.
+# Copyright (C) 2013-2021  Sequent Tech Inc <legal@sequentech.io>
 
-# agora-tally is free software: you can redistribute it and/or modify
+# tally-methods is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
 # the Free Software Foundation, either version 3 of the License.
 
-# agora-tally  is distributed in the hope that it will be useful,
+# tally-methods  is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
 
 # You should have received a copy of the GNU Affero General Public License
-# along with agora-tally.  If not, see <http://www.gnu.org/licenses/>.
+# along with tally-methods.  If not, see <http://www.gnu.org/licenses/>.
+
+import copy
+from collections import defaultdict
 
 from .base import (
     BaseVotingSystem, 
     BaseTally, 
-    WeightedChoice, 
-    get_key
+    BlankVoteException,
+    get_key,
+    WeightedChoice
 )
 
-class PluralityAtLarge(BaseVotingSystem):
+class Cumulative(BaseVotingSystem):
     '''
-    Defines the helper functions that allows agora to manage an OpenSTV-based
-    Plurality at large voting system.
+    Defines the helper functions that allows sequent to manage a
+    cumulative voting system.
     '''
 
     @staticmethod
@@ -32,25 +36,25 @@ class PluralityAtLarge(BaseVotingSystem):
         Returns the identifier of the voting system, used internally to
         discriminate  the voting system used in an election
         '''
-        return 'plurality-at-large'
+        return 'cumulative'
 
     @staticmethod
     def get_description():
-        return _('Plurality at large voting')
+        return _('Cumulative voting')
 
     @staticmethod
     def create_tally(question, question_num):
         '''
         Create object that helps to compute the tally
         '''
-        return PluralityAtLargeTally(
+        return CumulativeTally(
             question=question,
             question_num=question_num
         )
 
-class PluralityAtLargeTally(BaseTally):
+class CumulativeTally(BaseTally):
     '''
-    Class used to tally an election
+    Class used to tally a cumulative election
     '''
     def init(self):
         def custom_subparser(decoded_ballot, question, withdrawals):
@@ -63,11 +67,10 @@ class PluralityAtLargeTally(BaseTally):
                 answers.add(
                     WeightedChoice(
                         key=get_key(answer),
-                        answer_id=answer['id'],
-                        points=(answer['selected'] + 1)
+                        points=(answer['selected'] + 1),
+                        answer_id=answer['id']
                     )
                 )
             return frozenset(answers)
 
         self.custom_subparser = custom_subparser
-

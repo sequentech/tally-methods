@@ -7,11 +7,11 @@ import json
 import six
 from operator import itemgetter
 
-from agora_tally.tally import do_tartally, do_dirtally, do_tally
-from agora_tally.voting_systems.plurality_at_large import PluralityAtLarge
-from agora_tally import file_helpers
-from agora_tally.ballot_codec.mixed_radix import TestMixedRadix
-from agora_tally.ballot_codec.nvotes_codec import TestNVotesCodec
+from tally_methods.tally import do_tartally, do_dirtally, do_tally
+from tally_methods.voting_systems.plurality_at_large import PluralityAtLarge
+from tally_methods import file_helpers
+from tally_methods.ballot_codec.mixed_radix import TestMixedRadix
+from tally_methods.ballot_codec.sequent_codec import TestNVotesCodec
 
 import test.desborda_test
 import test.desborda_test_data

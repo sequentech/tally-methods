@@ -1,32 +1,32 @@
-# This file is part of agora-tally.
-# Copyright (C) 2013-2016  Agora Voting SL <agora@agoravoting.com>
+# This file is part of tally-methods.
+# Copyright (C) 2013-2016  Sequent Tech Inc <legal@sequentech.io>
 
-# agora-tally is free software: you can redistribute it and/or modify
+# tally-methods is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
 # the Free Software Foundation, either version 3 of the License.
 
-# agora-tally  is distributed in the hope that it will be useful,
+# tally-methods  is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
 
 # You should have received a copy of the GNU Affero General Public License
-# along with agora-tally.  If not, see <http://www.gnu.org/licenses/>.
+# along with tally-methods.  If not, see <http://www.gnu.org/licenses/>.
 
 from importlib import import_module
 from collections import defaultdict
 import copy
-from agora_tally.ballot_codec.nvotes_codec import NVotesCodec
+from tally_methods.ballot_codec.sequent_codec import NVotesCodec
 
 VOTING_METHODS = (
-    'agora_tally.voting_systems.plurality_at_large.PluralityAtLarge',
-    'agora_tally.voting_systems.borda_nauru.BordaNauru',
-    'agora_tally.voting_systems.borda.Borda',
-    'agora_tally.voting_systems.borda_custom.BordaCustom',
-    'agora_tally.voting_systems.desborda.Desborda',
-    'agora_tally.voting_systems.desborda2.Desborda2',
-    'agora_tally.voting_systems.desborda3.Desborda3',
-    'agora_tally.voting_systems.cumulative.Cumulative',
+    'tally_methods.voting_systems.plurality_at_large.PluralityAtLarge',
+    'tally_methods.voting_systems.borda_nauru.BordaNauru',
+    'tally_methods.voting_systems.borda.Borda',
+    'tally_methods.voting_systems.borda_custom.BordaCustom',
+    'tally_methods.voting_systems.desborda.Desborda',
+    'tally_methods.voting_systems.desborda2.Desborda2',
+    'tally_methods.voting_systems.desborda3.Desborda3',
+    'tally_methods.voting_systems.cumulative.Cumulative',
 )
 
 def get_voting_system_classes():
@@ -89,7 +89,7 @@ class WeightedChoice:
 
 class BaseVotingSystem(object):
     '''
-    Defines the helper functions that allows agora to manage a voting system.
+    Defines the helper functions that allows sequent to manage a voting system.
     '''
 
     @staticmethod
