@@ -16,7 +16,8 @@
 from .base import (
     BaseVotingSystem, 
     BaseTally, 
-    WeightedChoice, 
+    WeightedChoice,
+    ImplicitInvalidVoteException,
     get_key
 )
 from .borda import BordaTally
@@ -50,6 +51,7 @@ class BordaNauruTally(BordaTally):
     def init(self):
         def custom_subparser(decoded_ballot, question, withdrawals):
             answers = set()
+            exception = None
 
             for answer in decoded_ballot["answers"]:
                 if answer['selected'] < 0 or answer['id'] in withdrawals:
@@ -71,7 +73,7 @@ class BordaNauruTally(BordaTally):
             ]
             # - no position is repeated
             if len(selection) != len(set(selection)):
-                raise Exception()
+                exception = 'implicit'
 
             selection_sorted = sorted(selection)
             should_be_selection_sorted = [
@@ -80,8 +82,12 @@ class BordaNauruTally(BordaTally):
             ]
             # - no missing position in-between
             if selection_sorted != should_be_selection_sorted:
-                raise Exception()
+                exception = 'implicit'
 
-            return frozenset(answers)
+            ret_value = frozenset(answers)
+            if exception is None:
+                return ret_value
+            else:
+                raise ImplicitInvalidVoteException(ret_value)
 
         self.custom_subparser = custom_subparser
