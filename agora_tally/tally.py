@@ -16,7 +16,10 @@
 # along with agora-tally.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from agora_tally.voting_systems.base import get_voting_system_by_id, BlankVoteException
+from agora_tally.voting_systems.base import (
+    get_voting_system_by_id,
+    BlankVoteException
+)
 
 import copy
 import glob
