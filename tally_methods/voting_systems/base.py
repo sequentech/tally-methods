@@ -181,11 +181,12 @@ class BaseTally(object):
         '''
         raw_ballot = self.decoder.decode_from_int(int_ballot)
         decoded_ballot = self.decoder.decode_raw_ballot(raw_ballot)
+        exception = None
 
         # detect if the ballot was marked as invalid, even if there's no 
         # explicit invalid answer
         if raw_ballot['choices'][0] > 0:
-            raise Exception()
+            exception = 'explicit'
     
         non_blank_unwithdrawed_answers = None
         if self.custom_subparser is None:
@@ -208,8 +209,8 @@ class BaseTally(object):
                 withdrawals
             )
 
-        if len(non_blank_unwithdrawed_answers) == 0:
-            raise BlankVoteException()
+        if len(non_blank_unwithdrawed_answers) == 0 and exception is None:
+            exception = 'blank'
         
         # check that no write-in is repeated or else it's an invalid vote
         write_in_answers = [
@@ -220,15 +221,15 @@ class BaseTally(object):
                 len(answer['text']) > 0
             )
         ]
-        if len(write_in_answers) != len(set(write_in_answers)):
-            raise Exception()
+        if len(write_in_answers) != len(set(write_in_answers)) and exception != 'explicit':
+            exception = 'implicit'
 
         # detect and deal with different types of invalid votes
         if (
             len(non_blank_unwithdrawed_answers) < question['min'] or 
             len(set(non_blank_unwithdrawed_answers)) != len(non_blank_unwithdrawed_answers)
-        ):
-            raise Exception()
+        ) and exception != 'explicit':
+            exception = 'implicit'
 
         truncate = False
         if len(non_blank_unwithdrawed_answers) > question['max']:
@@ -239,8 +240,8 @@ class BaseTally(object):
                 non_blank_unwithdrawed_answers = \
                     non_blank_unwithdrawed_answers[:question['max']]
                 truncate = True
-            else:
-                raise Exception()
+            elif exception != 'explicit':
+                exception = 'implicit'
         
         # if panachage is disabled and vote is for answer of multiple categories
         # then it's an invalid vote
@@ -255,10 +256,20 @@ class BaseTally(object):
             ]
             if truncate:
                 filtered_answer_categories = filtered_answer_categories[:question['max']]
-            if len(set(filtered_answer_categories)) > 1:
-                raise Exception()
+            if (
+                len(set(filtered_answer_categories)) > 1 and
+                exception != 'explicit'
+            ):
+                exception = 'implicit'
 
-        return non_blank_unwithdrawed_answers
+        if exception is None:
+            return non_blank_unwithdrawed_answers
+        elif exception == 'blank':
+            raise BlankVoteException(non_blank_unwithdrawed_answers)
+        elif exception == 'explicit':
+            raise ExplicitInvalidVoteException(non_blank_unwithdrawed_answers)
+        elif exception == 'implicit':
+            raise ImplicitInvalidVoteException(non_blank_unwithdrawed_answers)
 
     def add_vote(self, voter_answers, questions, is_delegated):
         '''
@@ -354,3 +365,19 @@ class BaseTally(object):
 
 class BlankVoteException(Exception):
     pass
+
+class ExplicitInvalidVoteException(Exception):
+
+    ballot = None
+
+    def __init__(self, ballot):
+        self.ballot = ballot
+        super().__init__()
+
+class ImplicitInvalidVoteException(Exception):
+
+    ballot = None
+
+    def __init__(self, ballot):
+        self.ballot = ballot
+        super().__init__()

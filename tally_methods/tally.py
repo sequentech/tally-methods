@@ -16,7 +16,10 @@
 # along with tally-methods.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from tally_methods.voting_systems.base import get_voting_system_by_id, BlankVoteException
+from tally_methods.voting_systems.base import (
+    get_voting_system_by_id,
+    BlankVoteException
+)
 
 import copy
 import glob
