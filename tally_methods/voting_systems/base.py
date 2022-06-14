@@ -364,7 +364,11 @@ class BaseTally(object):
 
 
 class BlankVoteException(Exception):
-    pass
+    ballot = None
+
+    def __init__(self, ballot):
+        self.ballot = ballot
+        super().__init__()
 
 class ExplicitInvalidVoteException(Exception):
 
