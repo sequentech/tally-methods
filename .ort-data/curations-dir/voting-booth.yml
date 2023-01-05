@@ -1,7 +1,0 @@
-- id: "Yarn::voting-booth"
-  curations:
-    comment: "This package needs to be downloaded from git"
-    vcs:
-      type: "git"
-      url: "https://github.com/sequentech/common-ui.git"
-      revision: "4.0.1"
