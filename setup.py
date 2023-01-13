@@ -17,7 +17,7 @@ from setuptools import setup
 
 setup(
     name='tally-methods',
-    version='7.1.0',
+    version='7.1.1',
     author='Sequent Tech Inc',
     author_email='legal@sequentech.io',
     packages=['tally_methods', 'tally_methods.voting_systems'],
